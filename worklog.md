@@ -456,3 +456,28 @@ Stage Summary:
 - PDF ficha generation creates branded document with apartment details and PRAGA design system
 - PlantaInteractiva "Descargar Ficha" button wired to PDF API
 - Zero lint errors, all compiles cleanly
+---
+Task ID: 1
+Agent: Main Agent
+Task: Download, optimize, and integrate real SketchUp model into PRAGA Living
+
+Work Log:
+- Downloaded 903MB OBJ file from Google Drive (modelo1211.obj)
+- Analyzed model: 5,550,190 vertices, 8,409,430 faces, 15M+ estimated triangles, 514 materials
+- Model too large for direct web use (902MB, 15M triangles)
+- Created spatial grid decimation pipeline (8x20x8 grid cells)
+- Converted to GLB with 200K triangles, 473K vertices (96% geometry reduction)
+- Output: 16.7MB GLB file (praga-building.glb)
+- Updated BuildingScene.tsx to load real GLB model with useGLTF
+- Added fallback to procedural building if GLB fails to load
+- Added level highlighting, click zones, and PRAGA material overrides
+- Built successfully with Next.js 16.1.3
+- Pushed to GitHub (commit d4df086)
+- Vercel auto-deploys from GitHub
+
+Stage Summary:
+- Real SketchUp model now integrated as optimized GLB (17MB)
+- Model centered at origin, scaled to max dimension 12 units
+- BuildingScene supports real model + procedural fallback
+- URL: https://my-project-psi-sage.vercel.app
+- GitHub: https://github.com/yecos/PragaLiving
