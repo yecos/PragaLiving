@@ -481,3 +481,32 @@ Stage Summary:
 - BuildingScene supports real model + procedural fallback
 - URL: https://my-project-psi-sage.vercel.app
 - GitHub: https://github.com/yecos/PragaLiving
+---
+Task ID: 3
+Agent: Main Agent + Full-stack Developer
+Task: Create detailed procedural model based on real PRAGA Living planimetry
+
+Work Log:
+- Analyzed 7 planimetry images with VLM (parking, facades, sections, roofs, floor plan, social area, 1st floor)
+- Downloaded and analyzed OBJ model for exact dimensions: 32.52m × 26.04m footprint, 60.29m height
+- Identified real building structure: 3 basements, access, commercial, social, 12 residential floors, rooftop
+- Found 12 apartments per floor (6 per wing around central atrium)
+- Found apartment types: Tipo A (~73.70m², 1 alcoba) and Tipo B (~85-95m², 2 alcobas)
+- Found amenities: Ludoteca, Gimnasio, Vitality Pool, Salón Social, Sauna, Baño Turco
+- Found commercial spaces: Local 1 (43.17m²) and Locales 9701/9801 (558.91m²)
+- Created detailed procedural model with two-wing architecture, central atrium, balconies, greenery
+- Updated BuildingScene.tsx (840 lines) with real proportions and 18 floor levels
+- Updated ExplorarEdificio.tsx with real building level descriptions
+- Updated data.ts (383 lines) with 144 apartments and realistic pricing
+- Updated PlantaInteractiva.tsx (1245 lines) with 12-apartment layout
+- Copied 7 planimetry images to /public/images/planos/
+- Build passes successfully
+- Pushed to GitHub (commit ca516e4)
+- Vercel auto-deploys from GitHub
+
+Stage Summary:
+- Complete procedural model based on real planimetry data
+- 144 apartments with realistic Colombian pricing ($180M-$395M COP)
+- All building data reflects actual architectural plans
+- URL: https://my-project-psi-sage.vercel.app
+- GitHub: https://github.com/yecos/PragaLiving
