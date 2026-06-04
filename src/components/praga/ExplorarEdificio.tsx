@@ -30,33 +30,33 @@ const buildingLevels = [
     render: '/images/renders/hero-day.jpg',
   },
   {
-    id: 'residencial-12',
-    name: 'Pisos 9–12',
-    type: 'Residencial Premium · 2 Alcobas',
+    id: 'residencial-11',
+    name: 'Pisos 9–11',
+    type: 'Residencial Premium · 3 Alcobas',
     icon: '▦',
     description:
-      'Los niveles más exclusivos con apartamentos de 2 y 3 alcobas con vestier, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el Valle de Aburrá y la Autopista Sur. 4 apartamentos por piso.',
-    features: ['3 Alcobas Vestier', 'Balcón jardín', '2 Baños', '4 Aptos/Piso'],
+      'Los niveles más exclusivos con apartamentos de 3 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el valle de Aburrá y los cerros de Caldas.',
+    features: ['3 Alcobas', 'Balcón jardín', '2 Baños', 'Vista panorámica'],
     render: '/images/renders/apto-97.png',
   },
   {
     id: 'residencial-8',
     name: 'Pisos 5–8',
-    type: 'Residencial · 1-2 Alcobas',
+    type: 'Residencial · 2-3 Alcobas',
     icon: '▦',
     description:
-      'Niveles intermedios con tipologías de 1 y 2 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. 4 apartamentos por piso organizados en dos alas.',
-    features: ['1-2 Alcobas', 'Patio central', 'Ventilación cruzada', '4 Aptos/Piso'],
+      'Niveles intermedios con tipologías de 2 y 3 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. Apartamentos por piso organizados en dos alas con vistas a Caldas.',
+    features: ['2-3 Alcobas', 'Patio central', 'Ventilación cruzada', 'Balcones verdes'],
     render: '/images/renders/apto-74.png',
   },
   {
     id: 'residencial-4',
     name: 'Pisos 1–4',
-    type: 'Residencial · 1 Alcoba',
+    type: 'Residencial · 2 Alcobas',
     icon: '▦',
     description:
-      'Primeros pisos residenciales con apartamentos tipo de 1 y 2 alcobas (~68-90 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo. 4 apartamentos por piso.',
-    features: ['1-2 Alcobas', 'Vista al atrio', 'Acceso amenidades', '4 Aptos/Piso'],
+      'Primeros pisos residenciales con apartamentos tipo de 2 alcobas (~48 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo.',
+    features: ['2 Alcobas ~48m²', 'Vista al atrio', 'Acceso amenidades', 'Distribución eficiente'],
     render: '/images/renders/apto-57.png',
   },
   {
@@ -76,7 +76,7 @@ const buildingLevels = [
     icon: '□',
     description:
       'Dos locales comerciales de 558.91 m² en la base del edificio, con acceso independiente desde la Calle 133 Sur. Espacios versátiles para café, retail o servicios.',
-    features: ['2 Locales', '558.91 m²', 'Acceso independiente', 'Calle 133 Sur'],
+    features: ['2 Locales', '558.91 m²', 'Acceso independiente', 'Carrera 50'],
     render: '/images/renders/lobby.png',
   },
   {
@@ -116,10 +116,8 @@ const stats = [
   { label: 'Nivel Acceso', value: '1' },
   { label: 'Nivel Comercial', value: '1' },
   { label: 'Zona Social', value: '1' },
-  { label: 'Pisos Residenciales', value: '12' },
-  { label: 'Total Niveles', value: '18' },
-  { label: 'Aptos/Piso', value: '4' },
-  { label: 'Total Aptos', value: '48' },
+  { label: 'Pisos Residenciales', value: '11' },
+  { label: 'Total Niveles', value: '17' },
 ]
 
 /* ─── Loading Fallback for 3D Canvas ─── */
@@ -374,7 +372,7 @@ export default function ExplorarEdificio() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 1 }}
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-px mt-12 bg-[#D8D1C8]/5"
+          className="grid grid-cols-2 md:grid-cols-6 gap-px mt-12 bg-[#D8D1C8]/5"
         >
           {stats.map((stat, i) => (
             <div key={i} className="text-center p-5 bg-[#0A0A0A]">

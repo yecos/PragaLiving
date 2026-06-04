@@ -43,25 +43,30 @@ interface UnitLayoutDef {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SVG COORDINATE CONSTANTS
+// SVG COORDINATE CONSTANTS — Long rectangular slab (45.50m × 17.50m)
 // ═══════════════════════════════════════════════════════════════════
 
 const VB_W = 800
-const VB_H = 600
+const VB_H = 400
 
 // Building outline
-const BX = 40, BY = 20, BW = 720, BH = 560
+const BX = 40, BY = 40, BW = 720, BH = 200
 
-// Atrium void
-const AX = 290, AY = 230, AW = 220, AH = 160
+// Corridor strip (horizontal, running the length of the building)
+const CY_TOP = 112
+const CY_H = 56
+const CY_BOT = CY_TOP + CY_H // 168
 
-// Elevator core
-const ELX = 365, ELY = 75, ELW = 55, ELH = 110
+// Atrium void (central patio in corridor)
+const AX = 310, AY = CY_TOP, AW = 180, AH = CY_H
 
-// Stairwell
-const STX = 420, STY = 75, STW = 55, STH = 110
+// Elevator core (2 elevators, center-left of corridor)
+const ELX = 335, ELY = CY_TOP + 6, ELW = 55, ELH = CY_H - 12
 
-// Corridor width
+// Stairwell (center-right of corridor)
+const STX = 400, STY = CY_TOP + 6, STW = 50, STH = CY_H - 12
+
+// Corridor width (kept for legacy layout6 compatibility)
 const CW = 40
 
 // ═══════════════════════════════════════════════════════════════════
@@ -90,56 +95,76 @@ const STATUS_LABELS: Record<UnitStatus, string> = {
 // UNIT POLYGON LAYOUTS
 // ═══════════════════════════════════════════════════════════════════
 
-// 4 apartments per floor: 2 per wing (west + east)
-// West wing: 2 units (smaller, 1-2 alcobas) · East wing: 2 units (larger, 2-3 alcobas)
-function layout4(): UnitLayoutDef[] {
-  const midY = BY + BH / 2
-  const lwW = AX - BX - CW // west wing width
-  const rwX = AX + AW + CW // east wing start X
-  const rwW = BX + BW - rwX // east wing width
+// 12 apartments per floor: long rectangular slab
+// Top row: 6 units (Tipo A corners + Tipo B interior)
+// Bottom row: 6 units (mirrored)
+// Central corridor with atrium, elevators, stairwell
+function layout12(): UnitLayoutDef[] {
+  const topY = BY
+  const topBot = CY_TOP
+  const topH = topBot - topY // 72
+  const botTop = CY_BOT
+  const botBot = BY + BH
+  const botH = botBot - botTop // 72
 
-  // West wing: top unit + bottom unit
-  const westTopH = midY - BY - 10
-  const westBotY = midY + 10
-  const westBotH = BY + BH - westBotY
-
-  // East wing: top unit + bottom unit
-  const eastTopH = midY - BY - 10
-  const eastBotY = midY + 10
-  const eastBotH = BY + BH - eastBotY
+  // Tipo A (corner) units are wider; Tipo B (interior) are narrower
+  const aW = 130 // Tipo A width
+  const bW = (BW - 2 * aW) / 4 // Tipo B width = (720 - 260) / 4 = 115
 
   return [
-    // West wing - top unit (Unit 1: APTO 02 / 1 alcoba)
-    { polygon: [[BX, BY], [AX - CW, BY], [AX - CW, midY - 10], [BX, midY - 10]], center: [(BX + AX - CW) / 2, BY + westTopH / 2] },
-    // West wing - bottom unit (Unit 2: APTO 05 / 1-2 alcobas)
-    { polygon: [[BX, westBotY], [AX - CW, westBotY], [AX - CW, BY + BH], [BX, BY + BH]], center: [(BX + AX - CW) / 2, westBotY + westBotH / 2] },
-    // East wing - top unit (Unit 3: 2 alcobas)
-    { polygon: [[rwX, BY], [BX + BW, BY], [BX + BW, midY - 10], [rwX, midY - 10]], center: [(rwX + BX + BW) / 2, BY + eastTopH / 2] },
-    // East wing - bottom unit (Unit 4: 3 alcobas vestier)
-    { polygon: [[rwX, eastBotY], [BX + BW, eastBotY], [BX + BW, BY + BH], [rwX, BY + BH]], center: [(rwX + BX + BW) / 2, eastBotY + eastBotH / 2] },
+    // ── Top row ──
+    // Unit 0: Tipo A (left corner)
+    { polygon: [[BX, topY], [BX + aW, topY], [BX + aW, topBot], [BX, topBot]], center: [BX + aW / 2, topY + topH / 2] },
+    // Unit 1: Tipo B
+    { polygon: [[BX + aW, topY], [BX + aW + bW, topY], [BX + aW + bW, topBot], [BX + aW, topBot]], center: [BX + aW + bW / 2, topY + topH / 2] },
+    // Unit 2: Tipo B
+    { polygon: [[BX + aW + bW, topY], [BX + aW + bW * 2, topY], [BX + aW + bW * 2, topBot], [BX + aW + bW, topBot]], center: [BX + aW + bW * 1.5, topY + topH / 2] },
+    // Unit 3: Tipo B
+    { polygon: [[BX + aW + bW * 2, topY], [BX + aW + bW * 3, topY], [BX + aW + bW * 3, topBot], [BX + aW + bW * 2, topBot]], center: [BX + aW + bW * 2.5, topY + topH / 2] },
+    // Unit 4: Tipo B
+    { polygon: [[BX + aW + bW * 3, topY], [BX + aW + bW * 4, topY], [BX + aW + bW * 4, topBot], [BX + aW + bW * 3, topBot]], center: [BX + aW + bW * 3.5, topY + topH / 2] },
+    // Unit 5: Tipo A (right corner)
+    { polygon: [[BX + aW + bW * 4, topY], [BX + BW, topY], [BX + BW, topBot], [BX + aW + bW * 4, topBot]], center: [BX + aW + bW * 4 + aW / 2, topY + topH / 2] },
+
+    // ── Bottom row ──
+    // Unit 6: Tipo A (left corner)
+    { polygon: [[BX, botTop], [BX + aW, botTop], [BX + aW, botBot], [BX, botBot]], center: [BX + aW / 2, botTop + botH / 2] },
+    // Unit 7: Tipo B
+    { polygon: [[BX + aW, botTop], [BX + aW + bW, botTop], [BX + aW + bW, botBot], [BX + aW, botBot]], center: [BX + aW + bW / 2, botTop + botH / 2] },
+    // Unit 8: Tipo B
+    { polygon: [[BX + aW + bW, botTop], [BX + aW + bW * 2, botTop], [BX + aW + bW * 2, botBot], [BX + aW + bW, botBot]], center: [BX + aW + bW * 1.5, botTop + botH / 2] },
+    // Unit 9: Tipo B
+    { polygon: [[BX + aW + bW * 2, botTop], [BX + aW + bW * 3, botTop], [BX + aW + bW * 3, botBot], [BX + aW + bW * 2, botBot]], center: [BX + aW + bW * 2.5, botTop + botH / 2] },
+    // Unit 10: Tipo B
+    { polygon: [[BX + aW + bW * 3, botTop], [BX + aW + bW * 4, botTop], [BX + aW + bW * 4, botBot], [BX + aW + bW * 3, botBot]], center: [BX + aW + bW * 3.5, botTop + botH / 2] },
+    // Unit 11: Tipo A (right corner)
+    { polygon: [[BX + aW + bW * 4, botTop], [BX + BW, botTop], [BX + BW, botBot], [BX + aW + bW * 4, botBot]], center: [BX + aW + bW * 4 + aW / 2, botTop + botH / 2] },
   ]
 }
 
 function layout6(): UnitLayoutDef[] {
+  const midX = BX + BW / 2
   return [
-    { polygon: [[BX, BY], [AX, BY], [AX, AY], [BX, AY]], center: [165, 125] },
-    { polygon: [[AX + AW, BY], [BX + BW, BY], [BX + BW, AY], [AX + AW, AY]], center: [635, 125] },
-    { polygon: [[BX, AY], [AX - CW, AY], [AX - CW, AY + AH], [BX, AY + AH]], center: [145, 310] },
-    { polygon: [[AX + AW + CW, AY], [BX + BW, AY], [BX + BW, AY + AH], [AX + AW + CW, AY + AH]], center: [655, 310] },
-    { polygon: [[BX, AY + AH], [AX, AY + AH], [AX, BY + BH], [BX, BY + BH]], center: [165, 485] },
-    { polygon: [[AX + AW, AY + AH], [BX + BW, AY + AH], [BX + BW, BY + BH], [AX + AW, BY + BH]], center: [635, 485] },
+    { polygon: [[BX, BY], [midX - 5, BY], [midX - 5, CY_TOP], [BX, CY_TOP]], center: [BX + (midX - 5 - BX) / 2, BY + (CY_TOP - BY) / 2] },
+    { polygon: [[midX + 5, BY], [BX + BW, BY], [BX + BW, CY_TOP], [midX + 5, CY_TOP]], center: [midX + 5 + (BX + BW - midX - 5) / 2, BY + (CY_TOP - BY) / 2] },
+    { polygon: [[BX, CY_BOT], [midX - 5, CY_BOT], [midX - 5, BY + BH], [BX, BY + BH]], center: [BX + (midX - 5 - BX) / 2, CY_BOT + (BY + BH - CY_BOT) / 2] },
+    { polygon: [[midX + 5, CY_BOT], [BX + BW, CY_BOT], [BX + BW, BY + BH], [midX + 5, BY + BH]], center: [midX + 5 + (BX + BW - midX - 5) / 2, CY_BOT + (BY + BH - CY_BOT) / 2] },
+    // Extra two if needed — corridor-left and corridor-right
+    { polygon: [[BX, CY_TOP], [AX, CY_TOP], [AX, CY_BOT], [BX, CY_BOT]], center: [(BX + AX) / 2, (CY_TOP + CY_BOT) / 2] },
+    { polygon: [[AX + AW, CY_TOP], [BX + BW, CY_TOP], [BX + BW, CY_BOT], [AX + AW, CY_BOT]], center: [(AX + AW + BX + BW) / 2, (CY_TOP + CY_BOT) / 2] },
   ]
 }
 
 function layoutCommercial(): UnitLayoutDef[] {
+  const midX = BX + BW / 2
   return [
-    { polygon: [[BX, BY], [390, BY], [390, BY + BH], [BX, BY + BH]], center: [215, 300] },
-    { polygon: [[410, BY], [BX + BW, BY], [BX + BW, BY + BH], [410, BY + BH]], center: [585, 300] },
+    { polygon: [[BX, BY], [midX - 5, BY], [midX - 5, BY + BH], [BX, BY + BH]], center: [BX + (midX - 5 - BX) / 2, BY + BH / 2] },
+    { polygon: [[midX + 5, BY], [BX + BW, BY], [BX + BW, BY + BH], [midX + 5, BY + BH]], center: [midX + 5 + (BX + BW - midX - 5) / 2, BY + BH / 2] },
   ]
 }
 
 function getUnitLayouts(count: number): UnitLayoutDef[] {
-  if (count === 4) return layout4()
+  if (count === 12) return layout12()
   if (count === 6) return layout6()
   if (count === 2) return layoutCommercial()
   return []
@@ -154,79 +179,89 @@ const FLOORS: FloorConfig[] = [
     id: 's3', name: 'Sótano 3', typeLabel: 'Parqueaderos · Cuarto Técnico · UTIL 01-05',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: '9401-9417' },
-      { label: 'UTIL', rect: { x: 420, y: 50, w: 140, h: 150 }, sublabel: '01-03' },
-      { label: 'Cuarto Técnico', rect: { x: 580, y: 50, w: 160, h: 150 }, sublabel: 'Equipos' },
-      { label: 'Parqueaderos', rect: { x: 420, y: 230, w: 320, h: 320 }, sublabel: '9418-9423' },
+      { label: 'Parqueaderos', rect: { x: 60, y: 55, w: 340, h: 170 }, sublabel: '9401-9417' },
+      { label: 'UTIL', rect: { x: 420, y: 55, w: 140, h: 75 }, sublabel: '01-03' },
+      { label: 'Cuarto Técnico', rect: { x: 580, y: 55, w: 160, h: 75 }, sublabel: 'Equipos' },
+      { label: 'Parqueaderos', rect: { x: 420, y: 145, w: 320, h: 80 }, sublabel: '9418-9423' },
     ],
   },
   {
     id: 's2', name: 'Sótano 2', typeLabel: 'Parqueaderos Residentes',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: '9501-9517' },
-      { label: 'UTIL', rect: { x: 420, y: 50, w: 140, h: 150 }, sublabel: '04-05' },
-      { label: 'Parqueaderos', rect: { x: 420, y: 230, w: 320, h: 320 }, sublabel: '9518-9523' },
+      { label: 'Parqueaderos', rect: { x: 60, y: 55, w: 340, h: 170 }, sublabel: '9501-9517' },
+      { label: 'UTIL', rect: { x: 420, y: 55, w: 140, h: 75 }, sublabel: '04-05' },
+      { label: 'Parqueaderos', rect: { x: 420, y: 145, w: 320, h: 80 }, sublabel: '9518-9523' },
     ],
   },
   {
-    id: 's1', name: 'Sótano 1', typeLabel: 'Parqueaderos Visitantes',
+    id: 's1', name: 'Sótano 1', typeLabel: 'Parqueaderos · Bodegas',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: 'Residentes' },
-      { label: 'Visitantes', rect: { x: 420, y: 50, w: 320, h: 230 }, sublabel: 'V-02 a V-14' },
-      { label: 'Bodegas', rect: { x: 420, y: 320, w: 320, h: 230 }, sublabel: 'Bod. 01-12' },
+      { label: 'Parqueaderos', rect: { x: 60, y: 55, w: 340, h: 170 }, sublabel: 'Residentes' },
+      { label: 'Bodegas', rect: { x: 420, y: 55, w: 320, h: 85 }, sublabel: 'Bod. 01-12' },
+      { label: 'Cuarto Técnico', rect: { x: 420, y: 155, w: 320, h: 70 }, sublabel: 'Equipos' },
+    ],
+  },
+  {
+    id: 'pv', name: 'Parqueaderos Visitantes', typeLabel: '14 Espacios Visitantes · Bodegas',
+    isResidential: false, unitCount: 0,
+    areas: [
+      { label: 'Visitantes', rect: { x: 60, y: 55, w: 400, h: 170 }, sublabel: 'V-01 a V-14' },
+      { label: 'Bodegas', rect: { x: 480, y: 55, w: 260, h: 85 }, sublabel: 'Bod. 13-20' },
+      { label: 'Parqueaderos', rect: { x: 480, y: 155, w: 260, h: 70 }, sublabel: 'Residentes' },
     ],
   },
   {
     id: 'acceso', name: '1° Piso / Acceso', typeLabel: 'Lobby · Recepción · Local 1 · Bodega',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Lobby', rect: { x: 290, y: 50, w: 220, h: 280 }, sublabel: 'Doble altura' },
-      { label: 'Local 1', rect: { x: 60, y: 50, w: 200, h: 180 }, sublabel: '43.17 m²' },
-      { label: 'Recepción', rect: { x: 540, y: 50, w: 200, h: 180 } },
-      { label: 'Bodega', rect: { x: 60, y: 270, w: 200, h: 120 } },
-      { label: 'Baños', rect: { x: 540, y: 270, w: 200, h: 120 } },
-      { label: 'Áreas Verdes', rect: { x: 60, y: 430, w: 670, h: 120 }, sublabel: 'Fachada' },
+      { label: 'Lobby', rect: { x: 290, y: 55, w: 220, h: 110 }, sublabel: 'Doble altura' },
+      { label: 'Local 1', rect: { x: 60, y: 55, w: 210, h: 80 }, sublabel: '43.17 m²' },
+      { label: 'Recepción', rect: { x: 530, y: 55, w: 210, h: 80 } },
+      { label: 'Bodega', rect: { x: 60, y: 150, w: 210, h: 70 } },
+      { label: 'Baños', rect: { x: 530, y: 150, w: 210, h: 70 } },
+      { label: 'Áreas Verdes', rect: { x: 60, y: 55, w: 680, h: 170 }, sublabel: '' },
     ],
   },
   {
     id: 'comercial', name: 'Nivel Comercial', typeLabel: 'Locales 9701/9801 · 558.91 m²',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Local 9701', rect: { x: 60, y: 50, w: 310, h: 500 }, sublabel: '279.45 m²' },
-      { label: 'Local 9801', rect: { x: 420, y: 50, w: 310, h: 500 }, sublabel: '279.46 m²' },
+      { label: 'Local 9701', rect: { x: 60, y: 55, w: 330, h: 170 }, sublabel: '279.45 m²' },
+      { label: 'Local 9801', rect: { x: 410, y: 55, w: 330, h: 170 }, sublabel: '279.46 m²' },
     ],
   },
   {
-    id: 'social', name: 'Zona Social', typeLabel: 'Ludoteca · Gimnasio · Vitality Pool · Salón · Sauna · Turco',
+    id: 'social', name: 'Zona Social', typeLabel: 'Ludoteca · Gimnasio · Vitality Pool · Coworking · Sauna · Turco',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Ludoteca', rect: { x: 60, y: 50, w: 200, h: 230 } },
-      { label: 'Gimnasio', rect: { x: 290, y: 50, w: 220, h: 230 }, sublabel: '150 m²' },
-      { label: 'Vitality Pool', rect: { x: 540, y: 50, w: 200, h: 230 } },
-      { label: 'Salón Social', rect: { x: 60, y: 320, w: 200, h: 230 } },
-      { label: 'Sauna / Turco', rect: { x: 290, y: 320, w: 220, h: 230 } },
-      { label: 'Vestier / Baños', rect: { x: 540, y: 320, w: 200, h: 230 } },
+      { label: 'Ludoteca', rect: { x: 60, y: 55, w: 160, h: 80 } },
+      { label: 'Gimnasio', rect: { x: 240, y: 55, w: 180, h: 80 }, sublabel: '150 m²' },
+      { label: 'Vitality Pool', rect: { x: 440, y: 55, w: 160, h: 80 } },
+      { label: 'Sala Coworking', rect: { x: 620, y: 55, w: 120, h: 80 } },
+      { label: 'Salón Social', rect: { x: 60, y: 150, w: 160, h: 70 } },
+      { label: 'Sauna / Turco', rect: { x: 240, y: 150, w: 180, h: 70 } },
+      { label: 'Vestier / Baños', rect: { x: 440, y: 150, w: 160, h: 70 } },
     ],
   },
-  ...Array.from({ length: 12 }, (_, i) => ({
+  ...Array.from({ length: 11 }, (_, i) => ({
     id: `piso-${i + 1}`,
     name: `Piso ${i + 1}`,
-    typeLabel: i < 4 ? 'Residencial · 2 Tipo A (1 alcoba) + 2 Tipo A (2 alcobas)' : i < 8 ? 'Residencial · 2 Tipo B (1-2 alcobas) + 2 Tipo B (2 alcobas)' : 'Residencial Premium · 2 Tipo B+ (2 alcobas) + 2 Premium (3 alcobas vestier)',
+    typeLabel: i < 8 ? 'Residencial · 2-3 Alcobas' : 'Residencial Premium · 3 Alcobas',
     isResidential: true as const,
-    unitCount: 4,
+    unitCount: 12,
     areas: [] as LabeledArea[],
   })),
   {
     id: 'cubierta', name: 'Cubierta', typeLabel: 'Terraza Panorámica · Jardín Elevado · Zona Lounge',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Terraza Panorámica', rect: { x: 60, y: 50, w: 310, h: 230 }, sublabel: 'Vistas 360°' },
-      { label: 'Jardín Elevado', rect: { x: 420, y: 50, w: 310, h: 230 } },
-      { label: 'Zona Lounge', rect: { x: 60, y: 320, w: 200, h: 230 } },
-      { label: 'Descanso', rect: { x: 290, y: 320, w: 220, h: 230 } },
-      { label: 'Sky Garden', rect: { x: 540, y: 320, w: 200, h: 230 } },
+      { label: 'Terraza Panorámica', rect: { x: 60, y: 55, w: 310, h: 80 }, sublabel: 'Vistas 360°' },
+      { label: 'Jardín Elevado', rect: { x: 390, y: 55, w: 350, h: 80 } },
+      { label: 'Zona Lounge', rect: { x: 60, y: 150, w: 200, h: 70 } },
+      { label: 'Descanso', rect: { x: 280, y: 150, w: 200, h: 70 } },
+      { label: 'Sky Garden', rect: { x: 500, y: 150, w: 240, h: 70 } },
     ],
   },
 ]
@@ -235,55 +270,69 @@ const FLOORS: FloorConfig[] = [
 // UNIT DATA GENERATION
 // ═══════════════════════════════════════════════════════════════════
 
-const STATUS_MAP_4: UnitStatus[] = ['available', 'reserved', 'available', 'sold']
+const STATUS_MAP_12: UnitStatus[] = ['sold', 'reserved', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available', 'reserved', 'available', 'available']
 
-const TYPOLOGIES_4: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
-  '1-4': [
-    { typ: 'Tipo A', area: 68.50, beds: 1, baths: 1, price: '$180M – $212M' },
-    { typ: 'Tipo A', area: 71.20, beds: 1, baths: 1, price: '$183M – $215M' },
-    { typ: 'Tipo A', area: 87.30, beds: 2, baths: 2, price: '$195M – $227M' },
-    { typ: 'Tipo A', area: 89.60, beds: 2, baths: 2, price: '$199M – $231M' },
+const TYPOLOGIES_12: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
+  '1-8': [
+    // Positions 0,2,9,11 = Tipo A (corner, ~75m², 3hab, 2baños)
+    // Positions 1,3,4,5,6,7,8,10 = Tipo B (interior, ~48m², 2hab, 1baño)
+    { typ: 'Tipo A', area: 75.12, beds: 3, baths: 2, price: '$260M – $320M' },
+    { typ: 'Tipo B', area: 48.35, beds: 2, baths: 1, price: '$180M – $220M' },
+    { typ: 'Tipo A', area: 74.80, beds: 3, baths: 2, price: '$258M – $318M' },
+    { typ: 'Tipo B', area: 47.90, beds: 2, baths: 1, price: '$178M – $218M' },
+    { typ: 'Tipo B', area: 48.70, beds: 2, baths: 1, price: '$182M – $222M' },
+    { typ: 'Tipo B', area: 47.50, beds: 2, baths: 1, price: '$176M – $216M' },
+    { typ: 'Tipo B', area: 48.20, beds: 2, baths: 1, price: '$180M – $220M' },
+    { typ: 'Tipo B', area: 48.55, beds: 2, baths: 1, price: '$181M – $221M' },
+    { typ: 'Tipo A', area: 75.45, beds: 3, baths: 2, price: '$262M – $322M' },
+    { typ: 'Tipo B', area: 47.80, beds: 2, baths: 1, price: '$177M – $217M' },
+    { typ: 'Tipo A', area: 74.95, beds: 3, baths: 2, price: '$259M – $319M' },
+    { typ: 'Tipo B', area: 48.10, beds: 2, baths: 1, price: '$179M – $219M' },
   ],
-  '5-8': [
-    { typ: 'Tipo B', area: 72.40, beds: 1, baths: 1, price: '$250M – $298M' },
-    { typ: 'Tipo B', area: 74.80, beds: 1, baths: 1, price: '$255M – $303M' },
-    { typ: 'Tipo B', area: 91.20, beds: 2, baths: 2, price: '$280M – $328M' },
-    { typ: 'Tipo B', area: 93.50, beds: 2, baths: 2, price: '$286M – $334M' },
-  ],
-  '9-12': [
-    { typ: 'Tipo B+', area: 88.50, beds: 2, baths: 2, price: '$350M – $414M' },
-    { typ: 'Tipo B+', area: 90.80, beds: 2, baths: 2, price: '$356M – $420M' },
-    { typ: 'Premium', area: 108.40, beds: 3, baths: 2, price: '$420M – $498M' },
-    { typ: 'Premium', area: 111.20, beds: 3, baths: 2, price: '$430M – $508M' },
+  '9-11': [
+    // Premium floors - same layout but higher price
+    { typ: 'Tipo A+', area: 77.85, beds: 3, baths: 2, price: '$330M – $395M' },
+    { typ: 'Tipo B', area: 49.35, beds: 2, baths: 1, price: '$230M – $275M' },
+    { typ: 'Tipo A+', area: 77.50, beds: 3, baths: 2, price: '$328M – $393M' },
+    { typ: 'Tipo B', area: 48.90, beds: 2, baths: 1, price: '$228M – $273M' },
+    { typ: 'Tipo B', area: 49.70, beds: 2, baths: 1, price: '$232M – $277M' },
+    { typ: 'Tipo B', area: 48.50, beds: 2, baths: 1, price: '$226M – $271M' },
+    { typ: 'Tipo B', area: 49.20, beds: 2, baths: 1, price: '$230M – $275M' },
+    { typ: 'Tipo B', area: 49.55, beds: 2, baths: 1, price: '$231M – $276M' },
+    { typ: 'Tipo A+', area: 78.15, beds: 3, baths: 2, price: '$332M – $397M' },
+    { typ: 'Tipo B', area: 48.80, beds: 2, baths: 1, price: '$227M – $272M' },
+    { typ: 'Tipo A+', area: 77.65, beds: 3, baths: 2, price: '$329M – $394M' },
+    { typ: 'Tipo B', area: 49.10, beds: 2, baths: 1, price: '$229M – $274M' },
   ],
 }
 
 // Per-floor status overrides for realism (floor index → status overrides)
+// With new floor structure: residential floors start at index 8 (after s3,s2,s1,pv,acceso,comercial,social = 7 non-res)
 const FLOOR_STATUS_OVERRIDES: Record<number, Partial<Record<number, UnitStatus>>> = {
-  9: { 0: 'sold', 3: 'reserved' },
-  10: { 1: 'sold' },
-  11: { 0: 'reserved', 3: 'sold' },
-  12: { 2: 'reserved' },
-  13: { 1: 'sold' },
-  14: { 3: 'reserved' },
-  15: { 0: 'sold' },
-  16: { 2: 'sold' },
-  17: { 1: 'reserved' },
-  18: { 3: 'sold' },
+  8: { 0: 'sold', 2: 'sold', 5: 'reserved' },
+  9: { 1: 'sold', 7: 'reserved' },
+  10: { 0: 'reserved', 3: 'reserved' },
+  11: { 2: 'reserved', 8: 'sold' },
+  12: { 5: 'reserved' },
+  13: { 1: 'sold', 9: 'reserved' },
+  14: { 3: 'sold' },
+  15: { 0: 'reserved', 7: 'sold' },
+  16: { 4: 'reserved' },
+  17: { 2: 'sold' },
+  18: { 6: 'reserved', 11: 'sold' },
 }
 
 function generateUnits(floor: FloorConfig, floorIdx: number): UnitData[] {
   if (!floor.isResidential || floor.unitCount === 0) return []
   const n = floor.unitCount
 
-  // Determine which typology set to use based on floor
-  let typKey = '1-4'
+  // Determine which typology set to use based on floor number
+  let typKey = '1-8'
   const floorNum = parseInt(floor.name.replace('Piso ', ''))
-  if (floorNum >= 5 && floorNum <= 8) typKey = '5-8'
-  else if (floorNum >= 9) typKey = '9-12'
+  if (floorNum >= 9 && floorNum <= 11) typKey = '9-11'
 
-  const typs = TYPOLOGIES_4[typKey] ?? TYPOLOGIES_4['1-4']
-  const baseStatus = STATUS_MAP_4
+  const typs = TYPOLOGIES_12[typKey] ?? TYPOLOGIES_12['1-8']
+  const baseStatus = STATUS_MAP_12
   const overrides = FLOOR_STATUS_OVERRIDES[floorIdx] ?? {}
 
   return Array.from({ length: n }, (_, i) => {
@@ -443,16 +492,16 @@ function ElevatorCore() {
       {/* Center line */}
       <line x1={ELX + ELW / 2} y1={ELY + 4} x2={ELX + ELW / 2} y2={ELY + ELH - 4}
         stroke="#D8D1C8" strokeWidth="0.5" opacity="0.3" />
-      <text x={ELX + ELW / 2} y={ELY + ELH + 12}
-        textAnchor="middle" fill="#D8D1C8" fontSize="7" fontFamily="var(--font-inter)" opacity="0.5">
-        ELEV
+      <text x={ELX + ELW / 2} y={ELY + ELH + 10}
+        textAnchor="middle" fill="#D8D1C8" fontSize="6" fontFamily="var(--font-inter)" opacity="0.5">
+        ELEV ×2
       </text>
     </g>
   )
 }
 
 function Stairwell() {
-  const steps = 8
+  const steps = 6
   const stepH = (STH - 8) / steps
   return (
     <g>
@@ -466,12 +515,12 @@ function Stairwell() {
           stroke="#D8D1C8" strokeWidth="0.5" opacity="0.3" />
       ))}
       {/* Arrow */}
-      <line x1={STX + STW / 2} y1={STY + STH - 8} x2={STX + STW / 2} y2={STY + 10}
+      <line x1={STX + STW / 2} y1={STY + STH - 6} x2={STX + STW / 2} y2={STY + 8}
         stroke="#D8D1C8" strokeWidth="0.8" opacity="0.4" />
-      <polygon points={`${STX + STW / 2 - 3},${STY + 12} ${STX + STW / 2 + 3},${STY + 12} ${STX + STW / 2},${STY + 7}`}
+      <polygon points={`${STX + STW / 2 - 3},${STY + 10} ${STX + STW / 2 + 3},${STY + 10} ${STX + STW / 2},${STY + 5}`}
         fill="#D8D1C8" opacity="0.4" />
-      <text x={STX + STW / 2} y={STY + STH + 12}
-        textAnchor="middle" fill="#D8D1C8" fontSize="7" fontFamily="var(--font-inter)" opacity="0.5">
+      <text x={STX + STW / 2} y={STY + STH + 10}
+        textAnchor="middle" fill="#D8D1C8" fontSize="6" fontFamily="var(--font-inter)" opacity="0.5">
         STR
       </text>
     </g>
@@ -485,20 +534,20 @@ function AtriumVoid() {
         fill="url(#atrium-hatch)" stroke="#D8D1C8" strokeWidth="1.5"
         strokeDasharray="6 3" opacity="0.7" />
       {/* Diagonal cross lines */}
-      <line x1={AX + 10} y1={AY + 10} x2={AX + AW - 10} y2={AY + AH - 10}
+      <line x1={AX + 8} y1={AY + 8} x2={AX + AW - 8} y2={AY + AH - 8}
         stroke="#D8D1C8" strokeWidth="0.5" opacity="0.2" />
-      <line x1={AX + AW - 10} y1={AY + 10} x2={AX + 10} y2={AY + AH - 10}
+      <line x1={AX + AW - 8} y1={AY + 8} x2={AX + 8} y2={AY + AH - 8}
         stroke="#D8D1C8" strokeWidth="0.5" opacity="0.2" />
       {/* Label */}
-      <text x={AX + AW / 2} y={AY + AH / 2 - 6}
-        textAnchor="middle" fill="#D8D1C8" fontSize="10"
+      <text x={AX + AW / 2} y={AY + AH / 2 - 4}
+        textAnchor="middle" fill="#D8D1C8" fontSize="9"
         fontFamily="var(--font-cormorant)" opacity="0.4" letterSpacing="0.15em">
         ATRIO
       </text>
-      <text x={AX + AW / 2} y={AY + AH / 2 + 8}
-        textAnchor="middle" fill="#D8D1C8" fontSize="7"
+      <text x={AX + AW / 2} y={AY + AH / 2 + 7}
+        textAnchor="middle" fill="#D8D1C8" fontSize="6"
         fontFamily="var(--font-inter)" opacity="0.25" letterSpacing="0.1em">
-        VACÍO CENTRAL
+        PATIO CENTRAL
       </text>
     </g>
   )
@@ -507,37 +556,28 @@ function AtriumVoid() {
 function CorridorAreas({ unitCount }: { unitCount: number }) {
   return (
     <g>
-      {/* Top corridor */}
-      <rect x={AX} y={BY} width={AW} height={AY - BY}
+      {/* Left corridor section (before atrium) */}
+      <rect x={BX} y={CY_TOP} width={AX - BX} height={CY_H}
         fill="url(#corridor-pattern)" stroke="none" />
-      {/* Bottom corridor */}
-      <rect x={AX} y={AY + AH} width={AW} height={BY + BH - AY - AH}
+      {/* Right corridor section (after atrium) */}
+      <rect x={AX + AW} y={CY_TOP} width={BX + BW - AX - AW} height={CY_H}
         fill="url(#corridor-pattern)" stroke="none" />
-      {/* Left corridor */}
-      {unitCount >= 6 && (
-        <rect x={AX - CW} y={AY} width={CW} height={AH}
-          fill="url(#corridor-pattern)" stroke="none" />
-      )}
-      {/* Right corridor */}
-      {unitCount >= 6 && (
-        <rect x={AX + AW} y={AY} width={CW} height={AH}
-          fill="url(#corridor-pattern)" stroke="none" />
-      )}
-      {/* Corridor walls */}
-      <line x1={AX} y1={BY} x2={AX} y2={BY + BH}
+      {/* Corridor top wall */}
+      <line x1={BX} y1={CY_TOP} x2={BX + BW} y2={CY_TOP}
         stroke="#D8D1C8" strokeWidth="1" opacity="0.3" />
-      <line x1={AX + AW} y1={BY} x2={AX + AW} y2={BY + BH}
+      {/* Corridor bottom wall */}
+      <line x1={BX} y1={CY_BOT} x2={BX + BW} y2={CY_BOT}
         stroke="#D8D1C8" strokeWidth="1" opacity="0.3" />
       {/* Corridor labels */}
-      <text x={AX + AW / 2} y={BY + (AY - BY) / 2 + 20}
-        textAnchor="middle" fill="#D8D1C8" fontSize="7"
+      <text x={(BX + AX) / 2} y={CY_TOP + CY_H / 2 + 3}
+        textAnchor="middle" fill="#D8D1C8" fontSize="6"
         fontFamily="var(--font-inter)" opacity="0.3" letterSpacing="0.15em">
-        HALL
+        CORREDOR
       </text>
-      <text x={AX + AW / 2} y={AY + AH + (BY + BH - AY - AH) / 2}
-        textAnchor="middle" fill="#D8D1C8" fontSize="7"
+      <text x={(AX + AW + BX + BW) / 2} y={CY_TOP + CY_H / 2 + 3}
+        textAnchor="middle" fill="#D8D1C8" fontSize="6"
         fontFamily="var(--font-inter)" opacity="0.3" letterSpacing="0.15em">
-        HALL
+        CORREDOR
       </text>
     </g>
   )
@@ -712,27 +752,27 @@ function ResidentialFloorSVG({
 
       {/* Dimension lines - building width */}
       <g opacity="0.25" pointerEvents="none">
-        <line x1={BX} y1={BY + BH + 20} x2={BX + BW} y2={BY + BH + 20}
+        <line x1={BX} y1={BY + BH + 18} x2={BX + BW} y2={BY + BH + 18}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <line x1={BX} y1={BY + BH + 14} x2={BX} y2={BY + BH + 26}
+        <line x1={BX} y1={BY + BH + 12} x2={BX} y2={BY + BH + 24}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <line x1={BX + BW} y1={BY + BH + 14} x2={BX + BW} y2={BY + BH + 26}
+        <line x1={BX + BW} y1={BY + BH + 12} x2={BX + BW} y2={BY + BH + 24}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <text x={BX + BW / 2} y={BY + BH + 18}
+        <text x={BX + BW / 2} y={BY + BH + 16}
           textAnchor="middle" fill="#D8D1C8" fontSize="6"
-          fontFamily="var(--font-inter)">32.52 m</text>
+          fontFamily="var(--font-inter)">45.50 m</text>
       </g>
       <g opacity="0.25" pointerEvents="none">
-        <line x1={BX - 20} y1={BY} x2={BX - 20} y2={BY + BH}
+        <line x1={BX - 18} y1={BY} x2={BX - 18} y2={BY + BH}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <line x1={BX - 26} y1={BY} x2={BX - 14} y2={BY}
+        <line x1={BX - 24} y1={BY} x2={BX - 12} y2={BY}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <line x1={BX - 26} y1={BY + BH} x2={BX - 14} y2={BY + BH}
+        <line x1={BX - 24} y1={BY + BH} x2={BX - 12} y2={BY + BH}
           stroke="#D8D1C8" strokeWidth="0.5" />
-        <text x={BX - 24} y={BY + BH / 2}
+        <text x={BX - 22} y={BY + BH / 2}
           textAnchor="middle" fill="#D8D1C8" fontSize="6"
           fontFamily="var(--font-inter)"
-          transform={`rotate(-90, ${BX - 24}, ${BY + BH / 2})`}>26.04 m</text>
+          transform={`rotate(-90, ${BX - 22}, ${BY + BH / 2})`}>17.50 m</text>
       </g>
     </g>
   )
@@ -743,6 +783,7 @@ function ResidentialFloorSVG({
 // ═══════════════════════════════════════════════════════════════════
 
 function NonResidentialFloorSVG({ floor }: { floor: FloorConfig }) {
+  const isParking = floor.id.startsWith('s') || floor.id === 'pv'
   return (
     <g>
       <rect x={BX} y={BY} width={BW} height={BH}
@@ -750,8 +791,8 @@ function NonResidentialFloorSVG({ floor }: { floor: FloorConfig }) {
       <rect x={BX + 6} y={BY + 6} width={BW - 12} height={BH - 12}
         fill="none" stroke="#D8D1C8" strokeWidth="0.5" opacity="0.2" />
 
-      {/* Parking grid for sótanos */}
-      {floor.id.startsWith('s') && (
+      {/* Parking grid for sótanos and visitor parking */}
+      {isParking && (
         <rect x={BX + 8} y={BY + 8} width={BW - 16} height={BH - 16}
           fill="url(#parking-grid)" />
       )}
@@ -764,12 +805,12 @@ function NonResidentialFloorSVG({ floor }: { floor: FloorConfig }) {
             width={area.rect.w} height={area.rect.h}
             fill="#D8D1C8" fillOpacity="0.06"
             stroke="#D8D1C8" strokeWidth="1" strokeOpacity="0.2"
-            strokeDasharray={floor.id.startsWith('s') ? 'none' : '4 2'}
+            strokeDasharray={isParking ? 'none' : '4 2'}
           />
           <text
             x={area.rect.x + area.rect.w / 2}
-            y={area.rect.y + area.rect.h / 2 - (area.sublabel ? 6 : 0)}
-            textAnchor="middle" fill="#F5F1EA" fontSize="13"
+            y={area.rect.y + area.rect.h / 2 - (area.sublabel ? 5 : 0)}
+            textAnchor="middle" fill="#F5F1EA" fontSize="12"
             fontFamily="var(--font-cormorant)" opacity="0.7"
           >
             {area.label}
@@ -777,8 +818,8 @@ function NonResidentialFloorSVG({ floor }: { floor: FloorConfig }) {
           {area.sublabel && (
             <text
               x={area.rect.x + area.rect.w / 2}
-              y={area.rect.y + area.rect.h / 2 + 10}
-              textAnchor="middle" fill="#D8D1C8" fontSize="8"
+              y={area.rect.y + area.rect.h / 2 + 9}
+              textAnchor="middle" fill="#D8D1C8" fontSize="7"
               fontFamily="var(--font-inter)" opacity="0.4"
             >
               {area.sublabel}
@@ -788,7 +829,7 @@ function NonResidentialFloorSVG({ floor }: { floor: FloorConfig }) {
       ))}
 
       {/* Elevator/stair for non-residential too */}
-      {!floor.id.startsWith('s') && !floor.id.startsWith('cubierta') && (
+      {!isParking && floor.id !== 'cubierta' && (
         <>
           <ElevatorCore />
           <Stairwell />
@@ -1048,7 +1089,7 @@ function Legend({ floor }: { floor: FloorConfig }) {
 // ═══════════════════════════════════════════════════════════════════
 
 export default function PlantaInteractiva() {
-  const [selectedFloor, setSelectedFloor] = useState(9) // Piso 4 default
+  const [selectedFloor, setSelectedFloor] = useState(9) // Piso 2 default
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<{ unit: UnitData | null; x: number; y: number }>({ unit: null, x: 0, y: 0 })

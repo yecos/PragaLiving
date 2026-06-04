@@ -21,172 +21,78 @@ function generateFallbackApartments() {
   let uid = 1
   const mkId = () => `fallback-${uid++}`
 
-  // 4 apartments per floor, 12 residential floors = 48 total
-  // West wing (smaller): 2 apartments · East wing (larger): 2 apartments
-  // Unit 1,2 = West wing (Atrio / Calle 133 Sur) · Unit 3,4 = East wing (Autopista Sur / Valle de Aburrá)
-  const views4 = ['Atrio', 'Calle 133 Sur', 'Autopista Sur', 'Valle de Aburrá']
+  // ─── PRAGA Living — Real building data ───
+  // 11 residential floors (Pisos 1-11), 12 apartments per floor = 132 total
+  // Per floor: 4 × Tipo A (corner, ~75 m², 3hab/2baños) + 8 × Tipo B (interior, ~48 m², 2hab/1baño)
+  // Address: Cl. 133 Sur #49-94, Caldas, Antioquia
+  // Parking: Sótanos 1-3 + visitor parking | Ground: Local 1 (43.17 m²) + Lobby
+  // Commercial level: 558.91 m² (Locales 9701/9801) | Rooftop/Cubierta
 
-  // ─── Tipo A: Pisos 1-4 — 2 aptos 1 alcoba (oeste) + 2 aptos 2 alcobas (este) — 16 apartments ───
-  const tipoAWestAreas = [68.50, 71.20, 69.80, 72.40] // 1 alcoba ~65-75m²
-  const tipoAEastAreas = [87.30, 89.60, 88.10, 91.50] // 2 alcobas ~85-95m²
-  for (let floor = 1; floor <= 4; floor++) {
-    // West wing: 2 apartments of 1 alcoba
-    for (let unit = 1; unit <= 2; unit++) {
+  // Views per unit position on each floor
+  // Units 1-4: Tipo A (corner units) — Units 5-12: Tipo B (interior units)
+  const views12 = [
+    'Carrera 50',    // Unit 1 — Tipo A corner
+    'Calle 133 Sur', // Unit 2 — Tipo A corner
+    'Atrio',         // Unit 3 — Tipo A corner
+    'Panorámica',    // Unit 4 — Tipo A corner
+    'Atrio',         // Unit 5 — Tipo B
+    'Carrera 50',    // Unit 6 — Tipo B
+    'Carrera 50',    // Unit 7 — Tipo B
+    'Calle 133 Sur', // Unit 8 — Tipo B
+    'Calle 133 Sur', // Unit 9 — Tipo B
+    'Atrio',         // Unit 10 — Tipo B
+    'Interior',      // Unit 11 — Tipo B
+    'Interior',      // Unit 12 — Tipo B
+  ]
+
+  // Tipo A areas (~75 m², slight variation per unit position)
+  const tipoAAreas = [76.20, 74.85, 75.40, 73.90]
+  // Tipo B areas (~48 m², slight variation per unit position)
+  const tipoBAreas = [47.50, 48.20, 49.10, 48.60, 47.80, 48.90, 47.30, 48.40]
+
+  for (let floor = 1; floor <= 11; floor++) {
+    for (let unit = 1; unit <= 12; unit++) {
       const aptNumber = floor * 100 + unit
-      const area = tipoAWestAreas[floor - 1] + (unit - 1) * 2.5
-      const basePrice = 180_000_000
-      const floorPremium = (floor - 1) * 8_000_000
-      const unitPremium = (unit - 1) * 3_000_000
+      const isTipoA = unit <= 4
+      const tipoIndex = isTipoA ? unit - 1 : unit - 5
+      const area = isTipoA ? tipoAAreas[tipoIndex] : tipoBAreas[tipoIndex]
+
+      // Pricing — Caldas, Antioquia
+      // Tipo A: Base ~$260M COP, floor premium +$8M/floor
+      // Tipo B: Base ~$180M COP, floor premium +$5M/floor
+      const basePrice = isTipoA ? 260_000_000 : 180_000_000
+      const floorPremium = isTipoA
+        ? (floor - 1) * 8_000_000
+        : (floor - 1) * 5_000_000
+      const unitPremium = isTipoA
+        ? (unit - 1) * 1_500_000
+        : (unit - 5) * 800_000
+
       apartments.push({
         id: mkId(),
         name: `Apto ${aptNumber}`,
         area,
-        bedrooms: 1,
-        bathrooms: 1,
+        bedrooms: isTipoA ? 3 : 2,
+        bathrooms: isTipoA ? 2 : 1,
         floor,
-        view: views4[unit - 1],
-        typology: 'Tipo A · 1 Alcoba',
+        view: views12[unit - 1],
+        typology: isTipoA ? 'Tipo A · 3 Alcobas' : 'Tipo B · 2 Alcobas',
         status: 'available',
         price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-57.png',
+        image: isTipoA ? '/images/renders/apto-74.png' : '/images/renders/apto-57.png',
         plan360Url: null,
-        features: JSON.stringify(['1 alcoba', 'Baño completo', 'Sala', 'Cocina integral', 'Zona de ropas', 'Acabados premium']),
-      })
-    }
-    // East wing: 2 apartments of 2 alcobas
-    for (let unit = 3; unit <= 4; unit++) {
-      const aptNumber = floor * 100 + unit
-      const area = tipoAEastAreas[floor - 1] + (unit - 3) * 2.8
-      const basePrice = 195_000_000
-      const floorPremium = (floor - 1) * 6_000_000
-      const unitPremium = (unit - 3) * 4_000_000
-      apartments.push({
-        id: mkId(),
-        name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: 2,
-        bathrooms: 2,
-        floor,
-        view: views4[unit - 1],
-        typology: 'Tipo A · 2 Alcobas',
-        status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-74.png',
-        plan360Url: null,
-        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón', 'Zona de ropas', 'Acabados premium']),
+        features: JSON.stringify(
+          isTipoA
+            ? ['3 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium', 'Unidad esquinera']
+            : ['2 alcobas', 'Baño completo', 'Sala-comedor', 'Cocina integral', 'Zona de ropas', 'Acabados premium']
+        ),
       })
     }
   }
 
-  // ─── Tipo B: Pisos 5-8 — 2 aptos 1 alcoba (oeste) + 2 aptos 2 alcobas (este) — 16 apartments ───
-  const tipoBWestAreas = [72.40, 74.80, 73.50, 76.10] // 1 alcoba ~70-78m²
-  const tipoBEastAreas = [91.20, 93.50, 92.80, 96.40] // 2 alcobas ~90-100m²
-  for (let floor = 5; floor <= 8; floor++) {
-    // West wing: 2 apartments of 1 alcoba
-    for (let unit = 1; unit <= 2; unit++) {
-      const aptNumber = floor * 100 + unit
-      const area = tipoBWestAreas[floor - 5] + (unit - 1) * 3.2
-      const basePrice = 250_000_000
-      const floorPremium = (floor - 5) * 12_000_000
-      const unitPremium = (unit - 1) * 5_000_000
-      apartments.push({
-        id: mkId(),
-        name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: 1,
-        bathrooms: 1,
-        floor,
-        view: views4[unit - 1],
-        typology: 'Tipo B · 1 Alcoba',
-        status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-57.png',
-        plan360Url: null,
-        features: JSON.stringify(['1 alcoba', 'Baño completo', 'Sala', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium']),
-      })
-    }
-    // East wing: 2 apartments of 2 alcobas
-    for (let unit = 3; unit <= 4; unit++) {
-      const aptNumber = floor * 100 + unit
-      const area = tipoBEastAreas[floor - 5] + (unit - 3) * 3.5
-      const basePrice = 280_000_000
-      const floorPremium = (floor - 5) * 10_000_000
-      const unitPremium = (unit - 3) * 6_000_000
-      apartments.push({
-        id: mkId(),
-        name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: 2,
-        bathrooms: 2,
-        floor,
-        view: views4[unit - 1],
-        typology: 'Tipo B · 2 Alcobas',
-        status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-74.png',
-        plan360Url: null,
-        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium']),
-      })
-    }
-  }
-
-  // ─── Tipo B+: Pisos 9-12 — 2 aptos 2 alcobas (oeste) + 2 aptos 3 alcobas vestier (este) — 16 apartments ───
-  const tipoBPlusWestAreas = [88.50, 90.80, 89.60, 92.30] // 2 alcobas ~85-95m²
-  const tipoBPlusEastAreas = [108.40, 111.20, 109.80, 114.60] // 3 alcobas vestier ~105-120m²
-  for (let floor = 9; floor <= 12; floor++) {
-    // West wing: 2 apartments of 2 alcobas
-    for (let unit = 1; unit <= 2; unit++) {
-      const aptNumber = floor * 100 + unit
-      const area = tipoBPlusWestAreas[floor - 9] + (unit - 1) * 3.5
-      const premiumMultiplier = 1.05 + (floor - 9) * 0.03
-      const basePrice = Math.round(350_000_000 * premiumMultiplier)
-      const floorPremium = (floor - 9) * 8_000_000
-      const unitPremium = (unit - 1) * 6_000_000
-      apartments.push({
-        id: mkId(),
-        name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: 2,
-        bathrooms: 2,
-        floor,
-        view: views4[unit - 1],
-        typology: 'Tipo B+ · 2 Alcobas',
-        status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-74.png',
-        plan360Url: null,
-        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor con balcón', 'Cocina integrada', 'Balcón jardín', 'Zona de ropas', 'Acabados premium', 'Piso porcelánico']),
-      })
-    }
-    // East wing: 2 apartments of 3 alcobas con vestier
-    for (let unit = 3; unit <= 4; unit++) {
-      const aptNumber = floor * 100 + unit
-      const area = tipoBPlusEastAreas[floor - 9] + (unit - 3) * 4.2
-      const premiumMultiplier = 1.10 + (floor - 9) * 0.04
-      const basePrice = Math.round(420_000_000 * premiumMultiplier)
-      const floorPremium = (floor - 9) * 10_000_000
-      const unitPremium = (unit - 3) * 8_000_000
-      apartments.push({
-        id: mkId(),
-        name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: 3,
-        bathrooms: 2,
-        floor,
-        view: views4[unit - 1],
-        typology: 'Tipo B+ · 3 Alcobas Vestier',
-        status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: '/images/renders/apto-97.png',
-        plan360Url: null,
-        features: JSON.stringify(['3 alcobas con vestier', '2 baños completos', 'Sala-comedor con balcón', 'Cocina integrada', 'Balcón jardín', 'Zona de ropas', 'Walk-in closet', 'Acabados premium', 'Piso porcelánico']),
-      })
-    }
-  }
-
-  // Mark some as sold/reserved for realism (48 apartments total)
-  const soldIndices = [0, 7, 15, 23, 35, 44]
-  const reservedIndices = [3, 11, 19, 28, 38, 46]
+  // Mark some as sold/reserved for realism (distributed across floors and types)
+  const soldIndices = [0, 5, 24, 48, 60, 84, 108, 120]
+  const reservedIndices = [3, 14, 31, 42, 55, 67, 85, 99, 110, 128]
   for (const idx of soldIndices) {
     if (idx < apartments.length) apartments[idx].status = 'sold'
   }
@@ -201,14 +107,14 @@ function generateFallbackAmenities() {
   return [
     { id: 'fa-1', name: 'Ludoteca', description: 'Zona de juego y aprendizaje para los más pequeños. Segura, divertida y diseñada para estimular la creatividad infantil.', icon: 'Gamepad2', category: 'leisure', image: '/images/renders/atrio-main.png', active: true, order: 1 },
     { id: 'fa-2', name: 'Gimnasio', description: 'Gimnasio equipado con máquinas de última generación, zona de pesos libres y área de entrenamiento funcional.', icon: 'Dumbbell', category: 'wellness', image: '/images/renders/gimnasio.png', active: true, order: 2 },
-    { id: 'fa-3', name: 'Vitality Pool', description: 'Piscina de vitalidad con hidromasaje y cromoterapia. Un oasis de relajación con vistas al patio central.', icon: 'Waves', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 3 },
+    { id: 'fa-3', name: 'Vitality Pool', description: 'Piscina de vitalidad con hidromasaje y cromoterapia. Un oasis de relajación con vistas al atrio central.', icon: 'Waves', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 3 },
     { id: 'fa-4', name: 'Salón Social', description: 'Espacio elegante para reuniones, celebraciones y eventos. Con cocina de apoyo, terraza y capacidad para 40 personas.', icon: 'Wine', category: 'social', image: '/images/renders/salon-social.png', active: true, order: 4 },
     { id: 'fa-5', name: 'Sauna', description: 'Sauna seco con maderas aromáticas para la relajación profunda. Un ritual de bienestar que renueva cuerpo y mente.', icon: 'Thermometer', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 5 },
     { id: 'fa-6', name: 'Baño Turco', description: 'Baño turco con aromaterapia para purificar y relajar. La tradición milenaria del hammam en tu edificio.', icon: 'Cloud', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 6 },
     { id: 'fa-7', name: 'Vestieres', description: 'Vestieres completos con casilleros, duchas y zona de cambio para uso antes y después de las amenidades.', icon: 'Shirt', category: 'wellness', image: '/images/renders/coworking.png', active: true, order: 7 },
-    { id: 'fa-8', name: 'Terraza Cubierta', description: 'Terraza panorámica en la cubierta con jardín elevado, zona lounge y vistas 360° de Caldas y el Valle de Aburrá.', icon: 'Sun', category: 'leisure', image: '/images/renders/hero-day.jpg', active: true, order: 8 },
+    { id: 'fa-8', name: 'Sala Coworking', description: 'Espacio de trabajo compartido con internet de alta velocidad, zonas de reunión individual y grupal para profesionales y emprendedores.', icon: 'Laptop', category: 'service', image: '/images/renders/coworking.png', active: true, order: 8 },
     { id: 'fa-9', name: 'Lobby Doble Altura', description: 'Lobby de doble altura con recepción 24h, conexión directa al atrio central y diseño que marca la diferencia.', icon: 'DoorOpen', category: 'social', image: '/images/renders/lobby.png', active: true, order: 9 },
-    { id: 'fa-10', name: 'Parqueaderos', description: 'Tres niveles de sótano con 17 parqueaderos por nivel para residentes, visitantes y áreas de bodegas.', icon: 'Car', category: 'service', image: '/images/renders/exterior-dusk.png', active: true, order: 10 },
+    { id: 'fa-10', name: 'Terraza Cubierta / Jardín Elevado', description: 'Terraza panorámica en la cubierta con jardín elevado, zona lounge y vistas 360° de Caldas y el Valle de Aburrá.', icon: 'Sun', category: 'leisure', image: '/images/renders/hero-day.jpg', active: true, order: 10 },
   ]
 }
 

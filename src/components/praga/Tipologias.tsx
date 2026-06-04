@@ -5,58 +5,36 @@ import { motion, useInView, AnimatePresence } from 'framer-motion'
 
 const typologies = [
   {
-    id: 'studio-33',
-    name: 'Studio',
-    area: '33.05',
-    bedrooms: '1',
-    bathrooms: '1',
-    image: '/images/renders/studio-33.png',
-    description: 'Residencia compacta diseñada con máxima eficiencia espacial. Ideal para profesionales y jóvenes que buscan su primer hogar premium con acabados de lujo y distribución inteligente.',
-    features: ['Balcón privado', 'Cocina integrada', 'Iluminación natural', 'Acabados premium'],
-    status: 'Disponible',
-  },
-  {
-    id: 'studio-35a',
-    name: 'Studio Plus',
-    area: '35.60',
-    bedrooms: '1',
-    bathrooms: '1',
-    image: '/images/renders/studio-33.png',
-    description: 'Evolución del concepto studio con metros adicionales que permiten una zona de estar más amplia y una cocina mejor equipada. La perfecta combinación de funcionalidad y estilo.',
-    features: ['Zona estar ampliada', 'Cocina equipada', 'Balcón jardín', 'Closet walk-in'],
-    status: 'Disponible',
-  },
-  {
-    id: 'apto-57',
-    name: 'Apartamento',
-    area: '57.05',
-    bedrooms: '2',
-    bathrooms: '1',
-    image: '/images/renders/apto-57.png',
-    description: 'Diseño de dos habitaciones que prioriza la amplitud de la zona social. Sala-comedor con balcón, cocina semi-integrada y habitaciones con ventilación cruzada natural.',
-    features: ['Dos habitaciones', 'Sala-comedor amplia', 'Balcón panorámico', 'Cocina semi-integrada'],
-    status: 'Disponible',
-  },
-  {
-    id: 'apto-74',
-    name: 'Apartamento Premium',
-    area: '74.73',
-    bedrooms: '2',
-    bathrooms: '2',
-    image: '/images/renders/apto-74.png',
-    description: 'Residencia premium de dos habitaciones con dos baños completos. Zona social generosa, balcón amplio y suite principal con baño privado y vestier.',
-    features: ['Suite con vestier', 'Dos baños', 'Balcón generoso', 'Zona social amplia'],
-    status: 'Últimas unidades',
-  },
-  {
-    id: 'apto-97',
-    name: 'Penthouse',
-    area: '97.45',
+    id: 'tipo-a',
+    name: 'Tipo A',
+    area: '75',
     bedrooms: '3',
     bathrooms: '2',
     image: '/images/renders/apto-97.png',
-    description: 'La residencia más exclusiva de PRAGA Living. Tres habitaciones, zona social de doble altura potencial, terraza panorámica y acabados que elevan el estándar de vida.',
-    features: ['Tres habitaciones', 'Terraza panorámica', 'Doble altura potencial', 'Acabados exclusivos'],
+    description: 'Residencia espaciosa de tres habitaciones con dos baños completos. Suite principal con baño privado, dos habitaciones secundarias, sala-comedor abierta al balcón con vegetación, cocina semi-integrada y zona de ropas. Unidades esquineras con doble orientación y ventilación cruzada natural.',
+    features: ['3 Habitaciones', 'Suite principal', '2 Baños completos', 'Balcón con vegetación', 'Cocina semi-integrada', 'Doble orientación'],
+    status: 'Disponible',
+  },
+  {
+    id: 'tipo-b',
+    name: 'Tipo B',
+    area: '48',
+    bedrooms: '2',
+    bathrooms: '1',
+    image: '/images/renders/apto-57.png',
+    description: 'Diseño compacto de dos habitaciones optimizado para máxima funcionalidad. Sala-comedor con balcón, cocina integrada y habitación principal con ventilación cruzada. La eficiencia del espacio no sacrifica la calidad de vida ni los acabados premium.',
+    features: ['2 Habitaciones', 'Balcón', 'Cocina integrada', 'Baño completo', 'Ventilación cruzada', 'Acabados premium'],
+    status: 'Disponible',
+  },
+  {
+    id: 'tipo-a-premium',
+    name: 'Tipo A Premium',
+    area: '78',
+    bedrooms: '3',
+    bathrooms: '2',
+    image: '/images/renders/apto-74.png',
+    description: 'La mejor versión del Tipo A en los pisos más altos del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior con piso porcelánico, grifería de diseño y balcón amplio con jardín vertical. La altura marca la diferencia.',
+    features: ['3 Habitaciones', 'Vista Valle de Aburrá', 'Piso porcelánico', 'Balcón jardín vertical', 'Grifería premium', 'Acabados superiores'],
     status: 'Últimas unidades',
   },
 ]
@@ -64,7 +42,7 @@ const typologies = [
 export default function Tipologias() {
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [selected, setSelected] = useState(2)
+  const [selected, setSelected] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'compare'>('grid')
 
   return (

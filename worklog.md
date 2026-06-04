@@ -510,3 +510,32 @@ Stage Summary:
 - All building data reflects actual architectural plans
 - URL: https://my-project-psi-sage.vercel.app
 - GitHub: https://github.com/yecos/PragaLiving
+
+---
+Task ID: 9
+Agent: Main Agent
+Task: Update all information with real building plans, Caldas location, and accurate floor data
+
+Work Log:
+- Analyzed 7 PRAGA PDF pages (parking, facades, sections, roof plan, floor plans, social areas, visitor parking)
+- Extracted real building data: 11 residential floors, 12 apartments/floor (4×Tipo A + 8×Tipo B), footprint ~45.5m × ~17.5m
+- Identified typologies: Tipo A (~75m², 3hab, 2baños, corner), Tipo B (~48m², 2hab, 1baño, interior)
+- Identified address: Cl. 133 Sur #49-94, Caldas, Antioquia (not Bogotá!)
+- Geocoded address to 6.08895°N, -75.63514°W, altitude ~1,750m
+- Updated MapView.tsx: coordinates, POIs for Caldas, popup text
+- Updated Ubicacion.tsx: all 6 location layers with real Caldas POIs, coordinates, altitude
+- Updated data.ts: 132 apartments (11 floors × 12), correct typologies (Tipo A/B), Caldas pricing
+- Updated Tipologias.tsx: 3 real typologies (Tipo A, Tipo B, Tipo A Premium)
+- Updated BuildingScene.tsx: rectangular slab model, chevron balconies, asymmetric facade, 11 residential floors, biophilic vegetation
+- Updated PlantaInteractiva.tsx: elongated floor plan, 4×Tipo A + 8×Tipo B layout, correct dimensions (45.5m × 17.5m), visitor parking level
+- Updated ExplorarEdificio.tsx: 11 residential floors, 17 total levels, updated descriptions for Caldas
+- Updated ficha/route.ts: "Caldas, Antioquia" instead of "Bogota, Colombia"
+- Build passes successfully with zero errors
+
+Stage Summary:
+- All location data updated from Bogotá to Caldas, Antioquia (6.08895°N, 75.63514°W)
+- All apartment data reflects real building: 132 units, Tipo A (3hab/2baños ~75m²) + Tipo B (2hab/1baño ~48m²)
+- 3D building model redesigned: rectangular slab with chevron balconies, asymmetric facade, biophilic design
+- Interactive floor plan shows real 12-unit layout with correct dimensions
+- All POIs in the map are real Caldas locations (schools, hospitals, parks, transit)
+- Next.js build compiles successfully

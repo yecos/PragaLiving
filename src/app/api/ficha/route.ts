@@ -206,7 +206,7 @@ export async function GET(req: NextRequest) {
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)
     doc.setFont('helvetica', 'normal')
-    doc.text('Caldas, Antioquia, Colombia', margin, footerY + 4)
+    doc.text('Caldas, Antioquia', margin, footerY + 4)
 
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)
