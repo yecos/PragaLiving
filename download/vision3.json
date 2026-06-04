@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The visible sections of the PRAGA Living luxury real estate website are:  \n\n1. **Navigation Menu** (top): Includes links for *ARQUITECTURA* (currently active), *ATRIO*, *AMENIDADES*, *TIPOLOGÍAS*, *PLANTA*, *360°*, *UBICACIÓN*, and a call - to - action button *AGENDAR VISITA*.  \n2. **Architectural Feature Cards** (main content area): Three cards highlighting key design elements:  \n   - *Luz Natural* (with an image and description about natural light in the atrium).  \n   - *Vegetación Vertical* (with an image and description about vertical greenery).  \n   - *Circulación Fluida* (with an image and description about fluid circulation in the atrium).  \n3. **Branding/Header** (top - left): The “PRAGA LIVING” logo.  \n4. **Floating Elements** (bottom): A circular “N” icon (likely a navigation or branding element) and a green WhatsApp - style contact button.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780583911,
+  "id": "20260604223827e876952185ae46a0",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260604223827e876952185ae46a0",
+  "usage": {
+    "completion_tokens": 229,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 995,
+    "prompt_tokens_details": {
+      "cached_tokens": 5
+    },
+    "total_tokens": 1224
+  }
+}
