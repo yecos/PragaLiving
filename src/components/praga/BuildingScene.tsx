@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef, useMemo, useCallback, useEffect, useState } from 'react'
+import { useRef, useMemo, useEffect, useState, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls, useGLTF, Environment, ContactShadows, Html } from '@react-three/drei'
+import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 
 /* ─── Types ─── */
@@ -21,8 +21,6 @@ const BRONCE = '#8B6B4B'
 const MODEL_PATH = '/models/praga-building.glb'
 
 /* ─── Building Level Y-ranges (normalized to model bounds) ─── */
-// Model is centered at origin, roughly -6 to +6 in Y
-// Building has 18 levels total from Y=-6 (basement) to Y=+6 (rooftop)
 const LEVEL_RANGES: { name: string; yMin: number; yMax: number; groupIndex: number }[] = [
   { name: 'Cubierta', yMin: 5.0, yMax: 6.0, groupIndex: 0 },
   { name: 'Pisos 9-12', yMin: 3.0, yMax: 5.0, groupIndex: 1 },
@@ -33,109 +31,6 @@ const LEVEL_RANGES: { name: string; yMin: number; yMax: number; groupIndex: numb
   { name: 'Nivel Acceso', yMin: -4.0, yMax: -3.0, groupIndex: 6 },
   { name: 'Sótanos 1-3', yMin: -6.0, yMax: -4.0, groupIndex: 7 },
 ]
-
-/* ─── Real GLB Model Component ─── */
-function RealBuildingModel({
-  viewMode,
-  selectedLevel,
-  hoveredLevel,
-  onFloorClick,
-  onFloorHover,
-  clippingPlanes,
-}: {
-  viewMode: ViewMode
-  selectedLevel: number
-  hoveredLevel: number | null
-  onFloorClick: (groupIndex: number) => void
-  onFloorHover: (groupIndex: number | null) => void
-  clippingPlanes: THREE.Plane[]
-}) {
-  const groupRef = useRef<THREE.Group>(null)
-  const [modelLoaded, setModelLoaded] = useState(false)
-  const [loadError, setLoadError] = useState(false)
-
-  // Try to load the real model
-  let gltf: any = null
-  try {
-    gltf = useGLTF(MODEL_PATH)
-    if (gltf && !modelLoaded) {
-      setModelLoaded(true)
-    }
-  } catch (e: any) {
-    if (!loadError) {
-      setLoadError(true)
-    }
-  }
-
-  // If the real model loaded, render it
-  if (gltf && modelLoaded) {
-    const scene = gltf.scene
-
-    // Apply materials override for PRAGA aesthetic
-    useEffect(() => {
-      scene.traverse((child: any) => {
-        if (child.isMesh) {
-          // Override with PRAGA materials while keeping geometry
-          child.material = new THREE.MeshStandardMaterial({
-            color: '#1A1A1A',
-            roughness: 0.75,
-            metalness: 0.1,
-            ...(clippingPlanes.length > 0 ? { clippingPlanes } : {}),
-          })
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-      })
-    }, [scene, clippingPlanes.length > 0])
-
-    // Animate model rotation for view modes
-    useFrame(() => {
-      if (!groupRef.current) return
-      // Smooth Y rotation reset
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05)
-    })
-
-    return (
-      <group ref={groupRef}>
-        <primitive object={scene.clone()} />
-        {/* Level highlight planes */}
-        {selectedLevel >= 0 && selectedLevel < LEVEL_RANGES.length && (
-          <LevelHighlight
-            yMin={LEVEL_RANGES[selectedLevel].yMin}
-            yMax={LEVEL_RANGES[selectedLevel].yMax}
-            isHovered={false}
-            isSelected
-          />
-        )}
-        {hoveredLevel !== null && hoveredLevel !== selectedLevel && hoveredLevel < LEVEL_RANGES.length && (
-          <LevelHighlight
-            yMin={LEVEL_RANGES[hoveredLevel].yMin}
-            yMax={LEVEL_RANGES[hoveredLevel].yMax}
-            isHovered
-            isSelected={false}
-          />
-        )}
-        {/* Level click zones */}
-        {LEVEL_RANGES.map((level, i) => (
-          <mesh
-            key={level.name}
-            position={[0, (level.yMin + level.yMax) / 2, 0]}
-            visible={false}
-            onClick={(e) => { e.stopPropagation(); onFloorClick(level.groupIndex) }}
-            onPointerOver={(e) => { e.stopPropagation(); onFloorHover(level.groupIndex) }}
-            onPointerOut={(e) => { e.stopPropagation(); onFloorHover(null) }}
-          >
-            <boxGeometry args={[8, level.yMax - level.yMin, 6]} />
-            <meshBasicMaterial transparent opacity={0} />
-          </mesh>
-        ))}
-      </group>
-    )
-  }
-
-  // Fallback: procedural building if GLB fails
-  return <ProceduralBuilding />
-}
 
 /* ─── Level Highlight Box ─── */
 function LevelHighlight({ yMin, yMax, isHovered, isSelected }: { yMin: number; yMax: number; isHovered: boolean; isSelected: boolean }) {
@@ -156,6 +51,106 @@ function LevelHighlight({ yMin, yMax, isHovered, isSelected }: { yMin: number; y
   )
 }
 
+/* ─── Real GLB Model Loader (calls useGLTF at top level — no conditional hooks) ─── */
+function LoadedGLBModel({
+  selectedLevel,
+  hoveredLevel,
+  onFloorClick,
+  onFloorHover,
+  clippingPlanes,
+}: {
+  selectedLevel: number
+  hoveredLevel: number | null
+  onFloorClick: (groupIndex: number) => void
+  onFloorHover: (groupIndex: number | null) => void
+  clippingPlanes: THREE.Plane[]
+}) {
+  const groupRef = useRef<THREE.Group>(null)
+  const gltf = useGLTF(MODEL_PATH)
+  const scene = gltf.scene
+
+  // Apply PRAGA materials override
+  useEffect(() => {
+    scene.traverse((child: any) => {
+      if (child.isMesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          color: '#1A1A1A',
+          roughness: 0.75,
+          metalness: 0.1,
+          ...(clippingPlanes.length > 0 ? { clippingPlanes } : {}),
+        })
+        child.castShadow = true
+        child.receiveShadow = true
+      }
+    })
+  }, [scene, clippingPlanes])
+
+  useFrame(() => {
+    if (!groupRef.current) return
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.05)
+  })
+
+  return (
+    <group ref={groupRef}>
+      <primitive object={scene.clone()} />
+      {/* Level highlights */}
+      {selectedLevel >= 0 && selectedLevel < LEVEL_RANGES.length && (
+        <LevelHighlight
+          yMin={LEVEL_RANGES[selectedLevel].yMin}
+          yMax={LEVEL_RANGES[selectedLevel].yMax}
+          isHovered={false}
+          isSelected
+        />
+      )}
+      {hoveredLevel !== null && hoveredLevel !== selectedLevel && hoveredLevel < LEVEL_RANGES.length && (
+        <LevelHighlight
+          yMin={LEVEL_RANGES[hoveredLevel].yMin}
+          yMax={LEVEL_RANGES[hoveredLevel].yMax}
+          isHovered
+          isSelected={false}
+        />
+      )}
+      {/* Level click zones */}
+      {LEVEL_RANGES.map((level) => (
+        <mesh
+          key={level.name}
+          position={[0, (level.yMin + level.yMax) / 2, 0]}
+          visible={false}
+          onClick={(e) => { e.stopPropagation(); onFloorClick(level.groupIndex) }}
+          onPointerOver={(e) => { e.stopPropagation(); onFloorHover(level.groupIndex) }}
+          onPointerOut={(e) => { e.stopPropagation(); onFloorHover(null) }}
+        >
+          <boxGeometry args={[8, level.yMax - level.yMin, 6]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+/* ─── Error Boundary for GLB loading ─── */
+class ModelErrorBoundary extends (require('react') as any).Component {
+  state: { hasError: boolean }
+  props: { fallback: React.ReactNode; children: React.ReactNode }
+
+  constructor(props: any) {
+    super(props)
+    this.state = { hasError: false }
+    this.props = props
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback
+    }
+    return this.props.children
+  }
+}
+
 /* ─── Procedural Building Fallback ─── */
 function ProceduralBuilding() {
   const groupRef = useRef<THREE.Group>(null)
@@ -170,7 +165,7 @@ function ProceduralBuilding() {
   })
 
   const floors = useMemo(() => {
-    const items = []
+    const items: { y: number; height: number; width: number; depth: number; color: string }[] = []
     let y = -6
     const types = [
       { name: 'Sótano', count: 3, h: 0.5, color: '#161616' },
@@ -197,16 +192,17 @@ function ProceduralBuilding() {
     return items
   }, [])
 
+  // Calculate average depth for atrium (using last floor's depth as reference)
+  const avgDepth = floors.length > 0 ? floors[floors.length - 1].depth : 3.8
+
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
       {floors.map((floor, i) => (
         <group key={i} position={[0, floor.y + floor.height / 2, 0]}>
-          {/* Main floor body */}
           <mesh>
             <boxGeometry args={[floor.width, floor.height, floor.depth]} />
             <meshStandardMaterial color={floor.color} roughness={0.8} metalness={0.05} />
           </mesh>
-          {/* Window strips */}
           <mesh position={[0, 0, floor.depth / 2 + 0.005]}>
             <planeGeometry args={[floor.width * 0.85, floor.height * 0.5]} />
             <meshStandardMaterial color="#4A6070" roughness={0.15} metalness={0.1} transparent opacity={0.4} />
@@ -215,24 +211,51 @@ function ProceduralBuilding() {
             <planeGeometry args={[floor.width * 0.85, floor.height * 0.5]} />
             <meshStandardMaterial color="#4A6070" roughness={0.15} metalness={0.1} transparent opacity={0.4} />
           </mesh>
-          {/* Floor plate */}
           <mesh position={[0, -floor.height / 2 + 0.02, 0]}>
             <boxGeometry args={[floor.width + 0.05, 0.04, floor.depth + 0.05]} />
             <meshStandardMaterial color="#222222" roughness={0.8} />
           </mesh>
         </group>
       ))}
-      {/* Atrium void */}
+      {/* Atrium void — uses avgDepth computed outside map */}
       <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[1.0, 12, floor.depth * 0.8]} />
+        <boxGeometry args={[1.0, 12, avgDepth * 0.8]} />
         <meshStandardMaterial color="#0A0A0A" roughness={1} side={THREE.BackSide} />
       </mesh>
-      {/* Ground plane */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -6.1, 0]} receiveShadow>
         <planeGeometry args={[40, 40]} />
         <meshStandardMaterial color="#0A0A0A" roughness={1} />
       </mesh>
     </group>
+  )
+}
+
+/* ─── Building Model Wrapper — tries GLB, falls back to procedural ─── */
+function BuildingModelWrapper({
+  selectedLevel,
+  hoveredLevel,
+  onFloorClick,
+  onFloorHover,
+  clippingPlanes,
+}: {
+  selectedLevel: number
+  hoveredLevel: number | null
+  onFloorClick: (groupIndex: number) => void
+  onFloorHover: (groupIndex: number | null) => void
+  clippingPlanes: THREE.Plane[]
+}) {
+  return (
+    <ModelErrorBoundary fallback={<ProceduralBuilding />}>
+      <Suspense fallback={<ProceduralBuilding />}>
+        <LoadedGLBModel
+          selectedLevel={selectedLevel}
+          hoveredLevel={hoveredLevel}
+          onFloorClick={onFloorClick}
+          onFloorHover={onFloorHover}
+          clippingPlanes={clippingPlanes}
+        />
+      </Suspense>
+    </ModelErrorBoundary>
   )
 }
 
@@ -343,9 +366,8 @@ function Scene({
         color="#000000"
       />
 
-      {/* Building Model */}
-      <RealBuildingModel
-        viewMode={viewMode}
+      {/* Building Model — tries GLB, falls back to procedural */}
+      <BuildingModelWrapper
         selectedLevel={selectedLevel}
         hoveredLevel={hoveredLevel}
         onFloorClick={onFloorClick}
