@@ -22,81 +22,81 @@ const buildingLevels = [
   {
     id: 'cobertura',
     name: 'Cubierta',
-    type: 'Terraza · Jardín superior',
+    type: 'Terraza · Jardín Elevado',
     icon: '⌂',
     description:
-      'Espacio de cubierta con terraza panorámica y jardín elevado que ofrece vistas 360° de la ciudad. Un oasis en la altura diseñado para el descanso y la contemplación del paisaje urbano.',
-    features: ['Vista 360°', 'Jardín elevado', 'Zona descanso', 'Iluminación ambiental'],
+      'Terraza panorámica en la cima del edificio con jardín elevado, zona de descanso y vistas 360° de Caldas. Un oasis en la altura que conecta con el cielo y el paisaje antioqueño.',
+    features: ['Vista 360°', 'Jardín elevado', 'Zona lounge', 'Iluminación ambiental'],
     render: '/images/renders/hero-day.jpg',
   },
   {
     id: 'residencial-12',
     name: 'Pisos 9–12',
-    type: 'Residencial Premium',
+    type: 'Residencial Premium · 2 Alcobas',
     icon: '▦',
     description:
-      'Los niveles más exclusivos de la torre residencial con unidades de mayor área, vistas panorámicas privilegiadas y acabados de la más alta categoría. Residencias diseñadas para quienes buscan lo extraordinario.',
-    features: ['Penthouses', 'Vistas privilegiadas', 'Acabados exclusivos', 'Terrazas privadas'],
+      'Los niveles más exclusivos con apartamentos de 2 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia la Carrera 50 y la Calle 133 Sur.',
+    features: ['2 Alcobas', 'Balcón jardín', '2 Baños', 'Sala-comedor'],
     render: '/images/renders/apto-97.png',
   },
   {
     id: 'residencial-8',
     name: 'Pisos 5–8',
-    type: 'Residencial',
+    type: 'Residencial · 1-2 Alcobas',
     icon: '▦',
     description:
-      'Niveles residenciales intermedios con orientación óptima para la luz natural y ventilación cruzada. Tipologías de 2 y 3 habitaciones con balcones privados con vegetación.',
-    features: ['2-3 habitaciones', 'Balcones jardín', 'Ventilación cruzada', 'Vistas intermedias'],
+      'Niveles intermedios con tipologías de 1 y 2 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. 12 apartamentos por piso organizados en dos alas.',
+    features: ['1-2 Alcobas', 'Patio central', 'Ventilación cruzada', 'Balcones verdes'],
     render: '/images/renders/apto-74.png',
   },
   {
     id: 'residencial-4',
     name: 'Pisos 1–4',
-    type: 'Residencial',
+    type: 'Residencial · 1 Alcoba',
     icon: '▦',
     description:
-      'Primeros niveles residenciales con acceso directo al atrio y la zona social. Studios y apartamentos de 2 habitaciones con vista al atrio interior y la vegetación central.',
-    features: ['Studios y 2 habitaciones', 'Vista al atrio', 'Acceso directo amenidades', 'Precios accesibles'],
+      'Primeros pisos residenciales con apartamentos tipo de 1 alcoba (~73.70 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo.',
+    features: ['1 Alcoba ~74m²', 'Vista al atrio', 'Acceso amenidades', '12 aptos/piso'],
     render: '/images/renders/apto-57.png',
   },
   {
     id: 'social',
     name: 'Zona Social',
-    type: 'Coworking · Gimnasio · Salón Social · Ludoteca · Wellness',
+    type: 'Ludoteca · Gimnasio · Vitality Pool · Salón · Sauna · Turco',
     icon: '◇',
     description:
-      'El corazón social del edificio. Un nivel completo dedicado al bienestar, la productividad y la convivencia. Todas las amenidades conectadas visualmente con el atrio central.',
-    features: ['Coworking', 'Gimnasio', 'Wellness completo', 'Ludoteca'],
+      'El corazón social del edificio: Ludoteca infantil, gimnasio completo, Vitality Pool, salón social, vestieres, saunas y baño turco. Todo conectado visualmente con el patio central.',
+    features: ['Vitality Pool', 'Gimnasio', 'Sauna/Turco', 'Ludoteca'],
     render: '/images/renders/coworking.png',
   },
   {
     id: 'comercial',
     name: 'Nivel Comercial',
-    type: 'Locales · Servicios',
+    type: 'Locales 9701/9801 · 558.91 m²',
     icon: '□',
     description:
-      'Nivel de locales comerciales y servicios en la base del edificio, diseñados para complementar la experiencia residencial con conveniencia y vitalidad urbana.',
-    features: ['Locales comerciales', 'Café', 'Servicios', 'Acceso independiente'],
+      'Dos locales comerciales de 558.91 m² en la base del edificio, con acceso independiente desde la Calle 133 Sur. Espacios versátiles para café, retail o servicios.',
+    features: ['2 Locales', '558.91 m²', 'Acceso independiente', 'Carrera 50'],
     render: '/images/renders/lobby.png',
   },
   {
     id: 'acceso',
-    name: 'Nivel Acceso',
-    type: 'Lobby · Recepción · Comercio',
+    name: '1° Piso / Acceso',
+    type: 'Lobby · Recepción · Local 1 (43.17 m²)',
     icon: '◊',
     description:
-      'El primer contacto con PRAGA Living. Un lobby de doble altura que conecta directamente con el atrio, creando una experiencia de llegada que marca la diferencia desde el primer paso.',
-    features: ['Lobby doble altura', 'Recepción 24h', 'Acceso al atrio', 'Seguridad'],
+      'El primer contacto con PRAGA Living. Lobby de doble altura con recepción 24h, local comercial de 43.17 m², bodega y áreas verdes en fachada. Conexión directa al atrio central.',
+    features: ['Lobby doble altura', 'Recepción 24h', 'Local 43.17m²', 'Áreas verdes'],
     render: '/images/renders/lobby.png',
   },
   {
     id: 'sotanos',
     name: 'Sótanos 1–3',
-    type: 'Parqueaderos · Cuarto técnico · Visitantes',
+    type: 'Parqueaderos · 17 espacios/nivel · Visitantes · Bodegas',
     icon: '▬',
     description:
-      'Tres niveles de sótano con parqueaderos privativos y de visitantes, cuarto técnico y bodegas. Acceso controlado y circulación vehicular eficiente.',
-    features: ['Parqueaderos privativos', 'Visitantes', 'Bodegas', 'Cuarto técnico'],
+      'Tres niveles de sótano con parqueaderos para residentes (17 espacios por nivel), visitantes, áreas utilitarias (UTIL 01-05), bodegas y acceso por ascensor y escaleras.',
+    features: ['17 parqueaderos/nivel', 'Visitantes', 'Bodegas', 'Cuarto técnico'],
     render: '/images/renders/exterior-dusk.png',
   },
 ]
@@ -114,6 +114,7 @@ type ViewMode = 'exploded' | 'corte' | 'fachada'
 const stats = [
   { label: 'Sótanos', value: '3' },
   { label: 'Nivel Acceso', value: '1' },
+  { label: 'Nivel Comercial', value: '1' },
   { label: 'Zona Social', value: '1' },
   { label: 'Pisos Residenciales', value: '12' },
   { label: 'Total Niveles', value: '18' },
@@ -371,7 +372,7 @@ export default function ExplorarEdificio() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 1 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-px mt-12 bg-[#D8D1C8]/5"
+          className="grid grid-cols-2 md:grid-cols-6 gap-px mt-12 bg-[#D8D1C8]/5"
         >
           {stats.map((stat, i) => (
             <div key={i} className="text-center p-5 bg-[#0A0A0A]">

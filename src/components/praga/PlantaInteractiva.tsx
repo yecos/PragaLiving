@@ -90,31 +90,52 @@ const STATUS_LABELS: Record<UnitStatus, string> = {
 // UNIT POLYGON LAYOUTS
 // ═══════════════════════════════════════════════════════════════════
 
+// 12 apartments per floor: 6 per wing (left + right)
+// Left wing: 3 top + 3 bottom, Right wing: 3 top + 3 bottom
+function layout12(): UnitLayoutDef[] {
+  const midY = AY + AH / 2
+  const lwW = AX - BX - CW // left wing width
+  const rwX = AX + AW + CW // right wing start X
+  const rwW = BX + BW - rwX // right wing width
+  const topH = (AY - BY) // top section height
+  const botY = AY + AH // bottom section start Y
+  const botH = BY + BH - botY // bottom section height
+
+  // Left wing top: 3 units
+  const lwTopUnitW = lwW / 3
+  // Left wing bottom: 3 units
+  const lwBotUnitW = lwW / 3
+  // Right wing top: 3 units
+  const rwTopUnitW = rwW / 3
+  // Right wing bottom: 3 units
+  const rwBotUnitW = rwW / 3
+
+  return [
+    // Left wing - top row (3 units)
+    { polygon: [[BX, BY], [BX + lwTopUnitW, BY], [BX + lwTopUnitW, AY], [BX, AY]], center: [BX + lwTopUnitW / 2, BY + topH / 2] },
+    { polygon: [[BX + lwTopUnitW, BY], [BX + lwTopUnitW * 2, BY], [BX + lwTopUnitW * 2, AY], [BX + lwTopUnitW, AY]], center: [BX + lwTopUnitW * 1.5, BY + topH / 2] },
+    { polygon: [[BX + lwTopUnitW * 2, BY], [AX - CW, BY], [AX - CW, AY], [BX + lwTopUnitW * 2, AY]], center: [BX + lwTopUnitW * 2.5, BY + topH / 2] },
+    // Right wing - top row (3 units)
+    { polygon: [[rwX, BY], [rwX + rwTopUnitW, BY], [rwX + rwTopUnitW, AY], [rwX, AY]], center: [rwX + rwTopUnitW / 2, BY + topH / 2] },
+    { polygon: [[rwX + rwTopUnitW, BY], [rwX + rwTopUnitW * 2, BY], [rwX + rwTopUnitW * 2, AY], [rwX + rwTopUnitW, AY]], center: [rwX + rwTopUnitW * 1.5, BY + topH / 2] },
+    { polygon: [[rwX + rwTopUnitW * 2, BY], [BX + BW, BY], [BX + BW, AY], [rwX + rwTopUnitW * 2, AY]], center: [rwX + rwTopUnitW * 2.5, BY + topH / 2] },
+    // Left wing - bottom row (3 units)
+    { polygon: [[BX, botY], [BX + lwBotUnitW, botY], [BX + lwBotUnitW, BY + BH], [BX, BY + BH]], center: [BX + lwBotUnitW / 2, botY + botH / 2] },
+    { polygon: [[BX + lwBotUnitW, botY], [BX + lwBotUnitW * 2, botY], [BX + lwBotUnitW * 2, BY + BH], [BX + lwBotUnitW, BY + BH]], center: [BX + lwBotUnitW * 1.5, botY + botH / 2] },
+    { polygon: [[BX + lwBotUnitW * 2, botY], [AX - CW, botY], [AX - CW, BY + BH], [BX + lwBotUnitW * 2, BY + BH]], center: [BX + lwBotUnitW * 2.5, botY + botH / 2] },
+    // Right wing - bottom row (3 units)
+    { polygon: [[rwX, botY], [rwX + rwBotUnitW, botY], [rwX + rwBotUnitW, BY + BH], [rwX, BY + BH]], center: [rwX + rwBotUnitW / 2, botY + botH / 2] },
+    { polygon: [[rwX + rwBotUnitW, botY], [rwX + rwBotUnitW * 2, botY], [rwX + rwBotUnitW * 2, BY + BH], [rwX + rwBotUnitW, BY + BH]], center: [rwX + rwBotUnitW * 1.5, botY + botH / 2] },
+    { polygon: [[rwX + rwBotUnitW * 2, botY], [BX + BW, botY], [BX + BW, BY + BH], [rwX + rwBotUnitW * 2, BY + BH]], center: [rwX + rwBotUnitW * 2.5, botY + botH / 2] },
+  ]
+}
+
 function layout6(): UnitLayoutDef[] {
   return [
     { polygon: [[BX, BY], [AX, BY], [AX, AY], [BX, AY]], center: [165, 125] },
     { polygon: [[AX + AW, BY], [BX + BW, BY], [BX + BW, AY], [AX + AW, AY]], center: [635, 125] },
     { polygon: [[BX, AY], [AX - CW, AY], [AX - CW, AY + AH], [BX, AY + AH]], center: [145, 310] },
     { polygon: [[AX + AW + CW, AY], [BX + BW, AY], [BX + BW, AY + AH], [AX + AW + CW, AY + AH]], center: [655, 310] },
-    { polygon: [[BX, AY + AH], [AX, AY + AH], [AX, BY + BH], [BX, BY + BH]], center: [165, 485] },
-    { polygon: [[AX + AW, AY + AH], [BX + BW, AY + AH], [BX + BW, BY + BH], [AX + AW, BY + BH]], center: [635, 485] },
-  ]
-}
-
-function layout5(): UnitLayoutDef[] {
-  return [
-    { polygon: [[BX, BY], [AX, BY], [AX, AY], [BX, AY]], center: [165, 125] },
-    { polygon: [[AX + AW, BY], [BX + BW, BY], [BX + BW, AY], [AX + AW, AY]], center: [635, 125] },
-    { polygon: [[BX, AY], [AX - CW, AY], [AX - CW, AY + AH], [BX, AY + AH]], center: [145, 310] },
-    { polygon: [[AX + AW + CW, AY], [BX + BW, AY], [BX + BW, AY + AH], [AX + AW + CW, AY + AH]], center: [655, 310] },
-    { polygon: [[AX, AY + AH], [AX + AW, AY + AH], [AX + AW, BY + BH], [AX, BY + BH]], center: [400, 485] },
-  ]
-}
-
-function layout4(): UnitLayoutDef[] {
-  return [
-    { polygon: [[BX, BY], [AX, BY], [AX, AY], [BX, AY]], center: [165, 125] },
-    { polygon: [[AX + AW, BY], [BX + BW, BY], [BX + BW, AY], [AX + AW, AY]], center: [635, 125] },
     { polygon: [[BX, AY + AH], [AX, AY + AH], [AX, BY + BH], [BX, BY + BH]], center: [165, 485] },
     { polygon: [[AX + AW, AY + AH], [BX + BW, AY + AH], [BX + BW, BY + BH], [AX + AW, BY + BH]], center: [635, 485] },
   ]
@@ -128,9 +149,8 @@ function layoutCommercial(): UnitLayoutDef[] {
 }
 
 function getUnitLayouts(count: number): UnitLayoutDef[] {
+  if (count === 12) return layout12()
   if (count === 6) return layout6()
-  if (count === 5) return layout5()
-  if (count === 4) return layout4()
   if (count === 2) return layoutCommercial()
   return []
 }
@@ -141,80 +161,81 @@ function getUnitLayouts(count: number): UnitLayoutDef[] {
 
 const FLOORS: FloorConfig[] = [
   {
-    id: 's3', name: 'Sótano 3', typeLabel: 'Parqueaderos · Cuarto Técnico',
+    id: 's3', name: 'Sótano 3', typeLabel: 'Parqueaderos · Cuarto Técnico · UTIL 01-05',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 400, h: 500 } },
-      { label: 'Cuarto Técnico', rect: { x: 500, y: 50, w: 230, h: 200 }, sublabel: 'Equipos' },
-      { label: 'Parqueaderos', rect: { x: 500, y: 290, w: 230, h: 260 } },
+      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: '9401-9417' },
+      { label: 'UTIL', rect: { x: 420, y: 50, w: 140, h: 150 }, sublabel: '01-03' },
+      { label: 'Cuarto Técnico', rect: { x: 580, y: 50, w: 160, h: 150 }, sublabel: 'Equipos' },
+      { label: 'Parqueaderos', rect: { x: 420, y: 230, w: 320, h: 320 }, sublabel: '9418-9423' },
     ],
   },
   {
-    id: 's2', name: 'Sótano 2', typeLabel: 'Parqueaderos',
+    id: 's2', name: 'Sótano 2', typeLabel: 'Parqueaderos Residentes',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 670, h: 500 } },
+      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: '9501-9517' },
+      { label: 'UTIL', rect: { x: 420, y: 50, w: 140, h: 150 }, sublabel: '04-05' },
+      { label: 'Parqueaderos', rect: { x: 420, y: 230, w: 320, h: 320 }, sublabel: '9518-9523' },
     ],
   },
   {
     id: 's1', name: 'Sótano 1', typeLabel: 'Parqueaderos Visitantes',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 420, h: 500 } },
-      { label: 'Visitantes', rect: { x: 520, y: 50, w: 210, h: 230 }, sublabel: '27 cupos' },
-      { label: 'Bicicletero', rect: { x: 520, y: 320, w: 210, h: 230 }, sublabel: '40 cupos' },
+      { label: 'Parqueaderos', rect: { x: 60, y: 50, w: 340, h: 500 }, sublabel: 'Residentes' },
+      { label: 'Visitantes', rect: { x: 420, y: 50, w: 320, h: 230 }, sublabel: 'V-02 a V-14' },
+      { label: 'Bodegas', rect: { x: 420, y: 320, w: 320, h: 230 }, sublabel: 'Bod. 01-12' },
     ],
   },
   {
-    id: 'acceso', name: 'Nivel Acceso', typeLabel: 'Lobby · Recepción · Comercio',
+    id: 'acceso', name: '1° Piso / Acceso', typeLabel: 'Lobby · Recepción · Local 1 · Bodega',
     isResidential: false, unitCount: 0,
     areas: [
       { label: 'Lobby', rect: { x: 290, y: 50, w: 220, h: 280 }, sublabel: 'Doble altura' },
-      { label: 'Recepción', rect: { x: 60, y: 50, w: 200, h: 180 } },
-      { label: 'Comercio', rect: { x: 540, y: 50, w: 200, h: 180 } },
-      { label: 'Correspondencia', rect: { x: 60, y: 270, w: 200, h: 120 } },
-      { label: 'Seguridad 24/7', rect: { x: 540, y: 270, w: 200, h: 120 } },
-      { label: 'Acceso Vehicular', rect: { x: 60, y: 430, w: 670, h: 120 } },
+      { label: 'Local 1', rect: { x: 60, y: 50, w: 200, h: 180 }, sublabel: '43.17 m²' },
+      { label: 'Recepción', rect: { x: 540, y: 50, w: 200, h: 180 } },
+      { label: 'Bodega', rect: { x: 60, y: 270, w: 200, h: 120 } },
+      { label: 'Baños', rect: { x: 540, y: 270, w: 200, h: 120 } },
+      { label: 'Áreas Verdes', rect: { x: 60, y: 430, w: 670, h: 120 }, sublabel: 'Fachada' },
     ],
   },
   {
-    id: 'comercial', name: 'Nivel Comercial', typeLabel: 'Locales Comerciales',
+    id: 'comercial', name: 'Nivel Comercial', typeLabel: 'Locales 9701/9801 · 558.91 m²',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Local A', rect: { x: 60, y: 50, w: 310, h: 230 }, sublabel: '120 m²' },
-      { label: 'Local B', rect: { x: 420, y: 50, w: 310, h: 230 }, sublabel: '115 m²' },
-      { label: 'Local C', rect: { x: 60, y: 320, w: 310, h: 230 }, sublabel: '130 m²' },
-      { label: 'Local D', rect: { x: 420, y: 320, w: 310, h: 230 }, sublabel: '125 m²' },
+      { label: 'Local 9701', rect: { x: 60, y: 50, w: 310, h: 500 }, sublabel: '279.45 m²' },
+      { label: 'Local 9801', rect: { x: 420, y: 50, w: 310, h: 500 }, sublabel: '279.46 m²' },
     ],
   },
   {
-    id: 'social', name: 'Zona Social', typeLabel: 'Coworking · Gimnasio · Salón Social · Wellness',
+    id: 'social', name: 'Zona Social', typeLabel: 'Ludoteca · Gimnasio · Vitality Pool · Salón · Sauna · Turco',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Coworking', rect: { x: 60, y: 50, w: 200, h: 230 }, sublabel: '24 puestos' },
-      { label: 'Wellness & Spa', rect: { x: 290, y: 50, w: 220, h: 230 } },
-      { label: 'Gimnasio', rect: { x: 540, y: 50, w: 200, h: 230 }, sublabel: '150 m²' },
+      { label: 'Ludoteca', rect: { x: 60, y: 50, w: 200, h: 230 } },
+      { label: 'Gimnasio', rect: { x: 290, y: 50, w: 220, h: 230 }, sublabel: '150 m²' },
+      { label: 'Vitality Pool', rect: { x: 540, y: 50, w: 200, h: 230 } },
       { label: 'Salón Social', rect: { x: 60, y: 320, w: 200, h: 230 } },
-      { label: 'Piscina', rect: { x: 290, y: 320, w: 220, h: 230 }, sublabel: 'Vitality Pool' },
-      { label: 'Ludoteca', rect: { x: 540, y: 320, w: 200, h: 230 } },
+      { label: 'Sauna / Turco', rect: { x: 290, y: 320, w: 220, h: 230 } },
+      { label: 'Vestier / Baños', rect: { x: 540, y: 320, w: 200, h: 230 } },
     ],
   },
   ...Array.from({ length: 12 }, (_, i) => ({
     id: `piso-${i + 1}`,
     name: `Piso ${i + 1}`,
-    typeLabel: 'Residencial',
+    typeLabel: i < 4 ? 'Residencial · Tipo A · 1 Alcoba' : i < 8 ? 'Residencial · Tipo B · 1-2 Alcobas' : 'Residencial Premium · 2 Alcobas',
     isResidential: true as const,
-    unitCount: i < 4 ? 6 : i < 8 ? 5 : 4,
+    unitCount: 12,
     areas: [] as LabeledArea[],
   })),
   {
-    id: 'cubierta', name: 'Cubierta', typeLabel: 'Terraza · Jacuzzi · Solarium',
+    id: 'cubierta', name: 'Cubierta', typeLabel: 'Terraza Panorámica · Jardín Elevado · Zona Lounge',
     isResidential: false, unitCount: 0,
     areas: [
-      { label: 'Terraza Lounge', rect: { x: 60, y: 50, w: 310, h: 230 } },
-      { label: 'Solarium', rect: { x: 420, y: 50, w: 310, h: 230 } },
-      { label: 'BBQ & Bar', rect: { x: 60, y: 320, w: 200, h: 230 } },
-      { label: 'Jacuzzi', rect: { x: 290, y: 320, w: 220, h: 230 }, sublabel: '360° view' },
+      { label: 'Terraza Panorámica', rect: { x: 60, y: 50, w: 310, h: 230 }, sublabel: 'Vistas 360°' },
+      { label: 'Jardín Elevado', rect: { x: 420, y: 50, w: 310, h: 230 } },
+      { label: 'Zona Lounge', rect: { x: 60, y: 320, w: 200, h: 230 } },
+      { label: 'Descanso', rect: { x: 290, y: 320, w: 220, h: 230 } },
       { label: 'Sky Garden', rect: { x: 540, y: 320, w: 200, h: 230 } },
     ],
   },
@@ -224,65 +245,88 @@ const FLOORS: FloorConfig[] = [
 // UNIT DATA GENERATION
 // ═══════════════════════════════════════════════════════════════════
 
-const STATUS_MAP: Record<number, UnitStatus[]> = {
-  6: ['sold', 'reserved', 'sold', 'available', 'reserved', 'available'],
-  5: ['reserved', 'available', 'reserved', 'available', 'available'],
-  4: ['available', 'available', 'reserved', 'available'],
-}
+const STATUS_MAP_12: UnitStatus[] = ['sold', 'reserved', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available', 'reserved', 'available', 'available']
 
-const TYPOLOGIES: Record<number, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
-  6: [
-    { typ: 'Studio', area: 33.05, beds: 1, baths: 1, price: '$180M – $210M' },
-    { typ: 'Studio', area: 33.75, beds: 1, baths: 1, price: '$185M – $215M' },
-    { typ: '1BR', area: 35.60, beds: 1, baths: 1, price: '$195M – $230M' },
-    { typ: '1BR', area: 35.80, beds: 1, baths: 1, price: '$200M – $240M' },
-    { typ: '1BR+', area: 38.50, beds: 1, baths: 1, price: '$210M – $250M' },
-    { typ: '1BR+', area: 39.20, beds: 1, baths: 1, price: '$215M – $255M' },
+const TYPOLOGIES_12: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
+  '1-4': [
+    { typ: 'Tipo A', area: 71.85, beds: 1, baths: 1, price: '$180M – $195M' },
+    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $200M' },
+    { typ: 'Tipo A', area: 72.40, beds: 1, baths: 1, price: '$182M – $198M' },
+    { typ: 'Tipo A', area: 74.15, beds: 1, baths: 1, price: '$188M – $204M' },
+    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
+    { typ: 'Tipo A', area: 71.90, beds: 1, baths: 1, price: '$180M – $196M' },
+    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
+    { typ: 'Tipo A', area: 74.50, beds: 1, baths: 1, price: '$189M – $205M' },
+    { typ: 'Tipo A', area: 72.80, beds: 1, baths: 1, price: '$183M – $199M' },
+    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
+    { typ: 'Tipo A', area: 71.50, beds: 1, baths: 1, price: '$179M – $195M' },
+    { typ: 'Tipo A', area: 74.20, beds: 1, baths: 1, price: '$188M – $204M' },
   ],
-  5: [
-    { typ: '2BR', area: 57.05, beds: 2, baths: 2, price: '$320M – $370M' },
-    { typ: '2BR', area: 57.09, beds: 2, baths: 2, price: '$325M – $375M' },
-    { typ: '2BR+', area: 62.40, beds: 2, baths: 2, price: '$350M – $400M' },
-    { typ: '2BR+', area: 63.15, beds: 2, baths: 2, price: '$355M – $410M' },
-    { typ: '3BR', area: 74.73, beds: 3, baths: 2, price: '$420M – $480M' },
+  '5-8': [
+    { typ: 'Tipo B', area: 84.50, beds: 2, baths: 2, price: '$250M – $280M' },
+    { typ: 'Tipo B', area: 87.30, beds: 2, baths: 2, price: '$260M – $290M' },
+    { typ: 'Tipo B', area: 85.60, beds: 2, baths: 2, price: '$255M – $285M' },
+    { typ: 'Tipo B', area: 89.15, beds: 2, baths: 2, price: '$268M – $298M' },
+    { typ: 'Tipo B', area: 86.40, beds: 2, baths: 1, price: '$258M – $288M' },
+    { typ: 'Tipo B', area: 84.90, beds: 1, baths: 1, price: '$252M – $282M' },
+    { typ: 'Tipo B', area: 88.20, beds: 2, baths: 2, price: '$265M – $295M' },
+    { typ: 'Tipo B', area: 90.50, beds: 2, baths: 2, price: '$272M – $302M' },
+    { typ: 'Tipo B', area: 85.80, beds: 1, baths: 1, price: '$256M – $286M' },
+    { typ: 'Tipo B', area: 87.60, beds: 2, baths: 2, price: '$262M – $292M' },
+    { typ: 'Tipo B', area: 84.10, beds: 1, baths: 1, price: '$250M – $280M' },
+    { typ: 'Tipo B', area: 91.20, beds: 2, baths: 2, price: '$275M – $305M' },
   ],
-  4: [
-    { typ: '3BR', area: 74.73, beds: 3, baths: 2, price: '$450M – $520M' },
-    { typ: '3BR+', area: 82.30, beds: 3, baths: 2, price: '$490M – $560M' },
-    { typ: '4BR', area: 97.45, beds: 4, baths: 3, price: '$580M – $660M' },
-    { typ: '4BR PH', area: 105.20, beds: 4, baths: 3, price: '$630M – $720M' },
+  '9-12': [
+    { typ: 'Tipo B+', area: 86.50, beds: 2, baths: 2, price: '$320M – $360M' },
+    { typ: 'Tipo B+', area: 89.30, beds: 2, baths: 2, price: '$335M – $375M' },
+    { typ: 'Tipo B+', area: 87.60, beds: 2, baths: 2, price: '$328M – $368M' },
+    { typ: 'Tipo B+', area: 91.15, beds: 2, baths: 2, price: '$345M – $385M' },
+    { typ: 'Tipo B+', area: 88.40, beds: 2, baths: 2, price: '$332M – $372M' },
+    { typ: 'Tipo B+', area: 86.90, beds: 2, baths: 2, price: '$325M – $365M' },
+    { typ: 'Tipo B+', area: 90.20, beds: 2, baths: 2, price: '$340M – $380M' },
+    { typ: 'Tipo B+', area: 92.50, beds: 2, baths: 2, price: '$350M – $390M' },
+    { typ: 'Tipo B+', area: 87.80, beds: 2, baths: 2, price: '$330M – $370M' },
+    { typ: 'Tipo B+', area: 89.60, beds: 2, baths: 2, price: '$338M – $378M' },
+    { typ: 'Tipo B+', area: 86.10, beds: 1, baths: 1, price: '$322M – $362M' },
+    { typ: 'Tipo B+', area: 93.20, beds: 2, baths: 2, price: '$355M – $395M' },
   ],
 }
 
 // Per-floor status overrides for realism (floor index → status overrides)
 const FLOOR_STATUS_OVERRIDES: Record<number, Partial<Record<number, UnitStatus>>> = {
-  7: { 0: 'sold', 2: 'sold' },
-  8: { 1: 'sold' },
-  9: { 0: 'reserved', 3: 'reserved' },
-  10: { 2: 'reserved' },
-  11: {},
-  12: {},
-  13: {},
-  14: {},
-  15: {},
-  16: {},
-  17: {},
-  18: {},
+  9: { 0: 'sold', 2: 'sold', 5: 'reserved' },
+  10: { 1: 'sold', 7: 'reserved' },
+  11: { 0: 'reserved', 3: 'reserved' },
+  12: { 2: 'reserved', 8: 'sold' },
+  13: { 5: 'reserved' },
+  14: { 1: 'sold', 9: 'reserved' },
+  15: { 3: 'sold' },
+  16: { 0: 'reserved', 7: 'sold' },
+  17: { 4: 'reserved' },
+  18: { 2: 'sold' },
 }
 
 function generateUnits(floor: FloorConfig, floorIdx: number): UnitData[] {
   if (!floor.isResidential || floor.unitCount === 0) return []
   const n = floor.unitCount
-  const typs = TYPOLOGIES[n] ?? TYPOLOGIES[4]
-  const baseStatus = STATUS_MAP[n] ?? STATUS_MAP[4]
+
+  // Determine which typology set to use based on floor
+  let typKey = '1-4'
+  const floorNum = parseInt(floor.name.replace('Piso ', ''))
+  if (floorNum >= 5 && floorNum <= 8) typKey = '5-8'
+  else if (floorNum >= 9) typKey = '9-12'
+
+  const typs = TYPOLOGIES_12[typKey] ?? TYPOLOGIES_12['1-4']
+  const baseStatus = STATUS_MAP_12
   const overrides = FLOOR_STATUS_OVERRIDES[floorIdx] ?? {}
 
   return Array.from({ length: n }, (_, i) => {
     const t = typs[i % typs.length]
     const st = overrides[i] ?? baseStatus[i % baseStatus.length]
+    const aptNumber = floorNum * 100 + (i + 1)
     return {
-      id: `${floor.id.toUpperCase().replace(/-/g, '-')}-${String(i + 1).padStart(2, '0')}`,
-      name: `${floor.name.toUpperCase().replace(/ /g, '-')}-${String(i + 1).padStart(2, '0')}`,
+      id: `APTO-${aptNumber}`,
+      name: `Apto ${aptNumber}`,
       area: t.area,
       bedrooms: t.beds,
       bathrooms: t.baths,
@@ -503,13 +547,13 @@ function CorridorAreas({ unitCount }: { unitCount: number }) {
       {/* Bottom corridor */}
       <rect x={AX} y={AY + AH} width={AW} height={BY + BH - AY - AH}
         fill="url(#corridor-pattern)" stroke="none" />
-      {/* Left corridor (only for 6 and 5 unit layouts) */}
-      {unitCount >= 5 && (
+      {/* Left corridor */}
+      {unitCount >= 6 && (
         <rect x={AX - CW} y={AY} width={CW} height={AH}
           fill="url(#corridor-pattern)" stroke="none" />
       )}
-      {/* Right corridor (only for 6 and 5 unit layouts) */}
-      {unitCount >= 5 && (
+      {/* Right corridor */}
+      {unitCount >= 6 && (
         <rect x={AX + AW} y={AY} width={CW} height={AH}
           fill="url(#corridor-pattern)" stroke="none" />
       )}
@@ -518,16 +562,16 @@ function CorridorAreas({ unitCount }: { unitCount: number }) {
         stroke="#D8D1C8" strokeWidth="1" opacity="0.3" />
       <line x1={AX + AW} y1={BY} x2={AX + AW} y2={BY + BH}
         stroke="#D8D1C8" strokeWidth="1" opacity="0.3" />
-      {/* Corridor label */}
-      <text x={AX + AW / 2} y={BY + (AY - BY) / 2 + 40}
+      {/* Corridor labels */}
+      <text x={AX + AW / 2} y={BY + (AY - BY) / 2 + 20}
         textAnchor="middle" fill="#D8D1C8" fontSize="7"
         fontFamily="var(--font-inter)" opacity="0.3" letterSpacing="0.15em">
-        CORREDOR
+        HALL
       </text>
       <text x={AX + AW / 2} y={AY + AH + (BY + BH - AY - AH) / 2}
         textAnchor="middle" fill="#D8D1C8" fontSize="7"
         fontFamily="var(--font-inter)" opacity="0.3" letterSpacing="0.15em">
-        CORREDOR
+        HALL
       </text>
     </g>
   )
@@ -710,7 +754,7 @@ function ResidentialFloorSVG({
           stroke="#D8D1C8" strokeWidth="0.5" />
         <text x={BX + BW / 2} y={BY + BH + 18}
           textAnchor="middle" fill="#D8D1C8" fontSize="6"
-          fontFamily="var(--font-inter)">24.00 m</text>
+          fontFamily="var(--font-inter)">32.52 m</text>
       </g>
       <g opacity="0.25" pointerEvents="none">
         <line x1={BX - 20} y1={BY} x2={BX - 20} y2={BY + BH}
@@ -722,7 +766,7 @@ function ResidentialFloorSVG({
         <text x={BX - 24} y={BY + BH / 2}
           textAnchor="middle" fill="#D8D1C8" fontSize="6"
           fontFamily="var(--font-inter)"
-          transform={`rotate(-90, ${BX - 24}, ${BY + BH / 2})`}>18.60 m</text>
+          transform={`rotate(-90, ${BX - 24}, ${BY + BH / 2})`}>26.04 m</text>
       </g>
     </g>
   )
