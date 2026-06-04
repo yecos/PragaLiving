@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
 const heroImages = [
-  { src: '/images/renders/hero-day.png', alt: 'PRAGA Living Día', label: 'Día' },
-  { src: '/images/renders/hero-sunset.png', alt: 'PRAGA Living Atardecer', label: 'Atardecer' },
-  { src: '/images/renders/hero-night.png', alt: 'PRAGA Living Noche', label: 'Noche' },
+  { src: '/images/renders/hero-day.jpg', alt: 'PRAGA Living Día', label: 'Día' },
+  { src: '/images/renders/hero-sunset.jpg', alt: 'PRAGA Living Atardecer', label: 'Atardecer' },
+  { src: '/images/renders/hero-night.jpg', alt: 'PRAGA Living Noche', label: 'Noche' },
 ]
 
 // Time-of-day icons as inline SVGs

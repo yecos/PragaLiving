@@ -27,7 +27,7 @@ const buildingLevels = [
     description:
       'Espacio de cubierta con terraza panorámica y jardín elevado que ofrece vistas 360° de la ciudad. Un oasis en la altura diseñado para el descanso y la contemplación del paisaje urbano.',
     features: ['Vista 360°', 'Jardín elevado', 'Zona descanso', 'Iluminación ambiental'],
-    render: '/images/renders/hero-day.png',
+    render: '/images/renders/hero-day.jpg',
   },
   {
     id: 'residencial-12',

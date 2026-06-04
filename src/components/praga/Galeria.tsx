@@ -13,9 +13,9 @@ const categories = [
 ]
 
 const galleryItems = [
-  { id: 1, category: 'Exteriores', src: '/images/renders/hero-day.png', title: 'Fachada Principal - Día' },
-  { id: 2, category: 'Exteriores', src: '/images/renders/hero-sunset.png', title: 'Vista Atardecer' },
-  { id: 3, category: 'Exteriores', src: '/images/renders/hero-night.png', title: 'Vista Nocturna' },
+  { id: 1, category: 'Exteriores', src: '/images/renders/hero-day.jpg', title: 'Fachada Principal - Día' },
+  { id: 2, category: 'Exteriores', src: '/images/renders/hero-sunset.jpg', title: 'Vista Atardecer' },
+  { id: 3, category: 'Exteriores', src: '/images/renders/hero-night.jpg', title: 'Vista Nocturna' },
   { id: 4, category: 'Exteriores', src: '/images/renders/exterior-dusk.png', title: 'Fachada - Atardecer' },
   { id: 5, category: 'Exteriores', src: '/images/renders/exterior-golden.png', title: 'Fachada - Golden Hour' },
   { id: 6, category: 'Interiores', src: '/images/renders/lobby.png', title: 'Lobby Principal' },
