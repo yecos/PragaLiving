@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { getApartmentById } from '@/lib/data'
 import jsPDF from 'jspdf'
-
-const prisma = new PrismaClient()
 
 function formatCOP(value: number): string {
   return '$' + Math.round(value).toLocaleString('es-CO')
@@ -17,7 +15,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'ID de apartamento requerido' }, { status: 400 })
     }
 
-    const apt = await prisma.apartment.findUnique({ where: { id } })
+    const apt = await getApartmentById(id)
 
     if (!apt) {
       return NextResponse.json({ error: 'Apartamento no encontrado' }, { status: 404 })
@@ -33,7 +31,6 @@ export async function GET(req: NextRequest) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const pageW = 210
     const margin = 20
-    const contentW = pageW - margin * 2
 
     // Full page dark background
     doc.setFillColor(...NEGRO)
@@ -52,9 +49,9 @@ export async function GET(req: NextRequest) {
 
     doc.setTextColor(...GRIS)
     doc.setFontSize(7)
-    doc.text('FICHA TÉCNICA', pageW - margin, y, { align: 'right' })
+    doc.text('FICHA TECNICA', pageW - margin, y, { align: 'right' })
 
-    // Divider line
+    // Divider
     y += 6
     doc.setDrawColor(...BRONCE)
     doc.setLineWidth(0.3)
@@ -89,7 +86,7 @@ export async function GET(req: NextRequest) {
     doc.setFont('helvetica', 'normal')
     doc.text(apt.typology.toUpperCase(), margin, y)
 
-    // Area - large display
+    // Area
     y += 14
     doc.setTextColor(...BRONCE)
     doc.setFontSize(36)
@@ -97,7 +94,7 @@ export async function GET(req: NextRequest) {
     doc.text(`${apt.area}`, margin, y)
     doc.setFontSize(14)
     doc.setTextColor(...GRIS)
-    doc.text('m²', margin + doc.getTextWidth(`${apt.area}`) + 2, y)
+    doc.text('m2', margin + doc.getTextWidth(`${apt.area}`) + 2, y)
 
     // Details table
     y += 14
@@ -107,7 +104,7 @@ export async function GET(req: NextRequest) {
 
     const details = [
       ['Habitaciones', apt.bedrooms === 0 ? 'Studio' : `${apt.bedrooms}`],
-      ['Baños', `${apt.bathrooms}`],
+      ['Banos', `${apt.bathrooms}`],
       ['Piso', `${apt.floor}`],
       ['Vista', apt.view],
       ['Estado', st.label],
@@ -134,10 +131,10 @@ export async function GET(req: NextRequest) {
     // Price section
     y += 4
     doc.setFillColor(...BRONCE.slice(0, 3).map(c => c * 0.15) as [number, number, number])
-    doc.roundedRect(margin, y - 2, contentW, 18, 2, 2, 'F')
+    doc.roundedRect(margin, y - 2, pageW - margin * 2, 18, 2, 2, 'F')
     doc.setDrawColor(...BRONCE)
     doc.setLineWidth(0.2)
-    doc.roundedRect(margin, y - 2, contentW, 18, 2, 2, 'S')
+    doc.roundedRect(margin, y - 2, pageW - margin * 2, 18, 2, 2, 'S')
 
     doc.setTextColor(...GRIS)
     doc.setFontSize(7)
@@ -159,7 +156,7 @@ export async function GET(req: NextRequest) {
     doc.setTextColor(...BRONCE)
     doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
-    doc.text('CARACTERÍSTICAS', margin, y)
+    doc.text('CARACTERISTICAS', margin, y)
 
     y += 5
     doc.setDrawColor(...BRONCE)
@@ -181,7 +178,7 @@ export async function GET(req: NextRequest) {
         if (y > 240) return
         doc.setTextColor(...BRONCE)
         doc.setFontSize(6)
-        doc.text('◆', margin + 1, y)
+        doc.text('-', margin + 1, y)
         doc.setTextColor(...MARFIL)
         doc.setFontSize(8)
         doc.setFont('helvetica', 'normal')
@@ -192,8 +189,7 @@ export async function GET(req: NextRequest) {
       doc.setTextColor(...GRIS)
       doc.setFontSize(8)
       doc.setFont('helvetica', 'italic')
-      doc.text('Consulte con un asesor para más detalles', margin, y)
-      y += 6
+      doc.text('Consulte con un asesor para mas detalles', margin, y)
     }
 
     // Footer
@@ -210,7 +206,7 @@ export async function GET(req: NextRequest) {
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)
     doc.setFont('helvetica', 'normal')
-    doc.text('Bogotá, Colombia', margin, footerY + 4)
+    doc.text('Bogota, Colombia', margin, footerY + 4)
 
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)

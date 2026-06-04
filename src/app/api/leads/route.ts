@@ -1,34 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { getLeads, createLead, updateLead } from '@/lib/data'
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const status = searchParams.get('status')
+    const status = searchParams.get('status') || undefined
 
-    const where: Record<string, unknown> = {}
-    if (status) where.status = status
-
-    const [leads, total] = await Promise.all([
-      prisma.lead.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.lead.count({ where }),
-    ])
-
-    return NextResponse.json({
-      leads,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    })
+    const leads = await getLeads({ status })
+    return NextResponse.json({ leads, total: leads.length })
   } catch {
     return NextResponse.json({ error: 'Error al obtener leads' }, { status: 500 })
   }
@@ -46,17 +25,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const lead = await prisma.lead.create({
-      data: {
-        name,
-        phone,
-        email,
-        interest: interest || null,
-        message: message || null,
-        source: source || 'website',
-        status: 'new',
-      },
-    })
+    const lead = await createLead({ name, phone, email, interest, message, source })
 
     return NextResponse.json({
       success: true,
@@ -80,15 +49,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
     }
 
-    const data: Record<string, unknown> = {}
+    const data: { status?: string; notes?: string } = {}
     if (status) data.status = status
     if (notes !== undefined) data.notes = notes
 
-    const lead = await prisma.lead.update({
-      where: { id },
-      data,
-    })
-
+    const lead = await updateLead(id, data)
     return NextResponse.json({ success: true, lead })
   } catch {
     return NextResponse.json({ error: 'Error al actualizar lead' }, { status: 500 })

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { verifyAdmin } from '@/lib/data'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,23 +10,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Usuario y contraseña requeridos' }, { status: 400 })
     }
 
-    const admin = await prisma.adminUser.findUnique({
-      where: { username },
-    })
+    const result = await verifyAdmin(username, password)
 
-    if (!admin || admin.password !== password) {
-      return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 })
+    if (result.success) {
+      return NextResponse.json({ success: true, user: result.user })
+    } else {
+      return NextResponse.json({ error: result.error }, { status: 401 })
     }
-
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: admin.id,
-        username: admin.username,
-        name: admin.name,
-        role: admin.role,
-      },
-    })
   } catch {
     return NextResponse.json({ error: 'Error al iniciar sesión' }, { status: 500 })
   }
