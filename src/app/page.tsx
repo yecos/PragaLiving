@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Lenis from 'lenis'
 import Navigation from '@/components/praga/Navigation'
 import Hero from '@/components/praga/Hero'
 import Manifiesto from '@/components/praga/Manifiesto'
@@ -22,6 +23,30 @@ import ChatIA from '@/components/praga/ChatIA'
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
+
+  // Lenis smooth scroll initialization
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1,
+    })
+
+    // Expose Lenis instance globally so Navigation scrollIntoView can use it
+    ;(window as unknown as Record<string, unknown>).__lenis = lenis
+
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+
+    return () => {
+      lenis.destroy()
+      delete (window as unknown as Record<string, unknown>).__lenis
+    }
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2200)

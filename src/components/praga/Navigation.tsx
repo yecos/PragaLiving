@@ -46,7 +46,12 @@ export default function Navigation() {
   const scrollTo = (href: string) => {
     setMenuOpen(false)
     const el = document.querySelector(href)
-    if (el) {
+    if (!el) return
+    // Use Lenis smooth scroll if available, otherwise fallback to native
+    const lenis = (window as unknown as Record<string, unknown>).__lenis as { scrollTo: (target: Element, options?: { offset?: number }) => void } | undefined
+    if (lenis) {
+      lenis.scrollTo(el, { offset: -80 })
+    } else {
       el.scrollIntoView({ behavior: 'smooth' })
     }
   }

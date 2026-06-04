@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +7,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Apartment {
+  id          String   @id @default(cuid())
+  name        String
+  area        Float
+  bedrooms    Int
+  bathrooms   Int
+  floor       Int
+  view        String   // "Atrio", "Exterior", "Panorámica"
+  typology    String   // "Studio", "Studio Plus", "Apartamento 2H", "Apartamento Premium 2H", "Penthouse 3H"
+  status      String   @default("available") // "available", "reserved", "sold"
+  price       Float
+  image       String?
+  plan360Url  String?
+  features    String?  // JSON string of features
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Amenity {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String?
+  category    String   // "wellness", "social", "work", "leisure"
+  image       String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  email       String
+  interest    String?  // typology they're interested in
+  message     String?
+  source      String   @default("website") // "website", "whatsapp", "referral"
+  status      String   @default("new") // "new", "contacted", "qualified", "lost"
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminUser {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String   // hashed
+  name        String
+  role        String   @default("admin") // "admin", "editor"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

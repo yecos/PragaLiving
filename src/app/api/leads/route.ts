@@ -1,21 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
 
-// In-memory leads store (will be replaced with Prisma DB)
-const leads: Array<{
-  id: string
-  name: string
-  phone: string
-  email: string
-  interest: string
-  message: string
-  source: string
-  created_at: string
-}> = []
+const prisma = new PrismaClient()
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '50')
+    const status = searchParams.get('status')
+
+    const where: Record<string, unknown> = {}
+    if (status) where.status = status
+
+    const [leads, total] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.lead.count({ where }),
+    ])
+
+    return NextResponse.json({
+      leads,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    })
+  } catch {
+    return NextResponse.json({ error: 'Error al obtener leads' }, { status: 500 })
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, phone, email, interest, message } = body
+    const { name, phone, email, interest, message, source } = body
 
     if (!name || !phone || !email) {
       return NextResponse.json(
@@ -24,25 +46,24 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const lead = {
-      id: Date.now().toString(),
-      name,
-      phone,
-      email,
-      interest: interest || 'general',
-      message: message || '',
-      source: 'website',
-      created_at: new Date().toISOString(),
-    }
-
-    leads.push(lead)
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Solicitud recibida. Un asesor se pondrá en contacto contigo pronto.',
-      leadId: lead.id 
+    const lead = await prisma.lead.create({
+      data: {
+        name,
+        phone,
+        email,
+        interest: interest || null,
+        message: message || null,
+        source: source || 'website',
+        status: 'new',
+      },
     })
-  } catch (error) {
+
+    return NextResponse.json({
+      success: true,
+      message: 'Solicitud recibida. Un asesor se pondrá en contacto contigo pronto.',
+      leadId: lead.id,
+    })
+  } catch {
     return NextResponse.json(
       { error: 'Error al procesar la solicitud' },
       { status: 500 }
@@ -50,6 +71,26 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({ leads, total: leads.length })
+export async function PUT(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { id, status, notes } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
+    }
+
+    const data: Record<string, unknown> = {}
+    if (status) data.status = status
+    if (notes !== undefined) data.notes = notes
+
+    const lead = await prisma.lead.update({
+      where: { id },
+      data,
+    })
+
+    return NextResponse.json({ success: true, lead })
+  } catch {
+    return NextResponse.json({ error: 'Error al actualizar lead' }, { status: 500 })
+  }
 }
