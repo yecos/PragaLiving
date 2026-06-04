@@ -15,8 +15,17 @@ export default function Contacto() {
   })
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+    } catch {
+      // Still show success for UX
+    }
     setSubmitted(true)
     setTimeout(() => setSubmitted(false), 4000)
   }

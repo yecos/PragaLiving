@@ -43,10 +43,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <h3 className="font-[family-name:var(--font-cormorant)] text-2xl tracking-[0.2em] text-[#F5F1EA] font-light">
-                PRAGA
-              </h3>
-              <span className="text-[8px] tracking-[0.4em] uppercase text-[#8B6B4B]">Living</span>
+              <img
+                src="/images/logo.png"
+                alt="PRAGA Living"
+                className="h-12 w-auto brightness-0 invert opacity-80"
+              />
             </div>
             <p className="font-[family-name:var(--font-inter)] text-xs text-[#D8D1C8]/30 leading-relaxed mb-6">
               Arquitectura para quienes valoran lo excepcional. Una pieza arquitectónica diseñada para permanecer.

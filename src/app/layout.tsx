@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   keywords: ["PRAGA Living", "residencias premium", "arquitectura", "bienestar", "exclusividad", "inmobiliaria"],
   authors: [{ name: "PRAGA Living" }],
   icons: {
-    icon: "/favicon.svg",
+    icon: "/favicon.png",
   },
   openGraph: {
     title: "PRAGA Living | Arquitectura para quienes valoran lo excepcional",

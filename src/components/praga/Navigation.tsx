@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const navItems = [
   { label: 'Inicio', href: '#hero' },
   { label: 'Arquitectura', href: '#arquitectura' },
+  { label: 'Edificio', href: '#edificio' },
   { label: 'Atrio', href: '#atrio' },
   { label: 'Amenidades', href: '#amenidades' },
   { label: 'Tipologías', href: '#tipologias' },
@@ -64,16 +65,11 @@ export default function Navigation() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <button onClick={() => scrollTo('#hero')} className="flex items-center gap-3 group">
-            <span className={`font-[family-name:var(--font-cormorant)] text-2xl tracking-[0.2em] font-light transition-colors duration-300 ${
-              scrolled ? 'text-[#F5F1EA]' : 'text-[#F5F1EA]'
-            }`}>
-              PRAGA
-            </span>
-            <span className={`text-[8px] tracking-[0.4em] uppercase transition-colors duration-300 ${
-              scrolled ? 'text-[#8B6B4B]' : 'text-[#8B6B4B]'
-            }`}>
-              Living
-            </span>
+            <img
+              src="/images/logo.png"
+              alt="PRAGA Living"
+              className="h-8 md:h-10 w-auto object-contain brightness-0 invert"
+            />
           </button>
 
           {/* Desktop nav */}

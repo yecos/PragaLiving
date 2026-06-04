@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Navigation from '@/components/praga/Navigation'
 import Hero from '@/components/praga/Hero'
 import Manifiesto from '@/components/praga/Manifiesto'
 import Arquitectura from '@/components/praga/Arquitectura'
+import ExplorarEdificio from '@/components/praga/ExplorarEdificio'
 import Atrio from '@/components/praga/Atrio'
 import Amenidades from '@/components/praga/Amenidades'
 import Tipologias from '@/components/praga/Tipologias'
@@ -17,6 +18,7 @@ import Inversion from '@/components/praga/Inversion'
 import Contacto from '@/components/praga/Contacto'
 import Footer from '@/components/praga/Footer'
 import WhatsAppButton from '@/components/praga/WhatsAppButton'
+import ChatIA from '@/components/praga/ChatIA'
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
@@ -49,17 +51,14 @@ export default function Home() {
                 transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1] }}
                 className="h-[1px] bg-[#8B6B4B] mx-auto mb-8"
               />
-              <h1 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl tracking-[0.3em] text-[#F5F1EA] font-light">
-                PRAGA
-              </h1>
-              <motion.p
+              <motion.img
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.6 }}
-                className="font-[family-name:var(--font-inter)] text-[10px] tracking-[0.5em] text-[#8B6B4B] mt-3 uppercase"
-              >
-                Living
-              </motion.p>
+                transition={{ delay: 0.3, duration: 0.8 }}
+                src="/images/logo.png"
+                alt="PRAGA Living"
+                className="h-16 md:h-20 w-auto mx-auto brightness-0 invert"
+              />
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: 60 }}
@@ -76,6 +75,7 @@ export default function Home() {
         <Hero />
         <Manifiesto />
         <Arquitectura />
+        <ExplorarEdificio />
         <Atrio />
         <Amenidades />
         <Tipologias />
@@ -87,6 +87,7 @@ export default function Home() {
         <Contacto />
         <Footer />
         <WhatsAppButton />
+        <ChatIA />
       </main>
     </>
   )
