@@ -26,9 +26,9 @@ const locationLayers = [
     icon: '→',
     color: '#6B8FB5',
     points: [
-      { name: 'Estación Metro', distance: '350m', time: '5 min', description: 'Acceso directo a línea principal del sistema de transporte masivo', lat: 4.6528, lng: -74.0535 },
-      { name: 'Parada BRT', distance: '200m', time: '3 min', description: 'Sistema de transporte rápido con cobertura integral de la ciudad', lat: 4.6475, lng: -74.0488 },
-      { name: 'Vía Principal', distance: '100m', time: '2 min', description: 'Conexión directa a la arteria vial más importante de la zona', lat: 4.6490, lng: -74.0555 },
+      { name: 'Estación Metro Caldas', distance: '400m', time: '5 min', description: 'Acceso directo a la línea A del Metro de Medellín en la estación Caldas', lat: 6.0965, lng: -75.6390 },
+      { name: 'Parada Ruta Integrada', distance: '150m', time: '2 min', description: 'Ruta alimentadora del sistema integrado de transporte del Valle de Aburrá', lat: 6.0920, lng: -75.6430 },
+      { name: 'Autopista Sur', distance: '100m', time: '1 min', description: 'Conexión directa a la Autopista Sur que comunica con Medellín y el sur del Valle de Aburrá', lat: 6.0910, lng: -75.6380 },
     ]
   },
   {
@@ -37,9 +37,9 @@ const locationLayers = [
     icon: '◆',
     color: '#B56B8F',
     points: [
-      { name: 'Restaurante Premium', distance: '150m', time: '2 min', description: 'Alta cocina en un entorno exclusivo con chefs reconocidos', lat: 4.6515, lng: -74.0472 },
-      { name: 'Café Especialidad', distance: '100m', time: '1 min', description: 'Café de especialidad y repostería artesanal', lat: 4.6482, lng: -74.0510 },
-      { name: 'Zona Gastronómica', distance: '400m', time: '6 min', description: 'Concentración de restaurantes y bares de autor', lat: 4.6538, lng: -74.0460 },
+      { name: 'Restaurante Típico', distance: '200m', time: '3 min', description: 'Gastronomía antioqueña auténtica con ingredientes locales y tradición paisa', lat: 6.0950, lng: -75.6395 },
+      { name: 'Café Especialidad', distance: '150m', time: '2 min', description: 'Café de especialidad del caucho antioqueño con tostión artesanal', lat: 6.0915, lng: -75.6425 },
+      { name: 'Parque Gastronómico', distance: '500m', time: '7 min', description: 'Zona de restaurantes y fondas tradicionales alrededor del parque central de Caldas', lat: 6.0978, lng: -75.6380 },
     ]
   },
   {
@@ -48,9 +48,9 @@ const locationLayers = [
     icon: '□',
     color: '#8B6B4B',
     points: [
-      { name: 'Centro Comercial', distance: '500m', time: '7 min', description: 'Centro comercial con tiendas de lujo y marcas internacionales', lat: 4.6455, lng: -74.0450 },
-      { name: 'Supermercado Premium', distance: '200m', time: '3 min', description: 'Supermercado gourmet con productos importados y orgánicos', lat: 4.6510, lng: -74.0530 },
-      { name: 'Boutiques', distance: '300m', time: '4 min', description: 'Tiendas de diseño y moda independiente', lat: 4.6535, lng: -74.0505 },
+      { name: 'Centro Comercial', distance: '600m', time: '8 min', description: 'Plaza comercial con supermercado, bancos y tiendas de servicio', lat: 6.0900, lng: -75.6370 },
+      { name: 'Supermercado', distance: '250m', time: '3 min', description: 'Supermercado con productos locales y de la región antioqueña', lat: 6.0945, lng: -75.6405 },
+      { name: 'Plaza de Mercado', distance: '450m', time: '6 min', description: 'Plaza de mercado campesino con frutas, verduras y productos frescos del sur del Valle', lat: 6.0960, lng: -75.6365 },
     ]
   },
   {
@@ -59,8 +59,8 @@ const locationLayers = [
     icon: '△',
     color: '#6B8F6B',
     points: [
-      { name: 'Universidad', distance: '800m', time: '10 min', description: 'Institución educativa de prestigio con programas de pregrado y posgrado', lat: 4.6560, lng: -74.0445 },
-      { name: 'Colegio Bilingüe', distance: '600m', time: '8 min', description: 'Colegio internacional con currículo bilingüe completo', lat: 4.6445, lng: -74.0520 },
+      { name: 'Sede Universitaria', distance: '1.2km', time: '15 min', description: 'Sede universitaria ITM con programas de ingeniería y tecnología a minutos en metro', lat: 6.1040, lng: -75.6340 },
+      { name: 'Colegio Caldas', distance: '500m', time: '6 min', description: 'Institución educativa con programas académicos y técnicos de calidad', lat: 6.0890, lng: -75.6440 },
     ]
   },
   {
@@ -69,8 +69,8 @@ const locationLayers = [
     icon: '○',
     color: '#6BB5A0',
     points: [
-      { name: 'Clínica Premium', distance: '700m', time: '9 min', description: 'Centro médico de alta complejidad con especialidades completas', lat: 4.6555, lng: -74.0545 },
-      { name: 'Farmacia 24h', distance: '150m', time: '2 min', description: 'Farmacia de turno con servicio de entrega a domicilio', lat: 4.6492, lng: -74.0478 },
+      { name: 'EPS / IPS Caldas', distance: '600m', time: '8 min', description: 'Centro de atención médica con servicios de consulta externa y urgencias', lat: 6.0955, lng: -75.6360 },
+      { name: 'Farmacia', distance: '200m', time: '3 min', description: 'Farmacia comunitaria con servicio de entrega a domicilio', lat: 6.0925, lng: -75.6430 },
     ]
   },
   {
@@ -79,8 +79,8 @@ const locationLayers = [
     icon: '◇',
     color: '#4B5646',
     points: [
-      { name: 'Parque Principal', distance: '300m', time: '4 min', description: 'Parque urbano con senderos, lagos y zonas de esparcimiento', lat: 4.6470, lng: -74.0555 },
-      { name: 'Ciclovía', distance: '100m', time: '1 min', description: 'Ruta ciclista dedicada con conexión a la red ciudadana', lat: 4.6518, lng: -74.0558 },
+      { name: 'Parque Principal Caldas', distance: '400m', time: '5 min', description: 'Parque central del municipio con zonas verdes, kiosko y espacio público', lat: 6.0972, lng: -75.6375 },
+      { name: 'Cerro Nutibama', distance: '800m', time: '10 min', description: 'Mirador natural con vistas panorámicas del Valle de Aburrá y senderos ecológicos', lat: 6.0860, lng: -75.6470 },
     ]
   },
 ]
@@ -409,13 +409,13 @@ export default function Ubicacion() {
                   </div>
                   <div>
                     <p className="font-[family-name:var(--font-cormorant)] text-sm text-[#F5F1EA]">PRAGA Living</p>
-                    <p className="text-[9px] text-[#8B6B4B] tracking-wider uppercase">Bogotá, Colombia</p>
+                    <p className="text-[9px] text-[#8B6B4B] tracking-wider uppercase">Caldas, Antioquia, Colombia</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-[9px] text-[#F5F1EA]/40 tracking-wider">
-                  <span>4.6500° N</span>
-                  <span>74.0500° W</span>
-                  <span>2,640m s.n.m.</span>
+                  <span>6.0935° N</span>
+                  <span>75.6410° W</span>
+                  <span>1,730m s.n.m.</span>
                 </div>
               </div>
             </div>

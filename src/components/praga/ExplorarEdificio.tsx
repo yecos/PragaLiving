@@ -35,7 +35,7 @@ const buildingLevels = [
     type: 'Residencial Premium · 2 Alcobas',
     icon: '▦',
     description:
-      'Los niveles más exclusivos con apartamentos de 2 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia la Carrera 50 y la Calle 133 Sur.',
+      'Los niveles más exclusivos con apartamentos de 2 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el Valle de Aburrá y la Autopista Sur.',
     features: ['2 Alcobas', 'Balcón jardín', '2 Baños', 'Sala-comedor'],
     render: '/images/renders/apto-97.png',
   },
@@ -76,7 +76,7 @@ const buildingLevels = [
     icon: '□',
     description:
       'Dos locales comerciales de 558.91 m² en la base del edificio, con acceso independiente desde la Calle 133 Sur. Espacios versátiles para café, retail o servicios.',
-    features: ['2 Locales', '558.91 m²', 'Acceso independiente', 'Carrera 50'],
+    features: ['2 Locales', '558.91 m²', 'Acceso independiente', 'Calle 133 Sur'],
     render: '/images/renders/lobby.png',
   },
   {

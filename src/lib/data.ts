@@ -23,7 +23,7 @@ function generateFallbackApartments() {
 
   // 12 apartments per floor, 12 residential floors = 144 total
   // Views cycle: 6 per wing (left wing = Atrio-side, right wing = Exterior-side)
-  const views12 = ['Atrio', 'Atrio', 'Atrio', 'Carrera 50', 'Carrera 50', 'Calle 133', 'Exterior', 'Exterior', 'Exterior', 'Panorámica', 'Panorámica', 'Patio Central']
+  const views12 = ['Atrio', 'Atrio', 'Atrio', 'Autopista Sur', 'Autopista Sur', 'Calle 133 Sur', 'Exterior', 'Exterior', 'Exterior', 'Panorámica', 'Panorámica', 'Patio Central']
 
   // ─── Tipo A: Pisos 1-4 (1 Alcoba, ~73.70 m²) — 48 apartments ───
   const tipoAAreas = [71.85, 73.70, 72.40, 74.15, 73.70, 71.90, 73.70, 74.50, 72.80, 73.70, 71.50, 74.20]
