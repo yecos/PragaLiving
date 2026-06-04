@@ -21,19 +21,22 @@ function generateFallbackApartments() {
   let uid = 1
   const mkId = () => `fallback-${uid++}`
 
-  // 12 apartments per floor, 12 residential floors = 144 total
-  // Views cycle: 6 per wing (left wing = Atrio-side, right wing = Exterior-side)
-  const views12 = ['Atrio', 'Atrio', 'Atrio', 'Autopista Sur', 'Autopista Sur', 'Calle 133 Sur', 'Exterior', 'Exterior', 'Exterior', 'Panorámica', 'Panorámica', 'Patio Central']
+  // 4 apartments per floor, 12 residential floors = 48 total
+  // West wing (smaller): 2 apartments · East wing (larger): 2 apartments
+  // Unit 1,2 = West wing (Atrio / Calle 133 Sur) · Unit 3,4 = East wing (Autopista Sur / Valle de Aburrá)
+  const views4 = ['Atrio', 'Calle 133 Sur', 'Autopista Sur', 'Valle de Aburrá']
 
-  // ─── Tipo A: Pisos 1-4 (1 Alcoba, ~73.70 m²) — 48 apartments ───
-  const tipoAAreas = [71.85, 73.70, 72.40, 74.15, 73.70, 71.90, 73.70, 74.50, 72.80, 73.70, 71.50, 74.20]
+  // ─── Tipo A: Pisos 1-4 — 2 aptos 1 alcoba (oeste) + 2 aptos 2 alcobas (este) — 16 apartments ───
+  const tipoAWestAreas = [68.50, 71.20, 69.80, 72.40] // 1 alcoba ~65-75m²
+  const tipoAEastAreas = [87.30, 89.60, 88.10, 91.50] // 2 alcobas ~85-95m²
   for (let floor = 1; floor <= 4; floor++) {
-    for (let unit = 1; unit <= 12; unit++) {
+    // West wing: 2 apartments of 1 alcoba
+    for (let unit = 1; unit <= 2; unit++) {
       const aptNumber = floor * 100 + unit
-      const area = tipoAAreas[unit - 1]
+      const area = tipoAWestAreas[floor - 1] + (unit - 1) * 2.5
       const basePrice = 180_000_000
-      const floorPremium = (floor - 1) * 5_000_000
-      const unitPremium = (unit - 1) * 800_000
+      const floorPremium = (floor - 1) * 8_000_000
+      const unitPremium = (unit - 1) * 3_000_000
       apartments.push({
         id: mkId(),
         name: `Apto ${aptNumber}`,
@@ -41,7 +44,7 @@ function generateFallbackApartments() {
         bedrooms: 1,
         bathrooms: 1,
         floor,
-        view: views12[unit - 1],
+        view: views4[unit - 1],
         typology: 'Tipo A · 1 Alcoba',
         status: 'available',
         price: basePrice + floorPremium + unitPremium,
@@ -50,76 +53,140 @@ function generateFallbackApartments() {
         features: JSON.stringify(['1 alcoba', 'Baño completo', 'Sala', 'Cocina integral', 'Zona de ropas', 'Acabados premium']),
       })
     }
+    // East wing: 2 apartments of 2 alcobas
+    for (let unit = 3; unit <= 4; unit++) {
+      const aptNumber = floor * 100 + unit
+      const area = tipoAEastAreas[floor - 1] + (unit - 3) * 2.8
+      const basePrice = 195_000_000
+      const floorPremium = (floor - 1) * 6_000_000
+      const unitPremium = (unit - 3) * 4_000_000
+      apartments.push({
+        id: mkId(),
+        name: `Apto ${aptNumber}`,
+        area,
+        bedrooms: 2,
+        bathrooms: 2,
+        floor,
+        view: views4[unit - 1],
+        typology: 'Tipo A · 2 Alcobas',
+        status: 'available',
+        price: basePrice + floorPremium + unitPremium,
+        image: '/images/renders/apto-74.png',
+        plan360Url: null,
+        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón', 'Zona de ropas', 'Acabados premium']),
+      })
+    }
   }
 
-  // ─── Tipo B: Pisos 5-8 (1-2 Alcobas, ~85-95 m²) — 48 apartments ───
-  const tipoBAreas = [84.50, 87.30, 85.60, 89.15, 86.40, 84.90, 88.20, 90.50, 85.80, 87.60, 84.10, 91.20]
+  // ─── Tipo B: Pisos 5-8 — 2 aptos 1 alcoba (oeste) + 2 aptos 2 alcobas (este) — 16 apartments ───
+  const tipoBWestAreas = [72.40, 74.80, 73.50, 76.10] // 1 alcoba ~70-78m²
+  const tipoBEastAreas = [91.20, 93.50, 92.80, 96.40] // 2 alcobas ~90-100m²
   for (let floor = 5; floor <= 8; floor++) {
-    for (let unit = 1; unit <= 12; unit++) {
+    // West wing: 2 apartments of 1 alcoba
+    for (let unit = 1; unit <= 2; unit++) {
       const aptNumber = floor * 100 + unit
-      const area = tipoBAreas[unit - 1]
-      const isTwoBed = unit <= 8 // First 8 units have 2 bedrooms
+      const area = tipoBWestAreas[floor - 5] + (unit - 1) * 3.2
       const basePrice = 250_000_000
-      const floorPremium = (floor - 5) * 8_000_000
-      const unitPremium = (unit - 1) * 1_200_000
+      const floorPremium = (floor - 5) * 12_000_000
+      const unitPremium = (unit - 1) * 5_000_000
       apartments.push({
         id: mkId(),
         name: `Apto ${aptNumber}`,
         area,
-        bedrooms: isTwoBed ? 2 : 1,
-        bathrooms: isTwoBed ? 2 : 1,
+        bedrooms: 1,
+        bathrooms: 1,
         floor,
-        view: views12[unit - 1],
-        typology: isTwoBed ? 'Tipo B · 2 Alcobas' : 'Tipo B · 1 Alcoba',
+        view: views4[unit - 1],
+        typology: 'Tipo B · 1 Alcoba',
         status: 'available',
         price: basePrice + floorPremium + unitPremium,
-        image: isTwoBed ? '/images/renders/apto-74.png' : '/images/renders/apto-57.png',
+        image: '/images/renders/apto-57.png',
         plan360Url: null,
-        features: JSON.stringify(
-          isTwoBed
-            ? ['2 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium']
-            : ['1 alcoba', 'Baño completo', 'Sala', 'Cocina integral', 'Balcón', 'Zona de ropas', 'Acabados premium']
-        ),
+        features: JSON.stringify(['1 alcoba', 'Baño completo', 'Sala', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium']),
       })
     }
-  }
-
-  // ─── Tipo B Premium: Pisos 9-12 (2 Alcobas, ~85-95 m², +15-25% premium) — 48 apartments ───
-  const tipoBPreAreas = [86.50, 89.30, 87.60, 91.15, 88.40, 86.90, 90.20, 92.50, 87.80, 89.60, 86.10, 93.20]
-  for (let floor = 9; floor <= 12; floor++) {
-    for (let unit = 1; unit <= 12; unit++) {
+    // East wing: 2 apartments of 2 alcobas
+    for (let unit = 3; unit <= 4; unit++) {
       const aptNumber = floor * 100 + unit
-      const area = tipoBPreAreas[unit - 1]
-      const isTwoBed = unit <= 10 // Most units have 2 bedrooms on premium floors
-      const premiumMultiplier = 1.15 + (floor - 9) * 0.03 // 15% to 24% premium
-      const basePrice = Math.round(280_000_000 * premiumMultiplier)
-      const floorPremium = (floor - 9) * 6_000_000
-      const unitPremium = (unit - 1) * 1_500_000
+      const area = tipoBEastAreas[floor - 5] + (unit - 3) * 3.5
+      const basePrice = 280_000_000
+      const floorPremium = (floor - 5) * 10_000_000
+      const unitPremium = (unit - 3) * 6_000_000
       apartments.push({
         id: mkId(),
         name: `Apto ${aptNumber}`,
         area,
-        bedrooms: isTwoBed ? 2 : 1,
-        bathrooms: isTwoBed ? 2 : 1,
+        bedrooms: 2,
+        bathrooms: 2,
         floor,
-        view: views12[unit - 1],
-        typology: isTwoBed ? 'Tipo B Premium · 2 Alcobas' : 'Tipo B Premium · 1 Alcoba',
+        view: views4[unit - 1],
+        typology: 'Tipo B · 2 Alcobas',
         status: 'available',
         price: basePrice + floorPremium + unitPremium,
-        image: isTwoBed ? '/images/renders/apto-74.png' : '/images/renders/apto-57.png',
+        image: '/images/renders/apto-74.png',
         plan360Url: null,
-        features: JSON.stringify(
-          isTwoBed
-            ? ['2 alcobas', '2 baños completos', 'Sala-comedor con balcón', 'Cocina integrada', 'Balcón jardín', 'Zona de ropas', 'Acabados premium', 'Piso porcelánico']
-            : ['1 alcoba', 'Baño completo', 'Sala-comedor', 'Cocina integrada', 'Balcón', 'Zona de ropas', 'Acabados premium', 'Piso porcelánico']
-        ),
+        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium']),
       })
     }
   }
 
-  // Mark some as sold/reserved for realism
-  const soldIndices = [0, 3, 24, 48, 72, 96, 120, 130]
-  const reservedIndices = [6, 14, 31, 42, 55, 67, 85, 99, 110, 140]
+  // ─── Tipo B+: Pisos 9-12 — 2 aptos 2 alcobas (oeste) + 2 aptos 3 alcobas vestier (este) — 16 apartments ───
+  const tipoBPlusWestAreas = [88.50, 90.80, 89.60, 92.30] // 2 alcobas ~85-95m²
+  const tipoBPlusEastAreas = [108.40, 111.20, 109.80, 114.60] // 3 alcobas vestier ~105-120m²
+  for (let floor = 9; floor <= 12; floor++) {
+    // West wing: 2 apartments of 2 alcobas
+    for (let unit = 1; unit <= 2; unit++) {
+      const aptNumber = floor * 100 + unit
+      const area = tipoBPlusWestAreas[floor - 9] + (unit - 1) * 3.5
+      const premiumMultiplier = 1.05 + (floor - 9) * 0.03
+      const basePrice = Math.round(350_000_000 * premiumMultiplier)
+      const floorPremium = (floor - 9) * 8_000_000
+      const unitPremium = (unit - 1) * 6_000_000
+      apartments.push({
+        id: mkId(),
+        name: `Apto ${aptNumber}`,
+        area,
+        bedrooms: 2,
+        bathrooms: 2,
+        floor,
+        view: views4[unit - 1],
+        typology: 'Tipo B+ · 2 Alcobas',
+        status: 'available',
+        price: basePrice + floorPremium + unitPremium,
+        image: '/images/renders/apto-74.png',
+        plan360Url: null,
+        features: JSON.stringify(['2 alcobas', '2 baños completos', 'Sala-comedor con balcón', 'Cocina integrada', 'Balcón jardín', 'Zona de ropas', 'Acabados premium', 'Piso porcelánico']),
+      })
+    }
+    // East wing: 2 apartments of 3 alcobas con vestier
+    for (let unit = 3; unit <= 4; unit++) {
+      const aptNumber = floor * 100 + unit
+      const area = tipoBPlusEastAreas[floor - 9] + (unit - 3) * 4.2
+      const premiumMultiplier = 1.10 + (floor - 9) * 0.04
+      const basePrice = Math.round(420_000_000 * premiumMultiplier)
+      const floorPremium = (floor - 9) * 10_000_000
+      const unitPremium = (unit - 3) * 8_000_000
+      apartments.push({
+        id: mkId(),
+        name: `Apto ${aptNumber}`,
+        area,
+        bedrooms: 3,
+        bathrooms: 2,
+        floor,
+        view: views4[unit - 1],
+        typology: 'Tipo B+ · 3 Alcobas Vestier',
+        status: 'available',
+        price: basePrice + floorPremium + unitPremium,
+        image: '/images/renders/apto-97.png',
+        plan360Url: null,
+        features: JSON.stringify(['3 alcobas con vestier', '2 baños completos', 'Sala-comedor con balcón', 'Cocina integrada', 'Balcón jardín', 'Zona de ropas', 'Walk-in closet', 'Acabados premium', 'Piso porcelánico']),
+      })
+    }
+  }
+
+  // Mark some as sold/reserved for realism (48 apartments total)
+  const soldIndices = [0, 7, 15, 23, 35, 44]
+  const reservedIndices = [3, 11, 19, 28, 38, 46]
   for (const idx of soldIndices) {
     if (idx < apartments.length) apartments[idx].status = 'sold'
   }

@@ -35,8 +35,8 @@ const buildingLevels = [
     type: 'Residencial Premium · 2 Alcobas',
     icon: '▦',
     description:
-      'Los niveles más exclusivos con apartamentos de 2 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el Valle de Aburrá y la Autopista Sur.',
-    features: ['2 Alcobas', 'Balcón jardín', '2 Baños', 'Sala-comedor'],
+      'Los niveles más exclusivos con apartamentos de 2 y 3 alcobas con vestier, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el Valle de Aburrá y la Autopista Sur. 4 apartamentos por piso.',
+    features: ['3 Alcobas Vestier', 'Balcón jardín', '2 Baños', '4 Aptos/Piso'],
     render: '/images/renders/apto-97.png',
   },
   {
@@ -45,8 +45,8 @@ const buildingLevels = [
     type: 'Residencial · 1-2 Alcobas',
     icon: '▦',
     description:
-      'Niveles intermedios con tipologías de 1 y 2 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. 12 apartamentos por piso organizados en dos alas.',
-    features: ['1-2 Alcobas', 'Patio central', 'Ventilación cruzada', 'Balcones verdes'],
+      'Niveles intermedios con tipologías de 1 y 2 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. 4 apartamentos por piso organizados en dos alas.',
+    features: ['1-2 Alcobas', 'Patio central', 'Ventilación cruzada', '4 Aptos/Piso'],
     render: '/images/renders/apto-74.png',
   },
   {
@@ -55,8 +55,8 @@ const buildingLevels = [
     type: 'Residencial · 1 Alcoba',
     icon: '▦',
     description:
-      'Primeros pisos residenciales con apartamentos tipo de 1 alcoba (~73.70 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo.',
-    features: ['1 Alcoba ~74m²', 'Vista al atrio', 'Acceso amenidades', '12 aptos/piso'],
+      'Primeros pisos residenciales con apartamentos tipo de 1 y 2 alcobas (~68-90 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo. 4 apartamentos por piso.',
+    features: ['1-2 Alcobas', 'Vista al atrio', 'Acceso amenidades', '4 Aptos/Piso'],
     render: '/images/renders/apto-57.png',
   },
   {
@@ -118,6 +118,8 @@ const stats = [
   { label: 'Zona Social', value: '1' },
   { label: 'Pisos Residenciales', value: '12' },
   { label: 'Total Niveles', value: '18' },
+  { label: 'Aptos/Piso', value: '4' },
+  { label: 'Total Aptos', value: '48' },
 ]
 
 /* ─── Loading Fallback for 3D Canvas ─── */
@@ -372,7 +374,7 @@ export default function ExplorarEdificio() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 1 }}
-          className="grid grid-cols-2 md:grid-cols-6 gap-px mt-12 bg-[#D8D1C8]/5"
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-px mt-12 bg-[#D8D1C8]/5"
         >
           {stats.map((stat, i) => (
             <div key={i} className="text-center p-5 bg-[#0A0A0A]">

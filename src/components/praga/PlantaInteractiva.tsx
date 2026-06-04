@@ -90,43 +90,33 @@ const STATUS_LABELS: Record<UnitStatus, string> = {
 // UNIT POLYGON LAYOUTS
 // ═══════════════════════════════════════════════════════════════════
 
-// 12 apartments per floor: 6 per wing (left + right)
-// Left wing: 3 top + 3 bottom, Right wing: 3 top + 3 bottom
-function layout12(): UnitLayoutDef[] {
-  const midY = AY + AH / 2
-  const lwW = AX - BX - CW // left wing width
-  const rwX = AX + AW + CW // right wing start X
-  const rwW = BX + BW - rwX // right wing width
-  const topH = (AY - BY) // top section height
-  const botY = AY + AH // bottom section start Y
-  const botH = BY + BH - botY // bottom section height
+// 4 apartments per floor: 2 per wing (west + east)
+// West wing: 2 units (smaller, 1-2 alcobas) · East wing: 2 units (larger, 2-3 alcobas)
+function layout4(): UnitLayoutDef[] {
+  const midY = BY + BH / 2
+  const lwW = AX - BX - CW // west wing width
+  const rwX = AX + AW + CW // east wing start X
+  const rwW = BX + BW - rwX // east wing width
 
-  // Left wing top: 3 units
-  const lwTopUnitW = lwW / 3
-  // Left wing bottom: 3 units
-  const lwBotUnitW = lwW / 3
-  // Right wing top: 3 units
-  const rwTopUnitW = rwW / 3
-  // Right wing bottom: 3 units
-  const rwBotUnitW = rwW / 3
+  // West wing: top unit + bottom unit
+  const westTopH = midY - BY - 10
+  const westBotY = midY + 10
+  const westBotH = BY + BH - westBotY
+
+  // East wing: top unit + bottom unit
+  const eastTopH = midY - BY - 10
+  const eastBotY = midY + 10
+  const eastBotH = BY + BH - eastBotY
 
   return [
-    // Left wing - top row (3 units)
-    { polygon: [[BX, BY], [BX + lwTopUnitW, BY], [BX + lwTopUnitW, AY], [BX, AY]], center: [BX + lwTopUnitW / 2, BY + topH / 2] },
-    { polygon: [[BX + lwTopUnitW, BY], [BX + lwTopUnitW * 2, BY], [BX + lwTopUnitW * 2, AY], [BX + lwTopUnitW, AY]], center: [BX + lwTopUnitW * 1.5, BY + topH / 2] },
-    { polygon: [[BX + lwTopUnitW * 2, BY], [AX - CW, BY], [AX - CW, AY], [BX + lwTopUnitW * 2, AY]], center: [BX + lwTopUnitW * 2.5, BY + topH / 2] },
-    // Right wing - top row (3 units)
-    { polygon: [[rwX, BY], [rwX + rwTopUnitW, BY], [rwX + rwTopUnitW, AY], [rwX, AY]], center: [rwX + rwTopUnitW / 2, BY + topH / 2] },
-    { polygon: [[rwX + rwTopUnitW, BY], [rwX + rwTopUnitW * 2, BY], [rwX + rwTopUnitW * 2, AY], [rwX + rwTopUnitW, AY]], center: [rwX + rwTopUnitW * 1.5, BY + topH / 2] },
-    { polygon: [[rwX + rwTopUnitW * 2, BY], [BX + BW, BY], [BX + BW, AY], [rwX + rwTopUnitW * 2, AY]], center: [rwX + rwTopUnitW * 2.5, BY + topH / 2] },
-    // Left wing - bottom row (3 units)
-    { polygon: [[BX, botY], [BX + lwBotUnitW, botY], [BX + lwBotUnitW, BY + BH], [BX, BY + BH]], center: [BX + lwBotUnitW / 2, botY + botH / 2] },
-    { polygon: [[BX + lwBotUnitW, botY], [BX + lwBotUnitW * 2, botY], [BX + lwBotUnitW * 2, BY + BH], [BX + lwBotUnitW, BY + BH]], center: [BX + lwBotUnitW * 1.5, botY + botH / 2] },
-    { polygon: [[BX + lwBotUnitW * 2, botY], [AX - CW, botY], [AX - CW, BY + BH], [BX + lwBotUnitW * 2, BY + BH]], center: [BX + lwBotUnitW * 2.5, botY + botH / 2] },
-    // Right wing - bottom row (3 units)
-    { polygon: [[rwX, botY], [rwX + rwBotUnitW, botY], [rwX + rwBotUnitW, BY + BH], [rwX, BY + BH]], center: [rwX + rwBotUnitW / 2, botY + botH / 2] },
-    { polygon: [[rwX + rwBotUnitW, botY], [rwX + rwBotUnitW * 2, botY], [rwX + rwBotUnitW * 2, BY + BH], [rwX + rwBotUnitW, BY + BH]], center: [rwX + rwBotUnitW * 1.5, botY + botH / 2] },
-    { polygon: [[rwX + rwBotUnitW * 2, botY], [BX + BW, botY], [BX + BW, BY + BH], [rwX + rwBotUnitW * 2, BY + BH]], center: [rwX + rwBotUnitW * 2.5, botY + botH / 2] },
+    // West wing - top unit (Unit 1: APTO 02 / 1 alcoba)
+    { polygon: [[BX, BY], [AX - CW, BY], [AX - CW, midY - 10], [BX, midY - 10]], center: [(BX + AX - CW) / 2, BY + westTopH / 2] },
+    // West wing - bottom unit (Unit 2: APTO 05 / 1-2 alcobas)
+    { polygon: [[BX, westBotY], [AX - CW, westBotY], [AX - CW, BY + BH], [BX, BY + BH]], center: [(BX + AX - CW) / 2, westBotY + westBotH / 2] },
+    // East wing - top unit (Unit 3: 2 alcobas)
+    { polygon: [[rwX, BY], [BX + BW, BY], [BX + BW, midY - 10], [rwX, midY - 10]], center: [(rwX + BX + BW) / 2, BY + eastTopH / 2] },
+    // East wing - bottom unit (Unit 4: 3 alcobas vestier)
+    { polygon: [[rwX, eastBotY], [BX + BW, eastBotY], [BX + BW, BY + BH], [rwX, BY + BH]], center: [(rwX + BX + BW) / 2, eastBotY + eastBotH / 2] },
   ]
 }
 
@@ -149,7 +139,7 @@ function layoutCommercial(): UnitLayoutDef[] {
 }
 
 function getUnitLayouts(count: number): UnitLayoutDef[] {
-  if (count === 12) return layout12()
+  if (count === 4) return layout4()
   if (count === 6) return layout6()
   if (count === 2) return layoutCommercial()
   return []
@@ -223,9 +213,9 @@ const FLOORS: FloorConfig[] = [
   ...Array.from({ length: 12 }, (_, i) => ({
     id: `piso-${i + 1}`,
     name: `Piso ${i + 1}`,
-    typeLabel: i < 4 ? 'Residencial · Tipo A · 1 Alcoba' : i < 8 ? 'Residencial · Tipo B · 1-2 Alcobas' : 'Residencial Premium · 2 Alcobas',
+    typeLabel: i < 4 ? 'Residencial · 2 Tipo A (1 alcoba) + 2 Tipo A (2 alcobas)' : i < 8 ? 'Residencial · 2 Tipo B (1-2 alcobas) + 2 Tipo B (2 alcobas)' : 'Residencial Premium · 2 Tipo B+ (2 alcobas) + 2 Premium (3 alcobas vestier)',
     isResidential: true as const,
-    unitCount: 12,
+    unitCount: 4,
     areas: [] as LabeledArea[],
   })),
   {
@@ -245,65 +235,41 @@ const FLOORS: FloorConfig[] = [
 // UNIT DATA GENERATION
 // ═══════════════════════════════════════════════════════════════════
 
-const STATUS_MAP_12: UnitStatus[] = ['sold', 'reserved', 'available', 'available', 'reserved', 'available', 'available', 'sold', 'available', 'reserved', 'available', 'available']
+const STATUS_MAP_4: UnitStatus[] = ['available', 'reserved', 'available', 'sold']
 
-const TYPOLOGIES_12: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
+const TYPOLOGIES_4: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
   '1-4': [
-    { typ: 'Tipo A', area: 71.85, beds: 1, baths: 1, price: '$180M – $195M' },
-    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $200M' },
-    { typ: 'Tipo A', area: 72.40, beds: 1, baths: 1, price: '$182M – $198M' },
-    { typ: 'Tipo A', area: 74.15, beds: 1, baths: 1, price: '$188M – $204M' },
-    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
-    { typ: 'Tipo A', area: 71.90, beds: 1, baths: 1, price: '$180M – $196M' },
-    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
-    { typ: 'Tipo A', area: 74.50, beds: 1, baths: 1, price: '$189M – $205M' },
-    { typ: 'Tipo A', area: 72.80, beds: 1, baths: 1, price: '$183M – $199M' },
-    { typ: 'Tipo A', area: 73.70, beds: 1, baths: 1, price: '$185M – $201M' },
-    { typ: 'Tipo A', area: 71.50, beds: 1, baths: 1, price: '$179M – $195M' },
-    { typ: 'Tipo A', area: 74.20, beds: 1, baths: 1, price: '$188M – $204M' },
+    { typ: 'Tipo A', area: 68.50, beds: 1, baths: 1, price: '$180M – $212M' },
+    { typ: 'Tipo A', area: 71.20, beds: 1, baths: 1, price: '$183M – $215M' },
+    { typ: 'Tipo A', area: 87.30, beds: 2, baths: 2, price: '$195M – $227M' },
+    { typ: 'Tipo A', area: 89.60, beds: 2, baths: 2, price: '$199M – $231M' },
   ],
   '5-8': [
-    { typ: 'Tipo B', area: 84.50, beds: 2, baths: 2, price: '$250M – $280M' },
-    { typ: 'Tipo B', area: 87.30, beds: 2, baths: 2, price: '$260M – $290M' },
-    { typ: 'Tipo B', area: 85.60, beds: 2, baths: 2, price: '$255M – $285M' },
-    { typ: 'Tipo B', area: 89.15, beds: 2, baths: 2, price: '$268M – $298M' },
-    { typ: 'Tipo B', area: 86.40, beds: 2, baths: 1, price: '$258M – $288M' },
-    { typ: 'Tipo B', area: 84.90, beds: 1, baths: 1, price: '$252M – $282M' },
-    { typ: 'Tipo B', area: 88.20, beds: 2, baths: 2, price: '$265M – $295M' },
-    { typ: 'Tipo B', area: 90.50, beds: 2, baths: 2, price: '$272M – $302M' },
-    { typ: 'Tipo B', area: 85.80, beds: 1, baths: 1, price: '$256M – $286M' },
-    { typ: 'Tipo B', area: 87.60, beds: 2, baths: 2, price: '$262M – $292M' },
-    { typ: 'Tipo B', area: 84.10, beds: 1, baths: 1, price: '$250M – $280M' },
-    { typ: 'Tipo B', area: 91.20, beds: 2, baths: 2, price: '$275M – $305M' },
+    { typ: 'Tipo B', area: 72.40, beds: 1, baths: 1, price: '$250M – $298M' },
+    { typ: 'Tipo B', area: 74.80, beds: 1, baths: 1, price: '$255M – $303M' },
+    { typ: 'Tipo B', area: 91.20, beds: 2, baths: 2, price: '$280M – $328M' },
+    { typ: 'Tipo B', area: 93.50, beds: 2, baths: 2, price: '$286M – $334M' },
   ],
   '9-12': [
-    { typ: 'Tipo B+', area: 86.50, beds: 2, baths: 2, price: '$320M – $360M' },
-    { typ: 'Tipo B+', area: 89.30, beds: 2, baths: 2, price: '$335M – $375M' },
-    { typ: 'Tipo B+', area: 87.60, beds: 2, baths: 2, price: '$328M – $368M' },
-    { typ: 'Tipo B+', area: 91.15, beds: 2, baths: 2, price: '$345M – $385M' },
-    { typ: 'Tipo B+', area: 88.40, beds: 2, baths: 2, price: '$332M – $372M' },
-    { typ: 'Tipo B+', area: 86.90, beds: 2, baths: 2, price: '$325M – $365M' },
-    { typ: 'Tipo B+', area: 90.20, beds: 2, baths: 2, price: '$340M – $380M' },
-    { typ: 'Tipo B+', area: 92.50, beds: 2, baths: 2, price: '$350M – $390M' },
-    { typ: 'Tipo B+', area: 87.80, beds: 2, baths: 2, price: '$330M – $370M' },
-    { typ: 'Tipo B+', area: 89.60, beds: 2, baths: 2, price: '$338M – $378M' },
-    { typ: 'Tipo B+', area: 86.10, beds: 1, baths: 1, price: '$322M – $362M' },
-    { typ: 'Tipo B+', area: 93.20, beds: 2, baths: 2, price: '$355M – $395M' },
+    { typ: 'Tipo B+', area: 88.50, beds: 2, baths: 2, price: '$350M – $414M' },
+    { typ: 'Tipo B+', area: 90.80, beds: 2, baths: 2, price: '$356M – $420M' },
+    { typ: 'Premium', area: 108.40, beds: 3, baths: 2, price: '$420M – $498M' },
+    { typ: 'Premium', area: 111.20, beds: 3, baths: 2, price: '$430M – $508M' },
   ],
 }
 
 // Per-floor status overrides for realism (floor index → status overrides)
 const FLOOR_STATUS_OVERRIDES: Record<number, Partial<Record<number, UnitStatus>>> = {
-  9: { 0: 'sold', 2: 'sold', 5: 'reserved' },
-  10: { 1: 'sold', 7: 'reserved' },
-  11: { 0: 'reserved', 3: 'reserved' },
-  12: { 2: 'reserved', 8: 'sold' },
-  13: { 5: 'reserved' },
-  14: { 1: 'sold', 9: 'reserved' },
-  15: { 3: 'sold' },
-  16: { 0: 'reserved', 7: 'sold' },
-  17: { 4: 'reserved' },
-  18: { 2: 'sold' },
+  9: { 0: 'sold', 3: 'reserved' },
+  10: { 1: 'sold' },
+  11: { 0: 'reserved', 3: 'sold' },
+  12: { 2: 'reserved' },
+  13: { 1: 'sold' },
+  14: { 3: 'reserved' },
+  15: { 0: 'sold' },
+  16: { 2: 'sold' },
+  17: { 1: 'reserved' },
+  18: { 3: 'sold' },
 }
 
 function generateUnits(floor: FloorConfig, floorIdx: number): UnitData[] {
@@ -316,8 +282,8 @@ function generateUnits(floor: FloorConfig, floorIdx: number): UnitData[] {
   if (floorNum >= 5 && floorNum <= 8) typKey = '5-8'
   else if (floorNum >= 9) typKey = '9-12'
 
-  const typs = TYPOLOGIES_12[typKey] ?? TYPOLOGIES_12['1-4']
-  const baseStatus = STATUS_MAP_12
+  const typs = TYPOLOGIES_4[typKey] ?? TYPOLOGIES_4['1-4']
+  const baseStatus = STATUS_MAP_4
   const overrides = FLOOR_STATUS_OVERRIDES[floorIdx] ?? {}
 
   return Array.from({ length: n }, (_, i) => {
