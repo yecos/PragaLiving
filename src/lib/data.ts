@@ -333,7 +333,7 @@ export async function verifyAdmin(username: string, password: string) {
       if (admin && admin.password === password) {
         return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
       }
-      return { success: false, error: 'Credenciales inválidas' }
+      // If DB is available but admin not found, fall through to hardcoded credentials
     } catch {
       // Fall through
     }

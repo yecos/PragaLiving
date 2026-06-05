@@ -583,3 +583,31 @@ Stage Summary:
 - Syntax error fixed (const overedUnit → const [hoveredUnit)
 - Hotspot coordinates are approximate and will need fine-tuning with user's help
 - Zero lint errors, compiles cleanly
+---
+Task ID: 1
+Agent: Main Agent
+Task: Review and fix image upload + CMS functionality, connect remaining components, add improvements
+
+Work Log:
+- Explored entire project structure and identified components using CMS vs hardcoded data
+- Found Amenidades.tsx and Galeria.tsx were NOT connected to CMS (hardcoded data)
+- Fixed upload API to support multiple categories (planos, renders, galeria, general, logos)
+- Updated ImageField in SiteConfigEditor to pass category prop to upload function
+- Connected Amenidades.tsx to useSiteConfig hook (reads from site-config.json)
+- Connected Galeria.tsx to useSiteConfig hook (reads from site-config.json)
+- Fixed login bug where verifyAdmin didn't fall through to hardcoded credentials when DB was available but empty
+- Created /api/media endpoint for media library
+- Added "Medios" tab to AdminPanel with full media library UI
+- Added "Abrir Sitio" button to admin top bar
+- Added "SEO & Social" section to SiteConfigEditor under Configuración tab
+- Added seo section to site-config.json
+- Updated layout.tsx metadata to read from site-config.json at build time
+- All builds pass successfully
+
+Stage Summary:
+- All 16 website sections now editable from admin panel via CMS
+- Image uploads now support proper categorization (renders, planos, galeria, general, logos)
+- Media library added for browsing and managing all uploaded images
+- Login fixed for environments where DB exists but admin table is empty
+- SEO metadata now configurable from admin panel
+- Live preview available via "Abrir Sitio" button

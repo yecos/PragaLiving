@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const amenities = [
+const defaultAmenities = [
   {
     id: 'coworking',
     name: 'Coworking',
@@ -55,6 +56,13 @@ const amenities = [
 ]
 
 export default function Amenidades() {
+  const { config } = useSiteConfig()
+  const amenConfig = config?.amenidades
+
+  const label = amenConfig?.label || 'Amenidades'
+  const title = amenConfig?.title || 'Vivir estilo de vida'
+  const amenities = amenConfig?.items || defaultAmenities
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const [selected, setSelected] = useState(0)
@@ -70,7 +78,7 @@ export default function Amenidades() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Amenidades
+            {label}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -78,7 +86,7 @@ export default function Amenidades() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#111111] font-light"
           >
-            Vender estilo de vida
+            {title}
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
@@ -100,8 +108,8 @@ export default function Amenidades() {
             <AnimatePresence mode="wait">
               <motion.img
                 key={selected}
-                src={amenities[selected].image}
-                alt={amenities[selected].name}
+                src={amenities[selected]?.image || '/images/renders/coworking.png'}
+                alt={amenities[selected]?.name || 'Amenidad'}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -111,7 +119,7 @@ export default function Amenidades() {
             </AnimatePresence>
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#111111]/70 to-transparent p-6">
               <h3 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">
-                {amenities[selected].name}
+                {amenities[selected]?.name || 'Amenidad'}
               </h3>
             </div>
           </motion.div>
@@ -119,9 +127,9 @@ export default function Amenidades() {
           {/* Right: Details */}
           <div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-              {amenities.map((amenity, i) => (
+              {amenities.map((amenity: typeof defaultAmenities[0], i: number) => (
                 <motion.button
-                  key={amenity.id}
+                  key={amenity.id || i}
                   initial={{ opacity: 0, y: 15 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.5 + i * 0.08 }}
@@ -150,13 +158,13 @@ export default function Amenidades() {
                 transition={{ duration: 0.4 }}
               >
                 <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl text-[#111111] mb-4">
-                  {amenities[selected].name}
+                  {amenities[selected]?.name || 'Amenidad'}
                 </h3>
                 <p className="font-[family-name:var(--font-inter)] text-sm text-[#111111]/60 leading-relaxed mb-6">
-                  {amenities[selected].description}
+                  {amenities[selected]?.description || ''}
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  {amenities[selected].benefits.map((benefit, i) => (
+                  {(amenities[selected]?.benefits || []).map((benefit: string, i: number) => (
                     <span
                       key={i}
                       className="text-[10px] tracking-[0.1em] uppercase border border-[#8B6B4B]/30 text-[#8B6B4B] px-3 py-1.5"

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
-import { Download } from 'lucide-react'
+import { Download, Upload, Copy, Check, ImageIcon, ExternalLink } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
 import SiteConfigEditor from './SiteConfigEditor'
 
-type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas' | 'contenido' | 'ubicacion' | 'configuracion'
+type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas' | 'contenido' | 'ubicacion' | 'configuracion' | 'medios'
 
 interface Apartment {
   id: string
@@ -86,6 +86,13 @@ export default function AdminPanel() {
   const [loginData, setLoginData] = useState({ user: '', pass: '' })
   const [loginError, setLoginError] = useState('')
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
+
+  const handleTabSwitch = (tab: Tab) => {
+    setActiveTab(tab)
+    if (tab === 'medios') {
+      void fetchMedia()
+    }
+  }
   const [apartments, setApartments] = useState<Apartment[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [amenities, setAmenities] = useState<Amenity[]>([])
@@ -108,6 +115,15 @@ export default function AdminPanel() {
   const [editingAmenity, setEditingAmenity] = useState<string | null>(null)
   const [amenityEditData, setAmenityEditData] = useState<{ name: string; description: string; category: string }>({ name: '', description: '', category: '' })
 
+  // Media library
+  const [mediaData, setMediaData] = useState<Record<string, Array<{ name: string; url: string; size: number }>>>({})
+  const [mediaCategory, setMediaCategory] = useState<string>('all')
+  const [mediaLoading, setMediaLoading] = useState(false)
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const [uploadCategory, setUploadCategory] = useState<string>('general')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
@@ -126,6 +142,18 @@ export default function AdminPanel() {
       // silently fail
     }
     setLoading(false)
+  }, [])
+
+  const fetchMedia = useCallback(async () => {
+    setMediaLoading(true)
+    try {
+      const res = await fetch('/api/media')
+      const data = await res.json()
+      setMediaData(data)
+    } catch {
+      // silently fail
+    }
+    setMediaLoading(false)
   }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -325,6 +353,7 @@ export default function AdminPanel() {
     { id: 'contenido', label: 'Contenido' },
     { id: 'ubicacion', label: 'Ubicación' },
     { id: 'configuracion', label: 'Configuración' },
+    { id: 'medios', label: 'Medios' },
   ]
 
   return (
@@ -336,6 +365,10 @@ export default function AdminPanel() {
           <span className="text-[10px] tracking-[0.3em] uppercase text-[#8B6B4B]">Admin</span>
         </div>
         <div className="flex items-center gap-4">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
+            <ExternalLink className="w-3 h-3" />
+            Abrir Sitio
+          </a>
           <button onClick={() => void fetchData()} className="text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
             Actualizar
           </button>
@@ -350,7 +383,7 @@ export default function AdminPanel() {
         <div className="w-56 bg-[#111111] border-r border-[#D8D1C8]/5 min-h-[calc(100vh-56px)] p-4 hidden md:block">
           <nav className="space-y-1">
             {tabs.map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full text-left px-4 py-2.5 text-[11px] tracking-[0.1em] uppercase transition-all duration-300 ${activeTab === tab.id ? 'bg-[#8B6B4B]/10 text-[#8B6B4B] border-l-2 border-[#8B6B4B]' : 'text-[#D8D1C8]/30 hover:text-[#D8D1C8]/50 border-l-2 border-transparent'}`}>
+              <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`w-full text-left px-4 py-2.5 text-[11px] tracking-[0.1em] uppercase transition-all duration-300 ${activeTab === tab.id ? 'bg-[#8B6B4B]/10 text-[#8B6B4B] border-l-2 border-[#8B6B4B]' : 'text-[#D8D1C8]/30 hover:text-[#D8D1C8]/50 border-l-2 border-transparent'}`}>
                 {tab.label}
               </button>
             ))}
@@ -360,7 +393,7 @@ export default function AdminPanel() {
         {/* Mobile tabs */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111111] border-t border-[#D8D1C8]/5 z-50 flex">
           {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 py-3 text-[9px] tracking-wider uppercase ${activeTab === tab.id ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/30'}`}>
+            <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`flex-1 py-3 text-[9px] tracking-wider uppercase ${activeTab === tab.id ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/30'}`}>
               {tab.label}
             </button>
           ))}
@@ -645,6 +678,168 @@ export default function AdminPanel() {
               {activeTab === 'configuracion' && (
                 <motion.div key="configuracion" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <SiteConfigEditor mode="configuracion" />
+                </motion.div>
+              )}
+
+              {/* ═══ MEDIOS ═══ */}
+              {activeTab === 'medios' && (
+                <motion.div key="medios" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Medios</h2>
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={uploadCategory}
+                        onChange={e => setUploadCategory(e.target.value)}
+                        className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                      >
+                        <option value="renders" className="bg-[#111111]">Renders</option>
+                        <option value="planos" className="bg-[#111111]">Planos</option>
+                        <option value="galeria" className="bg-[#111111]">Galería</option>
+                        <option value="general" className="bg-[#111111]">General</option>
+                        <option value="logos" className="bg-[#111111]">Logos</option>
+                      </select>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingFile}
+                        className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase bg-[#8B6B4B] text-[#F5F1EA] px-4 py-2 hover:bg-[#7A5C3E] transition-colors disabled:opacity-50"
+                      >
+                        {uploadingFile ? (
+                          <div className="w-3 h-3 border border-[#F5F1EA] border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Upload className="w-3 h-3" />
+                        )}
+                        Subir
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const handleUpload = async () => {
+                            setUploadingFile(true)
+                            try {
+                              const formData = new FormData()
+                              formData.append('file', file)
+                              formData.append('category', uploadCategory)
+                              const res = await fetch('/api/upload', { method: 'POST', body: formData })
+                              if (res.ok) {
+                                void fetchMedia()
+                              }
+                            } catch {
+                              // silently fail
+                            }
+                            setUploadingFile(false)
+                            if (fileInputRef.current) fileInputRef.current.value = ''
+                          }
+                          void handleUpload()
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Category filter tabs */}
+                  <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
+                    {[
+                      { id: 'all', label: 'Todos' },
+                      { id: 'renders', label: 'Renders' },
+                      { id: 'planos', label: 'Planos' },
+                      { id: 'galeria', label: 'Galería' },
+                      { id: 'general', label: 'General' },
+                      { id: 'logos', label: 'Logos' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setMediaCategory(cat.id)}
+                        className={`px-4 py-2 text-[10px] tracking-[0.1em] uppercase whitespace-nowrap transition-all duration-300 ${
+                          mediaCategory === cat.id
+                            ? 'bg-[#8B6B4B] text-[#F5F1EA]'
+                            : 'bg-[#111111] text-[#D8D1C8]/40 border border-[#D8D1C8]/10 hover:text-[#D8D1C8]/60 hover:border-[#8B6B4B]/30'
+                        }`}
+                      >
+                        {cat.label}
+                        {cat.id !== 'all' && mediaData[cat.id] && (
+                          <span className="ml-1.5 text-[9px] opacity-60">({mediaData[cat.id].length})</span>
+                        )}
+                        {cat.id === 'all' && (
+                          <span className="ml-1.5 text-[9px] opacity-60">({Object.values(mediaData).reduce((a, b) => a + b.length, 0)})</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+
+                  {mediaLoading ? (
+                    <div className="flex items-center justify-center h-48">
+                      <div className="w-8 h-8 border-2 border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  ) : Object.values(mediaData).every(v => v.length === 0) ? (
+                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-12 text-center">
+                      <ImageIcon className="w-8 h-8 text-[#D8D1C8]/15 mx-auto mb-3" />
+                      <p className="text-[11px] text-[#D8D1C8]/20">No hay imágenes en la biblioteca</p>
+                      <p className="text-[10px] text-[#D8D1C8]/10 mt-1">Sube imágenes usando el botón de arriba</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      {(mediaCategory === 'all'
+                        ? ['renders', 'planos', 'galeria', 'general', 'logos']
+                        : [mediaCategory]
+                      ).map((cat) => {
+                        const images = mediaData[cat] || []
+                        if (images.length === 0) return null
+                        return (
+                          <div key={cat}>
+                            <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#8B6B4B] mb-3 flex items-center gap-2">
+                              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                              <span className="text-[9px] text-[#D8D1C8]/20">({images.length})</span>
+                            </h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                              {images.map((img) => (
+                                <div
+                                  key={img.url}
+                                  className="group bg-[#111111] border border-[#D8D1C8]/5 hover:border-[#8B6B4B]/30 transition-all duration-300 overflow-hidden"
+                                >
+                                  <div className="aspect-square bg-[#0A0A0A] relative overflow-hidden">
+                                    <img
+                                      src={img.url}
+                                      alt={img.name}
+                                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                    />
+                                  </div>
+                                  <div className="p-2.5">
+                                    <p className="text-[10px] text-[#F5F1EA] truncate" title={img.name}>{img.name}</p>
+                                    <p className="text-[9px] text-[#D8D1C8]/25 mt-0.5">{(img.size / 1024).toFixed(1)} KB</p>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(img.url).then(() => {
+                                          setCopiedUrl(img.url)
+                                          setTimeout(() => setCopiedUrl(null), 2000)
+                                        })
+                                      }}
+                                      className="mt-2 w-full flex items-center justify-center gap-1 text-[9px] tracking-wider uppercase border border-[#D8D1C8]/10 text-[#D8D1C8]/40 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 py-1.5 transition-colors"
+                                    >
+                                      {copiedUrl === img.url ? (
+                                        <>
+                                          <Check className="w-3 h-3 text-[#4B5646]" />
+                                          <span className="text-[#4B5646]">Copiado</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3 h-3" />
+                                          <span>Copiar URL</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </motion.div>
               )}
 

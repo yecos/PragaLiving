@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const categories = [
+const defaultCategories = [
   'Exteriores',
   'Interiores',
   'Atrio',
@@ -12,7 +13,7 @@ const categories = [
   'Videos',
 ]
 
-const galleryItems = [
+const defaultGalleryItems = [
   { id: 1, category: 'Exteriores', src: '/images/renders/hero-day.jpg', title: 'Fachada Principal - Día' },
   { id: 2, category: 'Exteriores', src: '/images/renders/hero-sunset.jpg', title: 'Vista Atardecer' },
   { id: 3, category: 'Exteriores', src: '/images/renders/hero-night.jpg', title: 'Vista Nocturna' },
@@ -33,12 +34,20 @@ const galleryItems = [
 ]
 
 export default function Galeria() {
+  const { config } = useSiteConfig()
+  const galConfig = config?.galeria
+
+  const label = galConfig?.label || 'Galería'
+  const title = galConfig?.title || 'Visualizar Proyecto'
+  const categories = galConfig?.categories || defaultCategories
+  const galleryItems = galConfig?.items || defaultGalleryItems
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [activeCategory, setActiveCategory] = useState('Exteriores')
+  const [activeCategory, setActiveCategory] = useState(categories[0] || 'Exteriores')
   const [lightboxItem, setLightboxItem] = useState<typeof galleryItems[0] | null>(null)
 
-  const filteredItems = galleryItems.filter(item => item.category === activeCategory)
+  const filteredItems = galleryItems.filter((item: { category: string }) => item.category === activeCategory)
 
   return (
     <section id="galeria" ref={ref} className="relative py-24 md:py-32 bg-[#111111]">
@@ -51,7 +60,7 @@ export default function Galeria() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Galería
+            {label}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -59,7 +68,7 @@ export default function Galeria() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#F5F1EA] font-light"
           >
-            Visualizar Proyecto
+            {title}
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
@@ -71,7 +80,7 @@ export default function Galeria() {
 
         {/* Category filter */}
         <div className="flex justify-center gap-3 mb-12 overflow-x-auto">
-          {categories.map((cat) => (
+          {categories.map((cat: string) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
@@ -89,7 +98,7 @@ export default function Galeria() {
         {/* Gallery grid */}
         <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, i) => (
+            {filteredItems.map((item: { id: number; src: string; title: string; category: string }, i: number) => (
               <motion.div
                 key={item.id}
                 layout

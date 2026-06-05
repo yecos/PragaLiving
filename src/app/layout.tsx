@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
+import fs from "fs";
+import path from "path";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+
+const configPath = path.join(process.cwd(), "src", "data", "site-config.json");
+let siteConfig: Record<string, any> = {};
+try {
+  siteConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+} catch {}
+
+const seoConfig = siteConfig.seo || {};
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,17 +53,18 @@ const cormorant = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PRAGA Living | Arquitectura para quienes valoran lo excepcional",
-  description: "PRAGA Living - Una pieza arquitectónica diseñada para permanecer. Descubre residencias premium con arquitectura excepcional, diseño biophilic y estilo de vida exclusivo.",
+  title: seoConfig.metaTitle || "PRAGA Living | Arquitectura para quienes valoran lo excepcional",
+  description: seoConfig.metaDescription || "PRAGA Living - Una pieza arquitectónica diseñada para permanecer. Descubre residencias premium con arquitectura excepcional, diseño biophilic y estilo de vida exclusivo.",
   keywords: ["PRAGA Living", "residencias premium", "arquitectura", "bienestar", "exclusividad", "inmobiliaria"],
   authors: [{ name: "PRAGA Living" }],
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
-    title: "PRAGA Living | Arquitectura para quienes valoran lo excepcional",
-    description: "Una pieza arquitectónica diseñada para permanecer",
+    title: seoConfig.metaTitle || "PRAGA Living | Arquitectura para quienes valoran lo excepcional",
+    description: seoConfig.metaDescription || "Una pieza arquitectónica diseñada para permanecer",
     type: "website",
+    ...(seoConfig.ogImage ? { images: [{ url: seoConfig.ogImage }] } : {}),
   },
 };
 

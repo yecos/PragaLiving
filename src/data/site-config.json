@@ -565,5 +565,13 @@
     ],
     "ctaText": "Agendar Visita",
     "ctaLink": "#contacto"
+  },
+  "seo": {
+    "metaTitle": "PRAGA Living | Residencias Premium en Caldas, Antioquia",
+    "metaDescription": "Residencias premium con diseño biophilic en Caldas, Antioquia. Studios desde 33m² hasta penthouses de 97m² con vistas panorámicas al Valle de Aburrá.",
+    "ogImage": "/images/renders/hero-day.jpg",
+    "instagram": "https://instagram.com/pragaliving",
+    "facebook": "https://facebook.com/pragaliving",
+    "linkedin": ""
   }
 }

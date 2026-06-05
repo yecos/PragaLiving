@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 type SectionKey =
   | 'general' | 'hero' | 'manifiesto' | 'arquitectura' | 'edificio'
   | 'atrio' | 'amenidades' | 'tipologias' | 'recorridos' | 'ubicacion'
-  | 'galeria' | 'inversion' | 'contacto' | 'footer' | 'chat' | 'navigation'
+  | 'galeria' | 'inversion' | 'contacto' | 'footer' | 'chat' | 'navigation' | 'seo'
 
 interface SubTab {
   id: SectionKey
@@ -40,13 +40,15 @@ const configuracionTabs: SubTab[] = [
   { id: 'footer', label: 'Footer' },
   { id: 'chat', label: 'Chat IA' },
   { id: 'navigation', label: 'Navegación' },
+  { id: 'seo', label: 'SEO & Social' },
 ]
 
 // ─── Helper: Image upload ───
-async function uploadImage(file: File): Promise<string | null> {
+async function uploadImage(file: File, category?: string): Promise<string | null> {
   try {
     const formData = new FormData()
     formData.append('file', file)
+    if (category) formData.append('category', category)
     const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
@@ -84,7 +86,7 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
   )
 }
 
-function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ImageField({ label, value, onChange, category }: { label: string; value: string; onChange: (v: string) => void; category?: string }) {
   const [uploading, setUploading] = useState(false)
   return (
     <div>
@@ -102,7 +104,7 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
             const file = e.target.files?.[0]
             if (!file) return
             setUploading(true)
-            const url = await uploadImage(file)
+            const url = await uploadImage(file, category)
             if (url) onChange(url)
             setUploading(false)
           }} />
@@ -281,6 +283,7 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
             {activeSubTab === 'footer' && <FooterEditor data={config.footer} onChange={(d) => updateSection('footer', d)} onSave={() => void saveSection('footer')} saving={saving} />}
             {activeSubTab === 'chat' && <ChatEditor data={config.chat} onChange={(d) => updateSection('chat', d)} onSave={() => void saveSection('chat')} saving={saving} />}
             {activeSubTab === 'navigation' && <NavigationEditor data={config.navigation} onChange={(d) => updateSection('navigation', d)} onSave={() => void saveSection('navigation')} saving={saving} />}
+            {activeSubTab === 'seo' && <SeoEditor data={config.seo} onChange={(d) => updateSection('seo', d)} onSave={() => void saveSection('seo')} saving={saving} />}
           </motion.div>
         )}
       </AnimatePresence>
@@ -303,7 +306,7 @@ function GeneralEditor({ data, onChange, onSave, saving }: { data: any; onChange
         <TextField label="Dirección" value={data.address} onChange={v => upd('address', v)} />
         <TextField label="Altitud" value={data.altitude} onChange={v => upd('altitude', v)} />
       </div>
-      <ImageField label="Logo" value={data.logo} onChange={v => upd('logo', v)} />
+      <ImageField label="Logo" value={data.logo} onChange={v => upd('logo', v)} category="logos" />
       <div className="grid grid-cols-2 gap-4">
         <NumberField label="Latitud" value={data.coordinates?.[0] || 0} onChange={v => onChange({ ...data, coordinates: [v, data.coordinates?.[1] || 0] })} />
         <NumberField label="Longitud" value={data.coordinates?.[1] || 0} onChange={v => onChange({ ...data, coordinates: [data.coordinates?.[0] || 0, v] })} />
@@ -341,7 +344,7 @@ function HeroEditor({ data, onChange, onSave, saving }: { data: any; onChange: (
           createNew={() => ({ src: '', alt: '', label: '' })}
           renderItem={(item, i, update, remove) => (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <ImageField label="Imagen" value={item.src} onChange={v => update(i, { ...item, src: v })} />
+              <ImageField label="Imagen" value={item.src} onChange={v => update(i, { ...item, src: v })} category="renders" />
               <TextField label="Alt" value={item.alt} onChange={v => update(i, { ...item, alt: v })} />
               <TextField label="Etiqueta" value={item.label} onChange={v => update(i, { ...item, label: v })} />
             </div>
@@ -386,7 +389,7 @@ function ArquitecturaEditor({ data, onChange, onSave, saving }: { data: any; onC
   return (
     <div className="space-y-4">
       <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] mb-4">Arquitectura</h3>
-      <ImageField label="Imagen" value={d.image} onChange={v => { d.image = v; onChange(d) }} />
+      <ImageField label="Imagen" value={d.image} onChange={v => { d.image = v; onChange(d) }} category="renders" />
       <TextField label="Etiqueta" value={d.label} onChange={v => { d.label = v; onChange(d) }} />
       <TextField label="Encabezado 1" value={d.heading1} onChange={v => { d.heading1 = v; onChange(d) }} />
       <TextField label="Encabezado 2 (Acento)" value={d.heading2Accent} onChange={v => { d.heading2Accent = v; onChange(d) }} />
@@ -436,7 +439,7 @@ function EdificioEditor({ data, onChange, onSave, saving }: { data: any; onChang
                 <TextField label="Tipo" value={item.type} onChange={v => update(i, { ...item, type: v })} />
               </div>
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} />
+              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Características</p>
                 <ArrayEditor
@@ -497,7 +500,7 @@ function AtrioEditor({ data, onChange, onSave, saving }: { data: any; onChange: 
   return (
     <div className="space-y-4">
       <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] mb-4">Atrio</h3>
-      <ImageField label="Imagen Principal" value={d.image} onChange={v => { d.image = v; onChange(d) }} />
+      <ImageField label="Imagen Principal" value={d.image} onChange={v => { d.image = v; onChange(d) }} category="renders" />
       <TextField label="Etiqueta" value={d.label} onChange={v => { d.label = v; onChange(d) }} />
       <TextField label="Encabezado 1" value={d.heading1} onChange={v => { d.heading1 = v; onChange(d) }} />
       <TextField label="Encabezado 2 (Acento)" value={d.heading2Accent} onChange={v => { d.heading2Accent = v; onChange(d) }} />
@@ -515,7 +518,7 @@ function AtrioEditor({ data, onChange, onSave, saving }: { data: any; onChange: 
           createNew={() => ({ image: '', title: '', description: '' })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} />
+              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <TextField label="Título" value={item.title} onChange={v => update(i, { ...item, title: v })} />
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
             </div>
@@ -546,7 +549,7 @@ function AmenidadesEditor({ data, onChange, onSave, saving }: { data: any; onCha
             <div className="space-y-3">
               <TextField label="Nombre" value={item.name} onChange={v => update(i, { ...item, name: v })} />
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} />
+              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Beneficios</p>
                 <ArrayEditor
@@ -597,7 +600,7 @@ function TipologiasEditor({ data, onChange, onSave, saving }: { data: any; onCha
               </div>
               <TextField label="Estado" value={item.status} onChange={v => update(i, { ...item, status: v })} />
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} />
+              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Características</p>
                 <ArrayEditor
@@ -640,7 +643,7 @@ function RecorridosEditor({ data, onChange, onSave, saving }: { data: any; onCha
                 <TextField label="ID" value={item.id} onChange={v => update(i, { ...item, id: v })} />
                 <TextField label="Nombre" value={item.name} onChange={v => update(i, { ...item, name: v })} />
               </div>
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} />
+              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Hotspots</p>
                 <ArrayEditor
@@ -763,7 +766,7 @@ function GaleriaEditor({ data, onChange, onSave, saving }: { data: any; onChange
                 <TextField label="Categoría" value={item.category} onChange={v => update(i, { ...item, category: v })} />
                 <TextField label="Título" value={item.title} onChange={v => update(i, { ...item, title: v })} />
               </div>
-              <ImageField label="Imagen" value={item.src} onChange={v => update(i, { ...item, src: v })} />
+              <ImageField label="Imagen" value={item.src} onChange={v => update(i, { ...item, src: v })} category="galeria" />
             </div>
           )}
         />
@@ -1019,6 +1022,28 @@ function NavigationEditor({ data, onChange, onSave, saving }: { data: any; onCha
             </div>
           )}
         />
+      </div>
+      <SaveButton onSave={onSave} saving={saving} />
+    </div>
+  )
+}
+
+// ─── SEO EDITOR ───
+function SeoEditor({ data, onChange, onSave, saving }: { data: any; onChange: (d: any) => void; onSave: () => void; saving: boolean }) {
+  const d = { ...data }
+  return (
+    <div className="space-y-4">
+      <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] mb-4">SEO & Social</h3>
+      <TextField label="Meta Title" value={d.metaTitle} onChange={v => { d.metaTitle = v; onChange(d) }} placeholder="Título que aparece en Google..." />
+      <TextField label="Meta Description" value={d.metaDescription} onChange={v => { d.metaDescription = v; onChange(d) }} multiline placeholder="Descripción que aparece en los resultados de búsqueda..." />
+      <ImageField label="OG Image (imagen para redes sociales)" value={d.ogImage} onChange={v => { d.ogImage = v; onChange(d) }} category="renders" />
+      <div className="border-t border-[#D8D1C8]/5 pt-4 mt-4">
+        <p className="text-[10px] tracking-[0.15em] uppercase text-[#8B6B4B] mb-4">Redes Sociales</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TextField label="Instagram" value={d.instagram} onChange={v => { d.instagram = v; onChange(d) }} placeholder="https://instagram.com/..." />
+          <TextField label="Facebook" value={d.facebook} onChange={v => { d.facebook = v; onChange(d) }} placeholder="https://facebook.com/..." />
+          <TextField label="LinkedIn" value={d.linkedin} onChange={v => { d.linkedin = v; onChange(d) }} placeholder="https://linkedin.com/..." />
+        </div>
       </div>
       <SaveButton onSave={onSave} saving={saving} />
     </div>
