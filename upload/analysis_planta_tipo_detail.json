@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Basado en el análisis detallado del plano de planta del edificio PRAGA, aquí está la información exacta solicitada:\n\n### Apartamentos visibles (Cada uno con sus características):\n\n1. **Apartamento 101**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Esquina superior izquierda\n   - Forma: Rectangular\n\n2. **Apartamento 102**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro superior izquierdo\n   - Forma: Rectangular\n\n3. **Apartamento 103**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro superior\n   - Forma: Rectangular\n\n4. **Apartamento 104**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro superior derecho\n   - Forma: Rectangular\n\n5. **Apartamento 105**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Esquina superior derecha\n   - Forma: Rectangular\n\n6. **Apartamento 106**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Esquina inferior izquierda\n   - Forma: Rectangular\n\n7. **Apartamento 107**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro inferior izquierdo\n   - Forma: Rectangular\n\n8. **Apartamento 108**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro inferior\n   - Forma: Rectangular\n\n9. **Apartamento 109**\n   - Área privada: 33.75 m² (etiquetado)\n   - Número de alcobas: 1\n   - Posición: Centro inferior derecho\n   - Forma: Rectangular\n\n10. **Apartamento 110**\n    - Área privada: 33.75 m² (etiquetado)\n    - Número de alcobas: 1\n    - Posición: Esquina inferior derecha\n    - Forma: Rectangular\n\n### Información general del edificio:\n\n6. **Total de apartamentos en esta planta**: 10 (5 en la planta superior + 5 en la planta inferior)\n\n7. **Ancho total del edificio (entre ejes)**: 8.72 m (medido entre los ejes A y E)\n\n8. **Largo total del edificio (entre ejes)**: 33.40 m (medido entre los ejes 1 y 4)\n\n9. **Ubicación exacta del núcleo de escaleras/ascensores**: \n   - Posición central del edificio\n   - Coordenadas: Entre los ejes C-D y 2-3\n   - Descripción: Núcleo central con dos ascensores y escaleras, rodeado por el corredor principal\n\n10. **Ancho del corredor central**: 2.70 m (medido en la sección transversal)\n\n11. **Espacios comunes visibles**:\n    - Hall de entrada principal\n    - Corredor central\n    - Núcleo de escaleras y ascensores\n    - Áreas de circulación\n    - Espacios técnicos (marcados como \"VACIO\")\n    - Zonas de acceso a apartamentos\n\n### Notas adicionales:\n- Todos los apartamentos tienen la misma área (33.75 m²) y configuración (1 alcoba)\n- El plano muestra simetría en la distribución de apartamentos\n- Las dimensiones están medidas entre ejes estructurales\n- El corredor central divide el edificio en dos alas (izquierda y derecha)\n- Los apartamentos están organizados en dos filas (superior e inferior) alredeor del núcleo central\n\nEsta información permite recrear digitalmente el plano con precisión, manteniendo las proporciones y distribución exactas del original.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780624512,
+  "id": "2026060509545482b878c830b84e7b",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026060509545482b878c830b84e7b",
+  "usage": {
+    "completion_tokens": 983,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6270,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 7253
+  }
+}

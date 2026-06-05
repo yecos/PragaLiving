@@ -539,3 +539,47 @@ Stage Summary:
 - Interactive floor plan shows real 12-unit layout with correct dimensions
 - All POIs in the map are real Caldas locations (schools, hospitals, parks, transit)
 - Next.js build compiles successfully
+
+---
+Task ID: 12
+Agent: Main Agent
+Task: Rewrite PlantaInteractiva.tsx — Replace procedural SVG with real architectural floor plan images + interactive SVG hotspot overlays
+
+Work Log:
+- Read existing PlantaInteractiva.tsx (1252 lines, procedural SVG with 12-unit residential layout)
+- Identified syntax error at line 1198: `const overedUnit, setHoveredUnit]` → should be `const [hoveredUnit, setHoveredUnit]`
+- Verified all 7 floor plan images exist in /public/images/planos/ (planta-tipo.jpg, planta-primer-piso.jpg, planta-social.jpg, planta-parqueaderos.jpg, planta-techos.jpg, fachadas.jpg, secciones.jpg)
+- Designed new FloorConfig type with image path + percentage-based hotspot polygons instead of procedural SVG coordinates
+- Created RESIDENTIAL_HOTSPOTS: 10 apartment hotspots (5 top row + 5 bottom row) with percentage-based polygon coordinates (0–100%) that work regardless of image size
+- Built complete new PlantaInteractiva.tsx (~620 lines, down from 1252):
+  - Types: UnitStatus, UnitData, HotspotDef (polygon + center), FloorConfig (image + hotspots)
+  - Floor data: 19 floors mapped to real architectural images:
+    - Sótanos 1-3, Visitantes → planta-parqueaderos.jpg
+    - 1° Piso / Acceso, Nivel Comercial → planta-primer-piso.jpg
+    - Zona Social → planta-social.jpg
+    - Pisos 1-11 → planta-tipo.jpg (with interactive hotspot overlays)
+    - Cubierta → planta-techos.jpg
+  - Non-residential floors: just show the real image, no hotspot overlay
+  - Residential floors: real image + SVG overlay with transparent clickable polygon hotspots
+  - SVG viewBox="0 0 100 100" with preserveAspectRatio="none" to stretch to match image
+  - Status colors on hotspots: Available (#4B5646), Reserved (#8B6B4B), Sold (#D8D1C8)
+  - Selected unit gets bronce glow filter + pulsing stroke animation
+  - Unit labels (name, area, typology) rendered as SVG text at hotspot center
+  - FloorPlanDisplay component: Next.js Image (fill, object-contain) + absolute SVG overlay
+  - Kept all interactive features: tooltip on hover, detail panel on click, floor selector
+  - Fixed syntax error from original file
+  - Added calibration note for fine-tuning hotspot positions
+  - PRAGA design system throughout (Negro, Bronce, Marfil, Gris, Verde + Cormorant/Inter fonts)
+  - Fully responsive three-column layout preserved
+- Lint passes with zero errors
+- Dev server compiles and serves successfully
+
+Stage Summary:
+- Replaced 1252-line procedural SVG with ~620-line image+overlay approach
+- Real architectural floor plans now display as the visual truth (from DWG exports)
+- Interactive SVG hotspot overlays provide click/hover interactivity
+- Percentage-based coordinates make hotspots resolution-independent
+- All interactive features preserved: unit selection, tooltips, detail panel, floor selector
+- Syntax error fixed (const overedUnit → const [hoveredUnit)
+- Hotspot coordinates are approximate and will need fine-tuning with user's help
+- Zero lint errors, compiles cleanly

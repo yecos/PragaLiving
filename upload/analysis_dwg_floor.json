@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Basándonos en la vista previa del DWG del edificio \"PRAGA\", se puede analizar lo siguiente:  \n\n\n### 1) Plantas visibles  \nLa vista corresponde a **una única planta**, probablemente la planta baja o un nivel intermedio, ya que se muestra un plano horizontal con distribuciones de espacios (habitaciones, pasillos, etc.) y elementos estructurales (muros, columnas) típicos de un plano de planta. No se observan vistas de otras plantas (ej. planta superior o sótano) en esta imagen.  \n\n\n### 2) Cantidad de apartamentos  \nEn el plano, se identifican **al menos 2 apartamentos** (o unidades residenciales) diferenciadas por sus espacios interiores (habitaciones, cocinas, baños, etc.). Cada apartamento tiene una distribución de ambientes propios, separados por muros o particiones.  \n\n\n### 3) Forma del edificio  \nEl edificio tiene una **forma rectangular o cuasi-rectangular**. La planta se presenta con un contorno definido por muros perimetrales que forman un polígono con ángulos rectos, lo que sugiere una estructura compacta y regular.  \n\n\n### 4) Dimensiones visibles  \nAunque no se muestran valores numéricos explícitos, el plano incluye **líneas de referencia y marcas de dimensionamiento** (como líneas punteadas o segmentos con símbolos de medición) que indican que las dimensiones (longitudes y anchos de los espacios, muros, etc.) están definidas en el proyecto, pero no son legibles en esta vista previa. Las dimensiones exactas requerirían acceder al archivo DWG completo o a las anotaciones de medidas.  \n\n\nEn resumen, la vista muestra un plano de una sola planta de un edificio rectangular con al menos 2 apartamentos, donde las dimensiones están definidas pero no visibles en la imagen proporcionada.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780624408,
+  "id": "20260605095321682ca0c1eebd463a",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260605095321682ca0c1eebd463a",
+  "usage": {
+    "completion_tokens": 424,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1025,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 1449
+  }
+}

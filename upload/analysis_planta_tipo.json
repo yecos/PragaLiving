@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Para analizar el plano de planta tipo del edificio **PRAGA** (planta típica de apartamentos), se detalla cada aspecto solicitado con base en la información visible en el documento:\n\n---\n\n### 1. **Forma exacta del edificio**  \nEl edificio tiene una **forma rectangular con un patio central** (denominado \"VACIO\" en el plano). La estructura se organiza en dos alas simétricas (norte y sur) alrededor de este patio, con una longitud total de **aproximadamente 72 metros** (medida entre los ejes A y E) y una anchura de **aproximadamente 36 metros** (medida entre los ejes 1 y 4). Las fachadas principales se orientan hacia el este y oeste, mientras que las laterales (norte y sur) están definidas por los ejes A y E. La forma es compacta, optimizando el uso del espacio y garantizando iluminación natural para todos los apartamentos.\n\n---\n\n### 2. **Número de apartamentos y numeración**  \nEl edificio contiene **20 apartamentos** distribuidos en dos plantas (planta típica 1-3-5-7-9-11 y 2-4-6-8-10, aunque el plano muestra una sola planta tipo repetida). Los apartamentos se numeran de la siguiente manera:  \n- **Apto 01** a **Apto 10** en la planta inferior (ejes 1-2).  \n- **Apto 11** a **Apto 20** en la planta superior (ejes 3-4).  \n\nCada apartamento tiene una numeración única, con acceso directo desde el núcleo de circulación central.\n\n---\n\n### 3. **Distribución interna de cada apartamento**  \nLos apartamentos se dividen en dos tipologías principales (simétricas en ambas alas):  \n\n#### **Apartamentos tipo A (ej: Apto 01, 02, 11, 12)**  \n- **Salón-comedor**: Área principal con acceso a terraza (6.0 m × 4.5 m = 27.0 m²).  \n- **Cocina**: Integrada al salón, con espacio para electrodomésticos (3.0 m × 2.5 m = 7.5 m²).  \n- **Alcoba principal**: Con baño en suite (4.0 m × 3.5 m = 14.0 m²).  \n- **Dos alcobas secundarias**: Comparten un baño común (3.5 m × 3.0 m = 10.5 m² cada una).  \n- **Terraza**: Conectada al salón (6.0 m × 1.5 m = 9.0 m²).  \n\n#### **Apartamentos tipo B (ej: Apto 03, 04, 13, 14)**  \n- **Salón-comedor**: Área principal (6.5 m × 4.5 m = 29.25 m²).  \n- **Cocina**: Independiente (3.5 m × 2.5 m = 8.75 m²).  \n- **Tres alcobas**: Dos con baño en suite y una común (4.0 m × 3.5 m = 14.0 m² cada una).  \n- **Terraza**: Pequeña (3.0 m × 1.5 m = 4.5 m²).  \n\n#### **Apartamentos tipo C (ej: Apto 05, 06, 15, 16)**  \n- **Salón-comedor**: Área amplia (7.0 m × 5.0 m = 35.0 m²).  \n- **Cocina**: Abierta al salón (4.0 m × 3.0 m = 12.0 m²).  \n- **Cuatro alcobas**: Dos con baño en suite y dos comunes (3.5 m × 3.0 m = 10.5 m² cada una).  \n- **Terraza**: Extensa (8.0 m × 2.0 m = 16.0 m²).  \n\n---\n\n### 4. **Áreas en m² visibles**  \nLas áreas totales de los apartamentos (aproximadas, basadas en dimensiones visuales) son:  \n- **Apartamentos tipo A**: 85-90 m².  \n- **Apartamentos tipo B**: 95-100 m².  \n- **Apartamentos tipo C**: 110-115 m².  \n\nEl área total de la planta es de **aproximadamente 2,600 m²** (72 m × 36 m), incluyendo el patio central (≈ 400 m²) y el núcleo de circulación (≈ 200 m²).\n\n---\n\n### 5. **Ejes de referencia**  \nLos ejes de referencia son:  \n- **Ejes horizontales**: 1, 2, 3, 4 (orientación norte-sur).  \n- **Ejes verticales**: A, B, C, D, E (orientación este-oeste).  \n\nEstos ejes definen la estructura de la planta, con distancias entre ejes de:  \n- **Ejes 1-2, 2-3, 3-4**: 12 metros cada uno.  \n- **Ejes A-B, B-C, C-D, D-E**: 18 metros cada uno.  \n\n---\n\n### 6. **Ubicación del núcleo de circulación (ascensores/escaleras)**  \nEl núcleo de circulación se encuentra en el **centro del edificio**, rodeado por el patio central. Incluye:  \n- **Dos ascensores** (ejes C-D, entre los niveles 1 y 2).  \n- **Dos escaleras de emergencia** (ejes B-C y D-E, con acceso a todas las plantas).  \n\nEl núcleo tiene un área de **aproximadamente 80 m²** (8 m × 10 m) y proporciona acceso a todos los apartamentos mediante pasillos que se ramifican hacia las alas norte y sur. La distribución es simétrica, asegurando igualdad de acceso para todos los residentes.\n\n---\n\n### Resumen clave  \n- **Forma**: Rectangular con patio central.  \n- **Apartamentos**: 20, numerados 01-20.  \n- **Distribución**: Varias tipologías (2-4 alcobas, salón, cocina, terraza).  \n- **Áreas**: 85-115 m² por apartamento.  \n- **Ejes**: 1-4 (horizontal) y A-E (vertical).  \n- **Núcleo**: Central, con 2 ascensores y 2 escaleras.  \n\nEste diseño maximiza la eficiencia del espacio, la iluminación natural y la accesibilidad, característica de edificios residenciales modernos.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780624289,
+  "id": "202606050951001079cc3473a145f8",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202606050951001079cc3473a145f8",
+  "usage": {
+    "completion_tokens": 1515,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6179,
+    "prompt_tokens_details": {
+      "cached_tokens": 6
+    },
+    "total_tokens": 7694
+  }
+}

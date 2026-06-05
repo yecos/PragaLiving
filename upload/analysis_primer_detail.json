@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Basado en el análisis detallado del plano del edificio PRAGA, aquí está la información exacta solicitada:\n\n### 1. Apartamentos visibles con áreas (m²)\n- **V-07**: 95.07 m²\n- **V-08**: 95.07 m²\n- **V-10**: 95.07 m²\n- **V-11**: 95.07 m²\n- **V-12**: 95.07 m²\n- **V-13**: 95.07 m²\n- **V-14**: 95.07 m²\n- **V-04**: 95.07 m² (dos unidades)\n- **V-05**: 95.07 m²\n- **V-06**: 95.07 m²\n\n*Total: 11 apartamentos identificados con área uniforme de 95.07 m² cada uno.*\n\n### 2. Número de alcobas por apartamento\n- **Todos los apartamentos (V-04 a V-14)**: 2 alcobas cada uno (configuración estándar de 2 dormitorios).\n\n### 3. Ubicación del núcleo de escaleras/ascensores\n- **Posición central**: El núcleo vertical (escaleras + ascensores) se ubica en el centro del edificio, entre los ejes C-D y la línea central vertical.\n- **Acceso**: Conecta directamente con el \"HALL VIVIENDA\" y los apartamentos a través de un corredor central.\n\n### 4. Dimensiones del edificio\n- **Ancho**: 31.45 m (medido entre los ejes 1-1)\n- **Largo**: 43.20 m (medido entre los ejes A-E)\n- **Total construido**: 1,358.04 m² (31.45 m × 43.20 m).\n\n### 5. Espacios comunes identificados\n- **Hall de vivienda**: Área central de circulación para residentes.\n- **Local 1**: Espacio comercial de 432.17 m² (planta baja).\n- **Bodega**: Área de almacenamiento en la planta baja.\n- **Planta de parqueadero visitantes**: Nivel subterráneo para estacionamiento.\n- **Recepción**: Zona de acceso principal (planta baja).\n- **Circulación vertical**: Corredores y pasillos en ambos niveles.\n\n### 6. Tipologías de apartamentos y características\n- **Tipología uniforme**: Todos los apartamentos son de **2 alcobas** con:\n  - Área construida: 95.07 m².\n  - Distribución simétrica (dos unidades por eje).\n  - Acceso desde corredor central.\n  - Posición en la fachada este (excepto V-04, duplicado en el centro).\n\n### Notas adicionales:\n- **Etiquetas clave**: \"HALL VIVIENDA\", \"LOCAL 1\", \"PLANTA PARQUEADERO VISITANTES\" y \"BODEGA\" están claramente rotuladas.\n- **Duplicidad**: V-04 aparece dos veces (posiblemente error de etiquetado o unidades gemelas).\n- **Precisión**: Todas las mediciones se basan en las dimensiones impresas en el plano (escala 1:100).\n\nEsta información se extrajo directamente de los ejes, etiquetas y dimensiones visibles en el documento proporcionado.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780624528,
+  "id": "202606050955092df66cf69b1b47a6",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202606050955092df66cf69b1b47a6",
+  "usage": {
+    "completion_tokens": 760,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6176,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 6936
+  }
+}

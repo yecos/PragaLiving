@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Basándome en la vista previa del DWG del edificio \"PRAGA\" proporcionada, aquí está el análisis detallado:  \n\n\n### 1. **Plantas visibles**  \nLa vista muestra una **planta única** (probablemente la planta baja o una planta tipo), ya que no hay indicaciones visuales de múltiples niveles (como escaleras, marcas de altura o divisiones verticales que sugieran más de una planta). La estructura se presenta en una sola capa horizontal, sin elementos que indiquen la existencia de plantas superiores o inferiores.  \n\n\n### 2. **Número de apartamentos**  \nEs imposible determinar con precisión el número de apartamentos debido a la baja resolución y la falta de detalles claros (como divisiones de muros interiores, etiquetas de habitaciones o iconos que identifiquen unidades habitacionales). La imagen muestra una red de muros y espacios, pero no se distinguen claramente las unidades individuales.  \n\n\n### 3. **Forma del edificio**  \nEl edificio tiene una **forma rectangular o cuadrada** (aproximadamente), con una estructura modular basada en una cuadrícula de muros. La disposición de los muros (líneas rojas y azules) sugiere un diseño regular, con espacios organizados en una disposición simétrica o semisimétrica. No hay elementos que indiquen formas irregulares (como curvas, esquinas salientes o voladizos complejos).  \n\n\n### 4. **Dimensiones visibles**  \nNo se observan **dimensiones explícitas** (como números, líneas de medida o escalas) en la vista previa. La imagen muestra una estructura en una escala relativa, pero sin marcas que indiquen longitudes, anchuras o alturas medibles. La información dimensional probablemente se encuentra en capas o anotaciones no visibles en esta previsualización.  \n\n\n**Nota**: La baja resolución de la imagen limita la precisión del análisis. Para obtener detalles exactos (como el número de apartamentos, dimensiones o plantas específicas), se requeriría acceder al archivo DWG completo con herramientas de visualización adecuadas (ej. AutoCAD, DWG Viewer).",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780624400,
+  "id": "2026060509531377dda5b984e2455e",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026060509531377dda5b984e2455e",
+  "usage": {
+    "completion_tokens": 477,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 581,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 1058
+  }
+}
