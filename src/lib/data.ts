@@ -2,7 +2,7 @@
 // Priority: Supabase → Prisma → Hardcoded fallback
 
 import { PrismaClient } from '@prisma/client'
-import { supabase, isSupabaseConfigured, createFreshSupabaseClient } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured, createFreshSupabaseClient, createAdminSupabaseClient } from '@/lib/supabase'
 
 const prisma = new PrismaClient()
 
@@ -581,6 +581,14 @@ export async function verifyAdmin(username: string, password: string) {
 // SITE CONFIG (Supabase → JSON fallback)
 // ==========================================
 
+// Helper: Supabase may return JSONB 'value' as a string or object depending on column type
+function parseSiteConfigValue(val: unknown): unknown {
+  if (typeof val === 'string') {
+    try { return JSON.parse(val) } catch { return val }
+  }
+  return val
+}
+
 export async function getSiteConfig(section: string) {
   // 1. Try Supabase first
   const hasSupabase = await checkSupabase()
@@ -588,12 +596,12 @@ export async function getSiteConfig(section: string) {
     try {
       const { data, error } = await supabase
         .from('site_config')
-        .select('data')
-        .eq('section', section)
+        .select('value')
+        .eq('key', section)
         .single()
 
       if (!error && data) {
-        return data.data
+        return parseSiteConfigValue(data.value)
       }
     } catch {
       // Fall through
@@ -620,7 +628,7 @@ export async function getAllSiteConfig() {
       if (!error && data && data.length > 0) {
         const config: Record<string, unknown> = {}
         for (const row of data) {
-          config[row.section] = row.data
+          config[row.key] = parseSiteConfigValue(row.value)
         }
         return config
       }
@@ -639,15 +647,15 @@ export async function getAllSiteConfig() {
 }
 
 export async function updateSiteConfig(section: string, data: unknown) {
-  // 1. Try Supabase directly with a fresh client (bypass module-level caching issues)
-  const client = createFreshSupabaseClient()
+  // 1. Try Supabase with admin client (service role key — bypasses RLS, always works for writes)
+  const client = createAdminSupabaseClient()
   if (client) {
     try {
       const { error } = await client
         .from('site_config')
         .upsert(
-          { section, data, updated_at: new Date().toISOString() },
-          { onConflict: 'section' }
+          { key: section, value: data, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
         )
 
       if (!error) {
@@ -660,11 +668,33 @@ export async function updateSiteConfig(section: string, data: unknown) {
     } catch (err) {
       console.error('Supabase upsert exception for section', section, ':', err)
     }
-  } else {
+  }
+
+  // 2. Fallback: try with anon key client
+  const anonClient = createFreshSupabaseClient()
+  if (anonClient && anonClient !== client) {
+    try {
+      const { error } = await anonClient
+        .from('site_config')
+        .upsert(
+          { key: section, value: data, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        )
+
+      if (!error) {
+        supabaseChecked = true
+        supabaseAvailable = true
+        return { success: true }
+      }
+      console.error('Supabase anon upsert error for section', section, ':', error.message)
+    } catch (err) {
+      console.error('Supabase anon upsert exception for section', section, ':', err)
+    }
+  } else if (!client) {
     console.error('Supabase not configured: URL=', !!process.env.NEXT_PUBLIC_SUPABASE_URL, ' KEY=', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   }
 
-  // 2. Fallback: not persistable
+  // 3. Fallback: not persistable
   return { success: false, error: 'No database available to persist config' }
 }
 
@@ -679,12 +709,15 @@ export async function getFloorPlans() {
     try {
       const { data, error } = await supabase
         .from('site_config')
-        .select('data')
-        .eq('section', 'floor_plans')
+        .select('value')
+        .eq('key', 'floor_plans')
         .single()
 
-      if (!error && data?.data?.floors && Array.isArray(data.data.floors) && data.data.floors.length > 0) {
-        return data.data.floors
+      if (!error && data) {
+        const val = parseSiteConfigValue(data.value)
+        if (val?.floors && Array.isArray(val.floors) && val.floors.length > 0) {
+          return val.floors
+        }
       }
     } catch {
       // Fall through
