@@ -27,3 +27,25 @@ Stage Summary:
 - Auto-save works with 1-second debounce
 - Image upload route created (requires Supabase Storage bucket for production)
 - All changes pushed to GitHub and auto-deployed to Vercel
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix Plantas Interactivas overlay boxes bug - they save but don't display on the main page
+
+Work Log:
+- Investigated the full data flow: FloorPlanEditor → POST /api/floor-plans → updateSiteConfig() → Supabase
+- Initially suspected column name mismatch (key/value vs section/data) but discovered the actual DB uses key/value
+- Found the REAL root cause: Supabase returns the JSONB `value` column as a STRING, not a parsed object
+- When code did `data.value.floors`, it accessed `.floors` on a string → always undefined → fell back to JSON file
+- Added `parseSiteConfigValue()` helper to JSON.parse the value when it's a string
+- Also added `createAdminSupabaseClient()` with service role key for reliable writes
+- Improved `updateSiteConfig()` to try admin client first, then anon client as fallback
+- Restored floor plans data in Supabase that was accidentally overwritten during testing
+- Verified full save/load cycle works on production
+
+Stage Summary:
+- Bug root cause: Supabase JSONB column `value` returned as string, not parsed object
+- Fix: Added `parseSiteConfigValue()` to handle both string and object cases
+- Enhancement: Added admin client with `SUPABASE_SERVICE_ROLE_KEY` for reliable writes
+- Production verified: GET returns 19 floors with polygon data, POST saves successfully
