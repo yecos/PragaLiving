@@ -588,12 +588,12 @@ export async function getSiteConfig(section: string) {
     try {
       const { data, error } = await supabase
         .from('site_config')
-        .select('data')
-        .eq('section', section)
+        .select('value')
+        .eq('key', section)
         .single()
 
       if (!error && data) {
-        return data.data
+        return data.value
       }
     } catch {
       // Fall through
@@ -620,7 +620,7 @@ export async function getAllSiteConfig() {
       if (!error && data && data.length > 0) {
         const config: Record<string, unknown> = {}
         for (const row of data) {
-          config[row.section] = row.data
+          config[row.key] = row.value
         }
         return config
       }
@@ -646,8 +646,8 @@ export async function updateSiteConfig(section: string, data: unknown) {
       const { error } = await client
         .from('site_config')
         .upsert(
-          { section, data, updated_at: new Date().toISOString() },
-          { onConflict: 'section' }
+          { key: section, value: data, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
         )
 
       if (!error) {
@@ -679,12 +679,12 @@ export async function getFloorPlans() {
     try {
       const { data, error } = await supabase
         .from('site_config')
-        .select('data')
-        .eq('section', 'floor_plans')
+        .select('value')
+        .eq('key', 'floor_plans')
         .single()
 
-      if (!error && data?.data?.floors && Array.isArray(data.data.floors) && data.data.floors.length > 0) {
-        return data.data.floors
+      if (!error && data?.value?.floors && Array.isArray(data.value.floors) && data.value.floors.length > 0) {
+        return data.value.floors
       }
     } catch {
       // Fall through
