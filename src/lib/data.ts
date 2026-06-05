@@ -639,9 +639,8 @@ export async function getAllSiteConfig() {
 }
 
 export async function updateSiteConfig(section: string, data: unknown) {
-  // 1. Try Supabase first
-  const hasSupabase = await checkSupabase()
-  if (hasSupabase && supabase) {
+  // 1. Try Supabase directly (bypass checkSupabase cache which can be stale in serverless)
+  if (isSupabaseConfigured() && supabase) {
     try {
       const { error } = await supabase
         .from('site_config')
@@ -650,10 +649,18 @@ export async function updateSiteConfig(section: string, data: unknown) {
           { onConflict: 'section' }
         )
 
-      if (!error) return { success: true }
-    } catch {
-      // Fall through
+      if (!error) {
+        // Reset the cache since we know Supabase is working
+        supabaseChecked = true
+        supabaseAvailable = true
+        return { success: true }
+      }
+      console.error('Supabase upsert error for section', section, ':', error.message)
+    } catch (err) {
+      console.error('Supabase upsert exception for section', section, ':', err)
     }
+  } else {
+    console.error('Supabase not configured: URL=', !!process.env.NEXT_PUBLIC_SUPABASE_URL, ' KEY=', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, ' client=', !!supabase)
   }
 
   // 2. Fallback: not persistable

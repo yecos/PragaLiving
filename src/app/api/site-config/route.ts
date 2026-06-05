@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFile, writeFile } from 'fs/promises'
-import path from 'path'
 import { getAllSiteConfig, updateSiteConfig } from '@/lib/data'
-
-const CONFIG_PATH = path.join(process.cwd(), 'src', 'data', 'site-config.json')
 
 export async function GET() {
   try {
@@ -13,11 +9,10 @@ export async function GET() {
       return NextResponse.json(config)
     }
 
-    // Fallback to file
-    const data = await readFile(CONFIG_PATH, 'utf-8')
-    return NextResponse.json(JSON.parse(data))
+    // No data found
+    return NextResponse.json({})
   } catch {
-    return NextResponse.json({ error: 'Config file not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Config not found' }, { status: 404 })
   }
 }
 
@@ -35,48 +30,23 @@ export async function POST(request: NextRequest) {
       const section = body._section as string
       const sectionData = body._data
 
-      // Try Supabase first
       const result = await updateSiteConfig(section, sectionData)
       if (result.success) {
-        // Also write to file as a backup/secondary store
-        try {
-          let currentConfig: Record<string, unknown> = {}
-          try {
-            const data = await readFile(CONFIG_PATH, 'utf-8')
-            currentConfig = JSON.parse(data)
-          } catch {
-            // If file doesn't exist, start fresh
-          }
-          currentConfig[section] = sectionData
-          await writeFile(CONFIG_PATH, JSON.stringify(currentConfig, null, 2), 'utf-8')
-        } catch {
-          // File write failure is non-critical if Supabase succeeded
-        }
         return NextResponse.json({ success: true })
       }
+      return NextResponse.json({ error: result.error || 'Failed to save' }, { status: 500 })
     }
 
-    // Full config update — write to file (Supabase section-by-section handled above)
-    let currentConfig: Record<string, unknown> = {}
-    try {
-      const data = await readFile(CONFIG_PATH, 'utf-8')
-      currentConfig = JSON.parse(data)
-    } catch {
-      // If file doesn't exist, start fresh
+    // Full config update — update each section individually
+    const results: Record<string, boolean> = {}
+    for (const [section, sectionData] of Object.entries(body)) {
+      if (section.startsWith('_')) continue
+      const result = await updateSiteConfig(section, sectionData)
+      results[section] = result.success
     }
 
-    if (body._section && body._data) {
-      const section = body._section as string
-      const sectionData = body._data
-      currentConfig[section] = sectionData
-    } else {
-      currentConfig = body
-    }
-
-    const jsonStr = JSON.stringify(currentConfig, null, 2)
-    await writeFile(CONFIG_PATH, jsonStr, 'utf-8')
-
-    return NextResponse.json({ success: true, config: currentConfig })
+    const allSuccess = Object.values(results).every(v => v)
+    return NextResponse.json({ success: allSuccess, results })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to save config'
     return NextResponse.json({ error: message }, { status: 500 })
