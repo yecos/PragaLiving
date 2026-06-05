@@ -2,7 +2,7 @@
 // Priority: Supabase → Prisma → Hardcoded fallback
 
 import { PrismaClient } from '@prisma/client'
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured, createFreshSupabaseClient } from '@/lib/supabase'
 
 const prisma = new PrismaClient()
 
@@ -639,10 +639,11 @@ export async function getAllSiteConfig() {
 }
 
 export async function updateSiteConfig(section: string, data: unknown) {
-  // 1. Try Supabase directly (bypass checkSupabase cache which can be stale in serverless)
-  if (isSupabaseConfigured() && supabase) {
+  // 1. Try Supabase directly with a fresh client (bypass module-level caching issues)
+  const client = createFreshSupabaseClient()
+  if (client) {
     try {
-      const { error } = await supabase
+      const { error } = await client
         .from('site_config')
         .upsert(
           { section, data, updated_at: new Date().toISOString() },
@@ -655,12 +656,12 @@ export async function updateSiteConfig(section: string, data: unknown) {
         supabaseAvailable = true
         return { success: true }
       }
-      console.error('Supabase upsert error for section', section, ':', error.message)
+      console.error('Supabase upsert error for section', section, ':', error.message, error.code, error.details)
     } catch (err) {
       console.error('Supabase upsert exception for section', section, ':', err)
     }
   } else {
-    console.error('Supabase not configured: URL=', !!process.env.NEXT_PUBLIC_SUPABASE_URL, ' KEY=', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, ' client=', !!supabase)
+    console.error('Supabase not configured: URL=', !!process.env.NEXT_PUBLIC_SUPABASE_URL, ' KEY=', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   }
 
   // 2. Fallback: not persistable
