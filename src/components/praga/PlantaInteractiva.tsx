@@ -1,15 +1,42 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ═══════════════════════════════════════════════════════════════════
-// TYPES
+// TYPES — matching floor-plans.json schema
 // ═══════════════════════════════════════════════════════════════════
 
 type UnitStatus = 'available' | 'reserved' | 'sold'
 
+interface ApartmentZone {
+  id: string
+  polygon: number[][]
+  name: string
+  area: number
+  bedrooms: number
+  bathrooms: number
+  typology: string
+  priceRange: string
+  status: string
+  view: string
+}
+
+interface FloorConfig {
+  id: string
+  name: string
+  typeLabel: string
+  isResidential: boolean
+  image: string
+  apartments: ApartmentZone[]
+}
+
+interface FloorPlanConfig {
+  floors: FloorConfig[]
+}
+
+// UnitData for the detail panel (derived from ApartmentZone)
 interface UnitData {
   id: string
   name: string
@@ -19,25 +46,7 @@ interface UnitData {
   status: UnitStatus
   typology: string
   priceRange: string
-}
-
-interface HotspotDef {
-  id: string
-  /** Polygon points: "x1,y1 x2,y2 x3,y3 ..." (0–100 percentage) */
-  polygon: string
-  /** Center for the label [x, y] (0–100 percentage) */
-  center: [number, number]
-}
-
-interface FloorConfig {
-  id: string
-  name: string
-  typeLabel: string
-  isResidential: boolean
-  /** Path to the floor plan image */
-  image: string
-  /** Clickable hotspot polygons for apartments */
-  hotspots: HotspotDef[]
+  view: string
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -57,210 +66,32 @@ const STATUS_LABELS: Record<UnitStatus, string> = {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// HOTSPOT DATA — Real apartment positions from DWG
-// ═══════════════════════════════════════════════════════════════════
-// Building layout from DWG planta-tipo:
-//   - Rectangular slab, double-loaded corridor
-//   - Top row (above corridor): 4 apartments (01-04)
-//   - Bottom row (below corridor): 6 apartments (05-10)
-//   - Central corridor "HALL VIVIENDA" + elevator/stair core
-//   - Two "VACIO" (void) spaces flanking the core
-//   - Odd floors (1,3,5,7,9,11) use impares image
-//   - Even floors (2,4,6,8,10) use pares image (mirrored)
+// HELPERS
 // ═══════════════════════════════════════════════════════════════════
 
-const ODD_FLOOR_HOTSPOTS: HotspotDef[] = [
-  // Top row (above corridor) — 4 apartments
-  // APTO 01: Corner left, Tipo A (~75m²)
-  { id: 'apto-01', polygon: '6,4 28,4 28,22 6,22', center: [17, 13] },
-  // APTO 02: Interior left-center, Tipo B (~57m²)
-  { id: 'apto-02', polygon: '28,4 45,4 45,22 28,22', center: [36.5, 13] },
-  // APTO 03: Interior right-center, Tipo B (~57m²)
-  { id: 'apto-03', polygon: '55,4 72,4 72,22 55,22', center: [63.5, 13] },
-  // APTO 04: Corner right, Tipo A+ (~97m²)
-  { id: 'apto-04', polygon: '72,4 94,4 94,22 72,22', center: [83, 13] },
-
-  // Bottom row (below corridor) — 6 apartments
-  // APTO 05: Left, Tipo C
-  { id: 'apto-05', polygon: '6,38 20,38 20,56 6,56', center: [13, 47] },
-  // APTO 06: Center-left, Tipo C
-  { id: 'apto-06', polygon: '20,38 35,38 35,56 20,56', center: [27.5, 47] },
-  // APTO 07: Center, Tipo C
-  { id: 'apto-07', polygon: '35,38 50,38 50,56 35,56', center: [42.5, 47] },
-  // APTO 08: Center-right, Tipo C
-  { id: 'apto-08', polygon: '50,38 65,38 65,56 50,56', center: [57.5, 47] },
-  // APTO 09: Right-center, Tipo C
-  { id: 'apto-09', polygon: '65,38 80,38 80,56 65,56', center: [72.5, 47] },
-  // APTO 10: Right, Tipo C
-  { id: 'apto-10', polygon: '80,38 94,38 94,56 80,56', center: [87, 47] },
-]
-
-const EVEN_FLOOR_HOTSPOTS: HotspotDef[] = [
-  // Even floors are MIRRORED — swap left↔right
-  // Top row (above corridor) — 4 apartments (mirrored)
-  { id: 'apto-04', polygon: '6,4 28,4 28,22 6,22', center: [17, 13] },
-  { id: 'apto-03', polygon: '28,4 45,4 45,22 28,22', center: [36.5, 13] },
-  { id: 'apto-02', polygon: '55,4 72,4 72,22 55,22', center: [63.5, 13] },
-  { id: 'apto-01', polygon: '72,4 94,4 94,22 72,22', center: [83, 13] },
-
-  // Bottom row (below corridor) — 6 apartments (mirrored)
-  { id: 'apto-10', polygon: '6,38 20,38 20,56 6,56', center: [13, 47] },
-  { id: 'apto-09', polygon: '20,38 35,38 35,56 20,56', center: [27.5, 47] },
-  { id: 'apto-08', polygon: '35,38 50,38 50,56 35,56', center: [42.5, 47] },
-  { id: 'apto-07', polygon: '50,38 65,38 65,56 50,56', center: [57.5, 47] },
-  { id: 'apto-06', polygon: '65,38 80,38 80,56 65,56', center: [72.5, 47] },
-  { id: 'apto-05', polygon: '80,38 94,38 94,56 80,56', center: [87, 47] },
-]
-
-// ═══════════════════════════════════════════════════════════════════
-// FLOOR CONFIGURATION
-// ═══════════════════════════════════════════════════════════════════
-
-const FLOORS: FloorConfig[] = [
-  // ── Sótanos ──
-  {
-    id: 's3', name: 'Sótano 3',
-    typeLabel: 'Parqueaderos · Cuarto Técnico · UTIL 01-05',
-    isResidential: false,
-    image: '/images/planos/planta-parqueaderos.jpg',
-    hotspots: [],
-  },
-  {
-    id: 's2', name: 'Sótano 2',
-    typeLabel: 'Parqueaderos Residentes',
-    isResidential: false,
-    image: '/images/planos/planta-parqueaderos.jpg',
-    hotspots: [],
-  },
-  {
-    id: 's1', name: 'Sótano 1',
-    typeLabel: 'Parqueaderos · Bodegas',
-    isResidential: false,
-    image: '/images/planos/planta-parqueaderos.jpg',
-    hotspots: [],
-  },
-  {
-    id: 'pv', name: 'Parqueaderos Visitantes',
-    typeLabel: '14 Espacios Visitantes · Bodegas',
-    isResidential: false,
-    image: '/images/planos/planta-parqueaderos.jpg',
-    hotspots: [],
-  },
-  // ── Acceso y Comercial ──
-  {
-    id: 'acceso', name: '1° Piso / Acceso',
-    typeLabel: 'Lobby · Recepción · Local 1 · Bodega',
-    isResidential: false,
-    image: '/images/planos/planta-primer-piso.jpg',
-    hotspots: [],
-  },
-  {
-    id: 'comercial', name: 'Nivel Comercial',
-    typeLabel: 'Locales 9701/9801 · 558.91 m²',
-    isResidential: false,
-    image: '/images/planos/planta-primer-piso.jpg',
-    hotspots: [],
-  },
-  // ── Zona Social ──
-  {
-    id: 'social', name: 'Zona Social',
-    typeLabel: 'Ludoteca · Gimnasio · Vitality Pool · Coworking · Sauna · Turco',
-    isResidential: false,
-    image: '/images/planos/planta-social.jpg',
-    hotspots: [],
-  },
-  // ── Pisos Residenciales Impares (1,3,5,7,9,11) ──
-  ...[1, 3, 5, 7, 9, 11].map(n => ({
-    id: `piso-${n}`,
-    name: `Piso ${n}`,
-    typeLabel: 'Residencial · 10 Unidades',
-    isResidential: true as const,
-    image: '/images/planos/planta-tipo-impares.jpg',
-    hotspots: ODD_FLOOR_HOTSPOTS,
-  })),
-  // ── Pisos Residenciales Pares (2,4,6,8,10) ──
-  ...[2, 4, 6, 8, 10].map(n => ({
-    id: `piso-${n}`,
-    name: `Piso ${n}`,
-    typeLabel: 'Residencial · 10 Unidades',
-    isResidential: true as const,
-    image: '/images/planos/planta-tipo-pares.jpg',
-    hotspots: EVEN_FLOOR_HOTSPOTS,
-  })),
-  // ── Cubierta ──
-  {
-    id: 'cubierta', name: 'Cubierta',
-    typeLabel: 'Terraza Panorámica · Jardín Elevado · Zona Lounge',
-    isResidential: false,
-    image: '/images/planos/planta-techos.jpg',
-    hotspots: [],
-  },
-]
-
-// ═══════════════════════════════════════════════════════════════════
-// UNIT DATA GENERATION — 10 apartments per floor from DWG
-// ═══════════════════════════════════════════════════════════════════
-
-const UNIT_TYPES = [
-  // Top row (above corridor)
-  { typ: 'Tipo A', area: 74.75, beds: 3, baths: 2, price: '$230M – $310M' },     // APTO 01
-  { typ: 'Tipo B', area: 57.00, beds: 2, baths: 1, price: '$160M – $210M' },     // APTO 02
-  { typ: 'Tipo B', area: 57.00, beds: 2, baths: 1, price: '$160M – $210M' },     // APTO 03
-  { typ: 'Tipo A+', area: 97.45, beds: 3, baths: 2, price: '$310M – $390M' },    // APTO 04
-  // Bottom row (below corridor)
-  { typ: 'Tipo C', area: 33.40, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 05
-  { typ: 'Tipo C', area: 35.60, beds: 1, baths: 1, price: '$125M – $155M' },     // APTO 06
-  { typ: 'Tipo C', area: 35.80, beds: 1, baths: 1, price: '$125M – $155M' },     // APTO 07
-  { typ: 'Tipo C', area: 33.75, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 08
-  { typ: 'Tipo C', area: 33.05, beds: 1, baths: 1, price: '$118M – $148M' },     // APTO 09
-  { typ: 'Tipo C', area: 33.75, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 10
-]
-
-// Per-floor status overrides
-const FLOOR_STATUS: Record<string, Partial<Record<number, UnitStatus>>> = {
-  'piso-1': { 0: 'sold', 3: 'reserved' },
-  'piso-2': { 5: 'sold', 8: 'reserved' },
-  'piso-3': { 1: 'reserved', 7: 'sold' },
-  'piso-4': { 4: 'reserved', 9: 'sold' },
-  'piso-5': { 2: 'reserved', 6: 'reserved' },
-  'piso-6': { 3: 'sold', 8: 'reserved' },
-  'piso-7': { 0: 'reserved', 5: 'sold' },
-  'piso-8': { 1: 'sold', 9: 'reserved' },
-  'piso-9': { 4: 'reserved', 7: 'sold' },
-  'piso-10': { 2: 'sold', 6: 'reserved' },
-  'piso-11': { 3: 'sold', 8: 'reserved' },
+function polygonToPointsStr(polygon: number[][]): string {
+  return polygon.map(([x, y]) => `${x},${y}`).join(' ')
 }
 
-const DEFAULT_STATUS: UnitStatus[] = [
-  'available', 'available', 'available', 'available', 'available',
-  'available', 'available', 'available', 'available', 'available',
-]
+function getPolygonCenter(polygon: number[][]): [number, number] {
+  if (polygon.length === 0) return [50, 50]
+  const sumX = polygon.reduce((s, p) => s + p[0], 0)
+  const sumY = polygon.reduce((s, p) => s + p[1], 0)
+  return [sumX / polygon.length, sumY / polygon.length]
+}
 
-function generateUnits(floor: FloorConfig): UnitData[] {
-  if (!floor.isResidential || floor.hotspots.length === 0) return []
-
-  const floorNum = parseInt(floor.name.replace('Piso ', ''))
-  const overrides = FLOOR_STATUS[floor.id] ?? {}
-
-  return floor.hotspots.map((hotspot, i) => {
-    // For even floors, map the mirrored hotspot id back to unit type
-    const isEven = floorNum % 2 === 0
-    const unitIndex = i // The UNIT_TYPES array matches the hotspot order
-    const ut = UNIT_TYPES[unitIndex] ?? UNIT_TYPES[0]
-    const st = overrides[i] ?? DEFAULT_STATUS[i]
-    const aptNumber = floorNum * 100 + (i + 1)
-
-    return {
-      id: `APTO-${aptNumber}`,
-      name: `Apto ${aptNumber}`,
-      area: ut.area,
-      bedrooms: ut.beds,
-      bathrooms: ut.baths,
-      status: st,
-      typology: ut.typ,
-      priceRange: ut.price,
-    }
-  })
+function apartmentToUnit(apt: ApartmentZone): UnitData {
+  return {
+    id: apt.id,
+    name: apt.name,
+    area: apt.area,
+    bedrooms: apt.bedrooms,
+    bathrooms: apt.bathrooms,
+    status: (apt.status as UnitStatus) || 'available',
+    typology: apt.typology,
+    priceRange: apt.priceRange,
+    view: apt.view,
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -307,7 +138,7 @@ function FloorSelector({
   selectedFloor: number
   onSelect: (i: number) => void
 }) {
-  const progress = selectedFloor / (floors.length - 1)
+  const progress = selectedFloor / Math.max(floors.length - 1, 1)
 
   return (
     <div className="bg-[#111111] p-3 md:p-4 relative h-full">
@@ -415,6 +246,7 @@ function UnitDetailPanel({
           ['Baños', unit.bathrooms],
           ['Piso', floor.name],
           ['Tipología', unit.typology],
+          ['Vista', unit.view],
         ].map(([label, value]) => (
           <div key={label as string} className="flex justify-between border-b border-[#D8D1C8]/10 pb-2">
             <span className="text-[10px] text-[#D8D1C8]/40 uppercase tracking-wider font-[family-name:var(--font-inter)]">
@@ -549,7 +381,7 @@ function FloorPlanDisplay({
           />
 
           {/* SVG overlay with interactive hotspots */}
-          {floor.isResidential && floor.hotspots.length > 0 && (
+          {floor.isResidential && floor.apartments.length > 0 && (
             <svg
               viewBox="0 0 100 60"
               preserveAspectRatio="none"
@@ -570,7 +402,7 @@ function FloorPlanDisplay({
                 </filter>
               </defs>
 
-              {floor.hotspots.map((hotspot, i) => {
+              {floor.apartments.map((apt, i) => {
                 const unit = units[i]
                 if (!unit) return null
 
@@ -583,12 +415,13 @@ function FloorPlanDisplay({
                 const strokeOpacity = unit.status === 'sold'
                   ? (isSelected ? 0.8 : 0.2)
                   : (isSelected ? 1 : isHovered ? 0.9 : 0.7)
+                const center = getPolygonCenter(apt.polygon)
 
                 return (
-                  <g key={hotspot.id}>
+                  <g key={apt.id}>
                     {/* Clickable polygon hotspot */}
                     <motion.polygon
-                      points={hotspot.polygon}
+                      points={polygonToPointsStr(apt.polygon)}
                       fill={isSelected ? '#8B6B4B' : colors.fill}
                       fillOpacity={fillOpacity}
                       stroke={isSelected ? '#8B6B4B' : colors.stroke}
@@ -610,8 +443,8 @@ function FloorPlanDisplay({
                     {/* Unit label */}
                     <g pointerEvents="none" style={{ userSelect: 'none' }}>
                       <text
-                        x={hotspot.center[0]}
-                        y={hotspot.center[1] - 1.5}
+                        x={center[0]}
+                        y={center[1] - 1.5}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="#F5F1EA"
@@ -623,8 +456,8 @@ function FloorPlanDisplay({
                         {unit.name.replace('APTO-', '')}
                       </text>
                       <text
-                        x={hotspot.center[0]}
-                        y={hotspot.center[1] + 0.8}
+                        x={center[0]}
+                        y={center[1] + 0.8}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="#8B6B4B"
@@ -636,8 +469,8 @@ function FloorPlanDisplay({
                         {unit.area} m²
                       </text>
                       <text
-                        x={hotspot.center[0]}
-                        y={hotspot.center[1] + 3}
+                        x={center[0]}
+                        y={center[1] + 3}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="#D8D1C8"
@@ -664,7 +497,8 @@ function FloorPlanDisplay({
 // ═══════════════════════════════════════════════════════════════════
 
 export default function PlantaInteractiva() {
-  const [selectedFloor, setSelectedFloor] = useState(9) // First residential floor
+  const [config, setConfig] = useState<FloorPlanConfig | null>(null)
+  const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<{ unit: UnitData | null; x: number; y: number }>({
@@ -673,8 +507,29 @@ export default function PlantaInteractiva() {
     y: 0,
   })
 
-  const floor = FLOORS[selectedFloor]
-  const units = useMemo(() => generateUnits(floor), [floor])
+  // Fetch floor plan config from API
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch('/api/floor-plans')
+        const data = await res.json()
+        setConfig(data)
+        // Find first residential floor
+        const firstRes = data.floors?.findIndex((f: FloorConfig) => f.isResidential)
+        if (firstRes >= 0) setSelectedFloor(firstRes)
+      } catch {
+        // Silently fail
+      }
+    }
+    fetchConfig()
+  }, [])
+
+  const floors = config?.floors ?? []
+  const floor = floors[selectedFloor] ?? null
+  const units = useMemo(() => {
+    if (!floor) return []
+    return floor.apartments.map(apartmentToUnit)
+  }, [floor])
 
   const handleFloorSelect = useCallback((i: number) => {
     setSelectedFloor(i)
@@ -699,6 +554,17 @@ export default function PlantaInteractiva() {
     },
     [units]
   )
+
+  // Loading state
+  if (!config) {
+    return (
+      <section id="planta" className="relative py-24 md:py-32 bg-[#F5F1EA]">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-2 border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section id="planta" className="relative py-24 md:py-32 bg-[#F5F1EA]">
@@ -738,7 +604,7 @@ export default function PlantaInteractiva() {
           <div className="lg:col-span-2 order-2 lg:order-1">
             <div className="h-full min-h-[200px] lg:min-h-[640px]">
               <FloorSelector
-                floors={FLOORS}
+                floors={floors}
                 selectedFloor={selectedFloor}
                 onSelect={handleFloorSelect}
               />
@@ -748,33 +614,37 @@ export default function PlantaInteractiva() {
           {/* Floor plan — center */}
           <div className="lg:col-span-7 order-1 lg:order-2">
             <div className="bg-[#111111] p-4 md:p-6 h-full min-h-[400px] lg:min-h-[640px] relative">
-              <Legend floor={floor} />
+              {floor && (
+                <>
+                  <Legend floor={floor} />
 
-              <FloorPlanDisplay
-                floor={floor}
-                units={units}
-                selectedUnit={selectedUnit}
-                hoveredUnit={hoveredUnit}
-                onUnitClick={handleUnitClick}
-                onUnitMouseMove={handleUnitMouseMove}
-                onUnitLeave={handleUnitLeave}
-              />
+                  <FloorPlanDisplay
+                    floor={floor}
+                    units={units}
+                    selectedUnit={selectedUnit}
+                    hoveredUnit={hoveredUnit}
+                    onUnitClick={handleUnitClick}
+                    onUnitMouseMove={handleUnitMouseMove}
+                    onUnitLeave={handleUnitLeave}
+                  />
 
-              {/* Floor info strip */}
-              <div className="flex items-center justify-between mt-4 px-1">
-                <div className="flex items-center gap-3">
-                  <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
-                    PLANO ARQUITECTÓNICO
-                  </span>
-                  <span className="text-[8px] text-[#D8D1C8]/20">|</span>
-                  <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
-                    PRAGA LIVING
-                  </span>
-                </div>
-                <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
-                  {floor.isResidential ? `${floor.hotspots.length} UNIDADES` : 'ÁREAS COMUNES'}
-                </span>
-              </div>
+                  {/* Floor info strip */}
+                  <div className="flex items-center justify-between mt-4 px-1">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
+                        PLANO ARQUITECTÓNICO
+                      </span>
+                      <span className="text-[8px] text-[#D8D1C8]/20">|</span>
+                      <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
+                        PRAGA LIVING
+                      </span>
+                    </div>
+                    <span className="text-[8px] text-[#D8D1C8]/30 font-[family-name:var(--font-inter)] tracking-wider">
+                      {floor.isResidential ? `${floor.apartments.length} UNIDADES` : 'ÁREAS COMUNES'}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

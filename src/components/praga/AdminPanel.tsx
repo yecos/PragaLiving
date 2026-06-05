@@ -4,8 +4,9 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
 import { Download } from 'lucide-react'
+import FloorPlanEditor from './FloorPlanEditor'
 
-type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities'
+type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas'
 
 interface Apartment {
   id: string
@@ -319,6 +320,7 @@ export default function AdminPanel() {
     { id: 'apartments', label: 'Apartamentos' },
     { id: 'leads', label: 'Leads' },
     { id: 'amenities', label: 'Amenidades' },
+    { id: 'plantas', label: 'Plantas' },
   ]
 
   return (
@@ -611,6 +613,13 @@ export default function AdminPanel() {
                       ))}
                     </div>
                   )}
+                </motion.div>
+              )}
+
+              {/* ═══ PLANTAS ═══ */}
+              {activeTab === 'plantas' && (
+                <motion.div key="plantas" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <FloorPlanEditor />
                 </motion.div>
               )}
 
