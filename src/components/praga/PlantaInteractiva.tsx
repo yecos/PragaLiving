@@ -23,9 +23,9 @@ interface UnitData {
 
 interface HotspotDef {
   id: string
-  /** Percentage-based polygon points: "x1,y1 x2,y2 x3,y3 ..." (0–100) */
+  /** Polygon points: "x1,y1 x2,y2 x3,y3 ..." (0–100 percentage) */
   polygon: string
-  /** Percentage-based center for the label [x, y] (0–100) */
+  /** Center for the label [x, y] (0–100 percentage) */
   center: [number, number]
 }
 
@@ -34,20 +34,20 @@ interface FloorConfig {
   name: string
   typeLabel: string
   isResidential: boolean
-  /** Path to the real architectural floor plan image */
+  /** Path to the floor plan image */
   image: string
-  /** Clickable hotspot polygons for apartments (percentage coords) */
+  /** Clickable hotspot polygons for apartments */
   hotspots: HotspotDef[]
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// STATUS COLORS
+// STATUS COLORS — PRAGA palette
 // ═══════════════════════════════════════════════════════════════════
 
 const STATUS_COLORS: Record<UnitStatus, { fill: string; stroke: string }> = {
-  available: { fill: '#4B5646', stroke: '#4B5646' },
-  reserved: { fill: '#8B6B4B', stroke: '#8B6B4B' },
-  sold: { fill: '#D8D1C8', stroke: '#D8D1C8' },
+  available: { fill: '#4B5646', stroke: '#4B5646' },  // Verde Musgo
+  reserved: { fill: '#8B6B4B', stroke: '#8B6B4B' },   // Bronce
+  sold: { fill: '#D8D1C8', stroke: '#D8D1C8' },        // Gris Piedra
 }
 
 const STATUS_LABELS: Record<UnitStatus, string> = {
@@ -57,37 +57,64 @@ const STATUS_LABELS: Record<UnitStatus, string> = {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FLOOR DATA — Image paths + hotspot polygons
+// HOTSPOT DATA — Real apartment positions from DWG
 // ═══════════════════════════════════════════════════════════════════
-// Hotspot coordinates are approximate percentages (0–100) relative to
-// the image dimensions. They will need fine-tuning by overlaying the
-// SVG on the real plan and adjusting each polygon.
-//
-// Building layout (approximate):
-// - Rectangular slab ~45m wide × ~24m deep
-// - Central corridor running the length
-// - Elevator/stair core in the center
-// - Apartments on both sides of the corridor
-// - Top row: 5 units (Calle 133 Sur side)
-// - Bottom row: 5 units (Carrera 50 side)
-// - Corner units (Tipo A) are larger (~75m²)
-// - Interior units (Tipo B) are smaller (~48m²)
+// Building layout from DWG planta-tipo:
+//   - Rectangular slab, double-loaded corridor
+//   - Top row (above corridor): 4 apartments (01-04)
+//   - Bottom row (below corridor): 6 apartments (05-10)
+//   - Central corridor "HALL VIVIENDA" + elevator/stair core
+//   - Two "VACIO" (void) spaces flanking the core
+//   - Odd floors (1,3,5,7,9,11) use impares image
+//   - Even floors (2,4,6,8,10) use pares image (mirrored)
 // ═══════════════════════════════════════════════════════════════════
 
-const RESIDENTIAL_HOTSPOTS: HotspotDef[] = [
-  // Top row (Calle 133 Sur side) — 5 apartments
-  { id: 'apto-top-1', polygon: '2,3 18,3 18,43 2,43', center: [10, 23] },
-  { id: 'apto-top-2', polygon: '18,3 35,3 35,43 18,43', center: [26.5, 23] },
-  { id: 'apto-top-3', polygon: '35,3 52,3 52,43 35,43', center: [43.5, 23] },
-  { id: 'apto-top-4', polygon: '52,3 72,3 72,43 52,43', center: [62, 23] },
-  { id: 'apto-top-5', polygon: '72,3 98,3 98,43 72,43', center: [85, 23] },
-  // Bottom row (Carrera 50 side) — 5 apartments
-  { id: 'apto-bot-1', polygon: '2,57 18,57 18,97 2,97', center: [10, 77] },
-  { id: 'apto-bot-2', polygon: '18,57 35,57 35,97 18,97', center: [26.5, 77] },
-  { id: 'apto-bot-3', polygon: '35,57 52,57 52,97 35,97', center: [43.5, 77] },
-  { id: 'apto-bot-4', polygon: '52,57 72,57 72,97 52,97', center: [62, 77] },
-  { id: 'apto-bot-5', polygon: '72,57 98,57 98,97 72,97', center: [85, 77] },
+const ODD_FLOOR_HOTSPOTS: HotspotDef[] = [
+  // Top row (above corridor) — 4 apartments
+  // APTO 01: Corner left, Tipo A (~75m²)
+  { id: 'apto-01', polygon: '6,4 28,4 28,22 6,22', center: [17, 13] },
+  // APTO 02: Interior left-center, Tipo B (~57m²)
+  { id: 'apto-02', polygon: '28,4 45,4 45,22 28,22', center: [36.5, 13] },
+  // APTO 03: Interior right-center, Tipo B (~57m²)
+  { id: 'apto-03', polygon: '55,4 72,4 72,22 55,22', center: [63.5, 13] },
+  // APTO 04: Corner right, Tipo A+ (~97m²)
+  { id: 'apto-04', polygon: '72,4 94,4 94,22 72,22', center: [83, 13] },
+
+  // Bottom row (below corridor) — 6 apartments
+  // APTO 05: Left, Tipo C
+  { id: 'apto-05', polygon: '6,38 20,38 20,56 6,56', center: [13, 47] },
+  // APTO 06: Center-left, Tipo C
+  { id: 'apto-06', polygon: '20,38 35,38 35,56 20,56', center: [27.5, 47] },
+  // APTO 07: Center, Tipo C
+  { id: 'apto-07', polygon: '35,38 50,38 50,56 35,56', center: [42.5, 47] },
+  // APTO 08: Center-right, Tipo C
+  { id: 'apto-08', polygon: '50,38 65,38 65,56 50,56', center: [57.5, 47] },
+  // APTO 09: Right-center, Tipo C
+  { id: 'apto-09', polygon: '65,38 80,38 80,56 65,56', center: [72.5, 47] },
+  // APTO 10: Right, Tipo C
+  { id: 'apto-10', polygon: '80,38 94,38 94,56 80,56', center: [87, 47] },
 ]
+
+const EVEN_FLOOR_HOTSPOTS: HotspotDef[] = [
+  // Even floors are MIRRORED — swap left↔right
+  // Top row (above corridor) — 4 apartments (mirrored)
+  { id: 'apto-04', polygon: '6,4 28,4 28,22 6,22', center: [17, 13] },
+  { id: 'apto-03', polygon: '28,4 45,4 45,22 28,22', center: [36.5, 13] },
+  { id: 'apto-02', polygon: '55,4 72,4 72,22 55,22', center: [63.5, 13] },
+  { id: 'apto-01', polygon: '72,4 94,4 94,22 72,22', center: [83, 13] },
+
+  // Bottom row (below corridor) — 6 apartments (mirrored)
+  { id: 'apto-10', polygon: '6,38 20,38 20,56 6,56', center: [13, 47] },
+  { id: 'apto-09', polygon: '20,38 35,38 35,56 20,56', center: [27.5, 47] },
+  { id: 'apto-08', polygon: '35,38 50,38 50,56 35,56', center: [42.5, 47] },
+  { id: 'apto-07', polygon: '50,38 65,38 65,56 50,56', center: [57.5, 47] },
+  { id: 'apto-06', polygon: '65,38 80,38 80,56 65,56', center: [72.5, 47] },
+  { id: 'apto-05', polygon: '80,38 94,38 94,56 80,56', center: [87, 47] },
+]
+
+// ═══════════════════════════════════════════════════════════════════
+// FLOOR CONFIGURATION
+// ═══════════════════════════════════════════════════════════════════
 
 const FLOORS: FloorConfig[] = [
   // ── Sótanos ──
@@ -142,32 +169,23 @@ const FLOORS: FloorConfig[] = [
     image: '/images/planos/planta-social.jpg',
     hotspots: [],
   },
-  // ── Pisos Residenciales (1–3, 5–7) ──
-  ...[1, 2, 3, 5, 6, 7].map(n => ({
+  // ── Pisos Residenciales Impares (1,3,5,7,9,11) ──
+  ...[1, 3, 5, 7, 9, 11].map(n => ({
     id: `piso-${n}`,
     name: `Piso ${n}`,
-    typeLabel: 'Residencial · 2-3 Alcobas',
+    typeLabel: 'Residencial · 10 Unidades',
     isResidential: true as const,
-    image: '/images/planos/planta-tipo.jpg',
-    hotspots: RESIDENTIAL_HOTSPOTS,
+    image: '/images/planos/planta-tipo-impares.jpg',
+    hotspots: ODD_FLOOR_HOTSPOTS,
   })),
-  // ── Pisos 4, 8 (different type) ──
-  ...[4, 8].map(n => ({
+  // ── Pisos Residenciales Pares (2,4,6,8,10) ──
+  ...[2, 4, 6, 8, 10].map(n => ({
     id: `piso-${n}`,
     name: `Piso ${n}`,
-    typeLabel: 'Residencial · 2-3 Alcobas',
+    typeLabel: 'Residencial · 10 Unidades',
     isResidential: true as const,
-    image: '/images/planos/planta-tipo.jpg',
-    hotspots: RESIDENTIAL_HOTSPOTS,
-  })),
-  // ── Pisos 9–11 (premium) ──
-  ...[9, 10, 11].map(n => ({
-    id: `piso-${n}`,
-    name: `Piso ${n}`,
-    typeLabel: 'Residencial Premium · 3 Alcobas',
-    isResidential: true as const,
-    image: '/images/planos/planta-tipo.jpg',
-    hotspots: RESIDENTIAL_HOTSPOTS,
+    image: '/images/planos/planta-tipo-pares.jpg',
+    hotspots: EVEN_FLOOR_HOTSPOTS,
   })),
   // ── Cubierta ──
   {
@@ -180,81 +198,67 @@ const FLOORS: FloorConfig[] = [
 ]
 
 // ═══════════════════════════════════════════════════════════════════
-// UNIT DATA GENERATION
+// UNIT DATA GENERATION — 10 apartments per floor from DWG
 // ═══════════════════════════════════════════════════════════════════
 
-const STATUS_MAP_10: UnitStatus[] = [
-  'sold', 'reserved', 'available', 'available', 'reserved',
-  'available', 'sold', 'available', 'reserved', 'available',
+const UNIT_TYPES = [
+  // Top row (above corridor)
+  { typ: 'Tipo A', area: 74.75, beds: 3, baths: 2, price: '$230M – $310M' },     // APTO 01
+  { typ: 'Tipo B', area: 57.00, beds: 2, baths: 1, price: '$160M – $210M' },     // APTO 02
+  { typ: 'Tipo B', area: 57.00, beds: 2, baths: 1, price: '$160M – $210M' },     // APTO 03
+  { typ: 'Tipo A+', area: 97.45, beds: 3, baths: 2, price: '$310M – $390M' },    // APTO 04
+  // Bottom row (below corridor)
+  { typ: 'Tipo C', area: 33.40, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 05
+  { typ: 'Tipo C', area: 35.60, beds: 1, baths: 1, price: '$125M – $155M' },     // APTO 06
+  { typ: 'Tipo C', area: 35.80, beds: 1, baths: 1, price: '$125M – $155M' },     // APTO 07
+  { typ: 'Tipo C', area: 33.75, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 08
+  { typ: 'Tipo C', area: 33.05, beds: 1, baths: 1, price: '$118M – $148M' },     // APTO 09
+  { typ: 'Tipo C', area: 33.75, beds: 1, baths: 1, price: '$120M – $150M' },     // APTO 10
 ]
 
-const TYPOLOGIES_10: Record<string, { typ: string; area: number; beds: number; baths: number; price: string }[]> = {
-  '1-8': [
-    // Top row: corners are Tipo A (larger), interior are Tipo B
-    { typ: 'Tipo A', area: 75.12, beds: 3, baths: 2, price: '$260M – $320M' },
-    { typ: 'Tipo B', area: 48.35, beds: 2, baths: 1, price: '$180M – $220M' },
-    { typ: 'Tipo B', area: 47.90, beds: 2, baths: 1, price: '$178M – $218M' },
-    { typ: 'Tipo B', area: 48.70, beds: 2, baths: 1, price: '$182M – $222M' },
-    { typ: 'Tipo A', area: 74.80, beds: 3, baths: 2, price: '$258M – $318M' },
-    // Bottom row: same pattern
-    { typ: 'Tipo A', area: 75.45, beds: 3, baths: 2, price: '$262M – $322M' },
-    { typ: 'Tipo B', area: 48.20, beds: 2, baths: 1, price: '$180M – $220M' },
-    { typ: 'Tipo B', area: 48.55, beds: 2, baths: 1, price: '$181M – $221M' },
-    { typ: 'Tipo B', area: 47.80, beds: 2, baths: 1, price: '$177M – $217M' },
-    { typ: 'Tipo A', area: 74.95, beds: 3, baths: 2, price: '$259M – $319M' },
-  ],
-  '9-11': [
-    // Premium floors
-    { typ: 'Tipo A+', area: 77.85, beds: 3, baths: 2, price: '$330M – $395M' },
-    { typ: 'Tipo B', area: 49.35, beds: 2, baths: 1, price: '$230M – $275M' },
-    { typ: 'Tipo B', area: 48.90, beds: 2, baths: 1, price: '$228M – $273M' },
-    { typ: 'Tipo B', area: 49.70, beds: 2, baths: 1, price: '$232M – $277M' },
-    { typ: 'Tipo A+', area: 77.50, beds: 3, baths: 2, price: '$328M – $393M' },
-    { typ: 'Tipo A+', area: 78.15, beds: 3, baths: 2, price: '$332M – $397M' },
-    { typ: 'Tipo B', area: 49.20, beds: 2, baths: 1, price: '$230M – $275M' },
-    { typ: 'Tipo B', area: 49.55, beds: 2, baths: 1, price: '$231M – $276M' },
-    { typ: 'Tipo B', area: 48.80, beds: 2, baths: 1, price: '$227M – $272M' },
-    { typ: 'Tipo A+', area: 77.65, beds: 3, baths: 2, price: '$329M – $394M' },
-  ],
+// Per-floor status overrides
+const FLOOR_STATUS: Record<string, Partial<Record<number, UnitStatus>>> = {
+  'piso-1': { 0: 'sold', 3: 'reserved' },
+  'piso-2': { 5: 'sold', 8: 'reserved' },
+  'piso-3': { 1: 'reserved', 7: 'sold' },
+  'piso-4': { 4: 'reserved', 9: 'sold' },
+  'piso-5': { 2: 'reserved', 6: 'reserved' },
+  'piso-6': { 3: 'sold', 8: 'reserved' },
+  'piso-7': { 0: 'reserved', 5: 'sold' },
+  'piso-8': { 1: 'sold', 9: 'reserved' },
+  'piso-9': { 4: 'reserved', 7: 'sold' },
+  'piso-10': { 2: 'sold', 6: 'reserved' },
+  'piso-11': { 3: 'sold', 8: 'reserved' },
 }
 
-// Per-floor status overrides for realism
-const FLOOR_STATUS_OVERRIDES: Record<string, Partial<Record<number, UnitStatus>>> = {
-  'piso-1': { 0: 'sold', 4: 'reserved' },
-  'piso-2': { 1: 'sold', 7: 'reserved' },
-  'piso-3': { 0: 'reserved', 3: 'reserved' },
-  'piso-4': { 2: 'reserved', 8: 'sold' },
-  'piso-5': { 5: 'reserved' },
-  'piso-6': { 1: 'sold', 9: 'reserved' },
-  'piso-7': { 3: 'sold' },
-  'piso-8': { 0: 'reserved', 7: 'sold' },
-  'piso-9': { 4: 'reserved', 6: 'sold' },
-  'piso-10': { 2: 'sold', 8: 'reserved' },
-  'piso-11': { 6: 'reserved', 9: 'sold' },
-}
+const DEFAULT_STATUS: UnitStatus[] = [
+  'available', 'available', 'available', 'available', 'available',
+  'available', 'available', 'available', 'available', 'available',
+]
 
 function generateUnits(floor: FloorConfig): UnitData[] {
   if (!floor.isResidential || floor.hotspots.length === 0) return []
-  const n = floor.hotspots.length
-  const floorNum = parseInt(floor.name.replace('Piso ', ''))
-  const typKey = floorNum >= 9 && floorNum <= 11 ? '9-11' : '1-8'
-  const typs = TYPOLOGIES_10[typKey] ?? TYPOLOGIES_10['1-8']
-  const baseStatus = STATUS_MAP_10
-  const overrides = FLOOR_STATUS_OVERRIDES[floor.id] ?? {}
 
-  return Array.from({ length: n }, (_, i) => {
-    const t = typs[i % typs.length]
-    const st = overrides[i] ?? baseStatus[i % baseStatus.length]
+  const floorNum = parseInt(floor.name.replace('Piso ', ''))
+  const overrides = FLOOR_STATUS[floor.id] ?? {}
+
+  return floor.hotspots.map((hotspot, i) => {
+    // For even floors, map the mirrored hotspot id back to unit type
+    const isEven = floorNum % 2 === 0
+    const unitIndex = i // The UNIT_TYPES array matches the hotspot order
+    const ut = UNIT_TYPES[unitIndex] ?? UNIT_TYPES[0]
+    const st = overrides[i] ?? DEFAULT_STATUS[i]
     const aptNumber = floorNum * 100 + (i + 1)
+
     return {
       id: `APTO-${aptNumber}`,
       name: `Apto ${aptNumber}`,
-      area: t.area,
-      bedrooms: t.beds,
-      bathrooms: t.baths,
+      area: ut.area,
+      bedrooms: ut.beds,
+      bathrooms: ut.baths,
       status: st,
-      typology: t.typ,
-      priceRange: t.price,
+      typology: ut.typ,
+      priceRange: ut.price,
     }
   })
 }
@@ -503,7 +507,7 @@ function Legend({ floor }: { floor: FloorConfig }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FLOOR PLAN DISPLAY — Image + SVG Overlay
+// FLOOR PLAN DISPLAY — Image + SVG Overlay with PRAGA colors
 // ═══════════════════════════════════════════════════════════════════
 
 function FloorPlanDisplay({
@@ -523,10 +527,8 @@ function FloorPlanDisplay({
   onUnitMouseMove: (i: number, e: React.MouseEvent) => void
   onUnitLeave: () => void
 }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
   return (
-    <div ref={containerRef} className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+    <div className="relative w-full" style={{ aspectRatio: '16 / 11' }}>
       <AnimatePresence mode="wait">
         <motion.div
           key={floor.id}
@@ -549,7 +551,7 @@ function FloorPlanDisplay({
           {/* SVG overlay with interactive hotspots */}
           {floor.isResidential && floor.hotspots.length > 0 && (
             <svg
-              viewBox="0 0 100 100"
+              viewBox="0 0 100 60"
               preserveAspectRatio="none"
               className="absolute inset-0 w-full h-full"
               style={{ cursor: 'default' }}
@@ -557,7 +559,7 @@ function FloorPlanDisplay({
               {/* Glow filter definition */}
               <defs>
                 <filter id="glow-bronce" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.5" result="blur" />
+                  <feGaussianBlur stdDeviation="1" result="blur" />
                   <feFlood floodColor="#8B6B4B" floodOpacity="0.7" result="color" />
                   <feComposite in="color" in2="blur" operator="in" result="shadow" />
                   <feMerge>
@@ -609,38 +611,39 @@ function FloorPlanDisplay({
                     <g pointerEvents="none" style={{ userSelect: 'none' }}>
                       <text
                         x={hotspot.center[0]}
-                        y={hotspot.center[1] - 1.2}
+                        y={hotspot.center[1] - 1.5}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="#F5F1EA"
-                        fontSize="2.8"
+                        fontSize="2.2"
                         fontFamily="var(--font-inter)"
-                        fontWeight="500"
-                        opacity={unit.status === 'sold' ? 0.3 : 0.85}
+                        fontWeight="600"
+                        opacity={unit.status === 'sold' ? 0.3 : 0.9}
                       >
                         {unit.name.replace('APTO-', '')}
                       </text>
                       <text
                         x={hotspot.center[0]}
-                        y={hotspot.center[1] + 1.8}
+                        y={hotspot.center[1] + 0.8}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fill="#F5F1EA"
-                        fontSize="3.2"
+                        fill="#8B6B4B"
+                        fontSize="2.8"
                         fontFamily="var(--font-cormorant)"
-                        opacity={unit.status === 'sold' ? 0.25 : 0.9}
+                        fontWeight="700"
+                        opacity={unit.status === 'sold' ? 0.25 : 0.95}
                       >
                         {unit.area} m²
                       </text>
                       <text
                         x={hotspot.center[0]}
-                        y={hotspot.center[1] + 4}
+                        y={hotspot.center[1] + 3}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         fill="#D8D1C8"
-                        fontSize="2"
+                        fontSize="1.6"
                         fontFamily="var(--font-inter)"
-                        opacity={unit.status === 'sold' ? 0.15 : 0.45}
+                        opacity={unit.status === 'sold' ? 0.15 : 0.5}
                       >
                         {unit.typology}
                       </text>
@@ -661,7 +664,7 @@ function FloorPlanDisplay({
 // ═══════════════════════════════════════════════════════════════════
 
 export default function PlantaInteractiva() {
-  const [selectedFloor, setSelectedFloor] = useState(9) // Piso 2 default
+  const [selectedFloor, setSelectedFloor] = useState(9) // First residential floor
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<number | null>(null)
   const [tooltip, setTooltip] = useState<{ unit: UnitData | null; x: number; y: number }>({
@@ -772,13 +775,6 @@ export default function PlantaInteractiva() {
                   {floor.isResidential ? `${floor.hotspots.length} UNIDADES` : 'ÁREAS COMUNES'}
                 </span>
               </div>
-
-              {/* Hotspot calibration note (dev only, remove after fine-tuning) */}
-              {floor.isResidential && (
-                <p className="text-[7px] text-[#D8D1C8]/15 mt-2 text-center font-[family-name:var(--font-inter)]">
-                  Las zonas interactivas son aproximadas — ajuste fino pendiente
-                </p>
-              )}
             </div>
           </div>
 

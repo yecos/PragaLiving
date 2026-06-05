@@ -21,78 +21,69 @@ function generateFallbackApartments() {
   let uid = 1
   const mkId = () => `fallback-${uid++}`
 
-  // ─── PRAGA Living — Real building data ───
-  // 11 residential floors (Pisos 1-11), 12 apartments per floor = 132 total
-  // Per floor: 4 × Tipo A (corner, ~75 m², 3hab/2baños) + 8 × Tipo B (interior, ~48 m², 2hab/1baño)
+  // ─── PRAGA Living — Real building data from DWG ───
+  // 11 residential floors (Pisos 1-11), 10 apartments per floor = 110 total
+  // Layout from DWG planta-tipo:
+  //   Top row (above corridor): APTO 01 (corner ~75m²), APTO 02 (~57m²), APTO 03 (~57m²), APTO 04 (corner ~97m²)
+  //   Bottom row (below corridor): APTO 05-10 (~33-36m² each, 1 alcoba)
   // Address: Cl. 133 Sur #49-94, Caldas, Antioquia
-  // Parking: Sótanos 1-3 + visitor parking | Ground: Local 1 (43.17 m²) + Lobby
-  // Commercial level: 558.91 m² (Locales 9701/9801) | Rooftop/Cubierta
 
-  // Views per unit position on each floor
-  // Units 1-4: Tipo A (corner units) — Units 5-12: Tipo B (interior units)
-  const views12 = [
-    'Carrera 50',    // Unit 1 — Tipo A corner
-    'Calle 133 Sur', // Unit 2 — Tipo A corner
-    'Atrio',         // Unit 3 — Tipo A corner
-    'Panorámica',    // Unit 4 — Tipo A corner
-    'Atrio',         // Unit 5 — Tipo B
-    'Carrera 50',    // Unit 6 — Tipo B
-    'Carrera 50',    // Unit 7 — Tipo B
-    'Calle 133 Sur', // Unit 8 — Tipo B
-    'Calle 133 Sur', // Unit 9 — Tipo B
-    'Atrio',         // Unit 10 — Tipo B
-    'Interior',      // Unit 11 — Tipo B
-    'Interior',      // Unit 12 — Tipo B
+  // 10 units per floor — areas from DWG
+  const unitData = [
+    // Top row (above corridor)
+    { area: 74.75, beds: 3, baths: 2, typ: 'Tipo A · 3 Alcobas', view: 'Carrera 50', corner: true },
+    { area: 57.00, beds: 2, baths: 1, typ: 'Tipo B · 2 Alcobas', view: 'Calle 133 Sur', corner: false },
+    { area: 57.00, beds: 2, baths: 1, typ: 'Tipo B · 2 Alcobas', view: 'Atrio', corner: false },
+    { area: 97.45, beds: 3, baths: 2, typ: 'Tipo A+ · 3 Alcobas', view: 'Panorámica', corner: true },
+    // Bottom row (below corridor)
+    { area: 33.40, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Carrera 50', corner: false },
+    { area: 35.60, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Interior', corner: false },
+    { area: 35.80, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Atrio', corner: false },
+    { area: 33.75, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Calle 133 Sur', corner: false },
+    { area: 33.05, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Calle 133 Sur', corner: false },
+    { area: 33.75, beds: 1, baths: 1, typ: 'Tipo C · 1 Alcoba', view: 'Carrera 50', corner: false },
   ]
 
-  // Tipo A areas (~75 m², slight variation per unit position)
-  const tipoAAreas = [76.20, 74.85, 75.40, 73.90]
-  // Tipo B areas (~48 m², slight variation per unit position)
-  const tipoBAreas = [47.50, 48.20, 49.10, 48.60, 47.80, 48.90, 47.30, 48.40]
-
   for (let floor = 1; floor <= 11; floor++) {
-    for (let unit = 1; unit <= 12; unit++) {
-      const aptNumber = floor * 100 + unit
-      const isTipoA = unit <= 4
-      const tipoIndex = isTipoA ? unit - 1 : unit - 5
-      const area = isTipoA ? tipoAAreas[tipoIndex] : tipoBAreas[tipoIndex]
+    for (let unit = 0; unit < 10; unit++) {
+      const ud = unitData[unit]
+      const aptNumber = floor * 100 + (unit + 1)
+      const isTipoA = ud.corner
+      const isTipoC = unit >= 4
 
       // Pricing — Caldas, Antioquia
-      // Tipo A: Base ~$260M COP, floor premium +$8M/floor
-      // Tipo B: Base ~$180M COP, floor premium +$5M/floor
-      const basePrice = isTipoA ? 260_000_000 : 180_000_000
-      const floorPremium = isTipoA
-        ? (floor - 1) * 8_000_000
-        : (floor - 1) * 5_000_000
-      const unitPremium = isTipoA
-        ? (unit - 1) * 1_500_000
-        : (unit - 5) * 800_000
+      const basePrice = isTipoC ? 120_000_000 : (ud.area > 80 ? 310_000_000 : 230_000_000)
+      const floorPremium = isTipoC
+        ? (floor - 1) * 3_000_000
+        : (isTipoA ? (floor - 1) * 8_000_000 : (floor - 1) * 5_000_000)
 
       apartments.push({
         id: mkId(),
         name: `Apto ${aptNumber}`,
-        area,
-        bedrooms: isTipoA ? 3 : 2,
-        bathrooms: isTipoA ? 2 : 1,
+        area: ud.area,
+        bedrooms: ud.beds,
+        bathrooms: ud.baths,
         floor,
-        view: views12[unit - 1],
-        typology: isTipoA ? 'Tipo A · 3 Alcobas' : 'Tipo B · 2 Alcobas',
+        view: ud.view,
+        typology: ud.typ,
         status: 'available',
-        price: basePrice + floorPremium + unitPremium,
-        image: isTipoA ? '/images/renders/apto-74.png' : '/images/renders/apto-57.png',
+        price: basePrice + floorPremium,
+        image: isTipoA ? '/images/renders/apto-74.png' : (isTipoC ? '/images/renders/studio-33.png' : '/images/renders/apto-57.png'),
         plan360Url: null,
         features: JSON.stringify(
-          isTipoA
-            ? ['3 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón con vegetación', 'Zona de ropas', 'Acabados premium', 'Unidad esquinera']
-            : ['2 alcobas', 'Baño completo', 'Sala-comedor', 'Cocina integral', 'Zona de ropas', 'Acabados premium']
+          ud.beds >= 3
+            ? ['3 alcobas', '2 baños completos', 'Sala-comedor', 'Cocina integral', 'Balcón', 'Zona de ropas', 'Acabados premium', ud.corner ? 'Unidad esquinera' : 'Vista panorámica']
+            : ud.beds === 2
+            ? ['2 alcobas', 'Baño completo', 'Sala-comedor', 'Cocina integral', 'Balcón', 'Zona de ropas', 'Acabados premium']
+            : ['1 alcoba', 'Baño completo', 'Sala-comedor', 'Cocina integral', 'Zona de ropas', 'Acabados premium']
         ),
       })
     }
   }
 
-  // Mark some as sold/reserved for realism (distributed across floors and types)
-  const soldIndices = [0, 5, 24, 48, 60, 84, 108, 120]
-  const reservedIndices = [3, 14, 31, 42, 55, 67, 85, 99, 110, 128]
+  // Mark some as sold/reserved for realism
+  const soldIndices = [0, 7, 22, 48, 60, 84, 95, 105]
+  const reservedIndices = [3, 14, 31, 42, 55, 67, 78, 99]
   for (const idx of soldIndices) {
     if (idx < apartments.length) apartments[idx].status = 'sold'
   }
