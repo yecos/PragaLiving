@@ -1,11 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear()
+  const { config } = useSiteConfig()
+  const footerConfig = config?.footer
+  const generalConfig = config?.general
 
-  const footerLinks = [
+  const currentYear = new Date().getFullYear()
+  const tagline = footerConfig?.tagline || 'Arquitectura para quienes valoran lo excepcional. Una pieza arquitectónica diseñada para permanecer.'
+  const linkGroups = footerConfig?.linkGroups || [
     {
       title: 'Proyecto',
       links: [
@@ -34,6 +39,9 @@ export default function Footer() {
       ],
     },
   ]
+  const legalLinks = footerConfig?.legalLinks || ['Política de Privacidad', 'Términos de Uso']
+  const copyright = (footerConfig?.copyright || '© {year} PRAGA Living. Todos los derechos reservados.').replace('{year}', String(currentYear))
+  const logo = generalConfig?.logo || '/images/logo.png'
 
   return (
     <footer className="bg-[#0A0A0A] pt-20 pb-8">
@@ -44,25 +52,25 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-6">
               <img
-                src="/images/logo.png"
+                src={logo}
                 alt="PRAGA Living"
                 className="h-12 w-auto brightness-0 invert opacity-80"
               />
             </div>
             <p className="font-[family-name:var(--font-inter)] text-xs text-[#D8D1C8]/30 leading-relaxed mb-6">
-              Arquitectura para quienes valoran lo excepcional. Una pieza arquitectónica diseñada para permanecer.
+              {tagline}
             </p>
             <div className="w-[60px] h-[1px] bg-[#8B6B4B]/30" />
           </div>
 
           {/* Links */}
-          {footerLinks.map((section) => (
+          {linkGroups.map((section: { title: string; links: { label: string; href: string }[] }) => (
             <div key={section.title}>
               <h4 className="text-[10px] tracking-[0.3em] uppercase text-[#8B6B4B] mb-6">
                 {section.title}
               </h4>
               <ul className="space-y-3">
-                {section.links.map((link) => (
+                {section.links.map((link: { label: string; href: string }) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
@@ -83,15 +91,14 @@ export default function Footer() {
         {/* Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[10px] text-[#D8D1C8]/20 tracking-wider">
-            © {currentYear} PRAGA Living. Todos los derechos reservados.
+            {copyright}
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-[10px] text-[#D8D1C8]/20 hover:text-[#8B6B4B] transition-colors tracking-wider">
-              Política de Privacidad
-            </a>
-            <a href="#" className="text-[10px] text-[#D8D1C8]/20 hover:text-[#8B6B4B] transition-colors tracking-wider">
-              Términos de Uso
-            </a>
+            {legalLinks.map((link: string) => (
+              <a key={link} href="#" className="text-[10px] text-[#D8D1C8]/20 hover:text-[#8B6B4B] transition-colors tracking-wider">
+                {link}
+              </a>
+            ))}
           </div>
         </div>
       </div>

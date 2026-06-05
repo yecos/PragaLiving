@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
 import { Download } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
+import SiteConfigEditor from './SiteConfigEditor'
 
-type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas'
+type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas' | 'contenido' | 'ubicacion' | 'configuracion'
 
 interface Apartment {
   id: string
@@ -318,9 +319,12 @@ export default function AdminPanel() {
   const tabs: { id: Tab; label: string }[] = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'apartments', label: 'Apartamentos' },
+    { id: 'plantas', label: 'Plantas' },
     { id: 'leads', label: 'Leads' },
     { id: 'amenities', label: 'Amenidades' },
-    { id: 'plantas', label: 'Plantas' },
+    { id: 'contenido', label: 'Contenido' },
+    { id: 'ubicacion', label: 'Ubicación' },
+    { id: 'configuracion', label: 'Configuración' },
   ]
 
   return (
@@ -620,6 +624,27 @@ export default function AdminPanel() {
               {activeTab === 'plantas' && (
                 <motion.div key="plantas" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <FloorPlanEditor />
+                </motion.div>
+              )}
+
+              {/* ═══ CONTENIDO ═══ */}
+              {activeTab === 'contenido' && (
+                <motion.div key="contenido" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <SiteConfigEditor mode="contenido" />
+                </motion.div>
+              )}
+
+              {/* ═══ UBICACION ═══ */}
+              {activeTab === 'ubicacion' && (
+                <motion.div key="ubicacion" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <SiteConfigEditor mode="ubicacion" />
+                </motion.div>
+              )}
+
+              {/* ═══ CONFIGURACION ═══ */}
+              {activeTab === 'configuracion' && (
+                <motion.div key="configuracion" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <SiteConfigEditor mode="configuracion" />
                 </motion.div>
               )}
 

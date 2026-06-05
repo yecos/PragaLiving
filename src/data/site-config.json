@@ -1,0 +1,569 @@
+{
+  "general": {
+    "projectName": "PRAGA Living",
+    "logo": "/images/logo.png",
+    "tagline": "Arquitectura para quienes valoran lo excepcional",
+    "phone": "+57 601 234 5678",
+    "whatsapp": "+57 300 123 4567",
+    "email": "info@pragaliving.com",
+    "address": "Cl. 133 Sur #49-94, Caldas, Antioquia",
+    "coordinates": [6.08895, -75.63514],
+    "altitude": "1,750m s.n.m."
+  },
+  "hero": {
+    "subtitle": "Residencias Premium",
+    "title": "PRAGA",
+    "titleAccent": "Living",
+    "tagline": "Arquitectura para quienes valoran lo excepcional",
+    "ctaPrimary": { "text": "Explorar Residencias", "link": "#tipologias" },
+    "ctaSecondary": { "text": "Recorrer Edificio", "link": "#atrio" },
+    "images": [
+      { "src": "/images/renders/hero-day.jpg", "alt": "Vista Día", "label": "Día" },
+      { "src": "/images/renders/hero-sunset.jpg", "alt": "Vista Atardecer", "label": "Atardecer" },
+      { "src": "/images/renders/hero-night.jpg", "alt": "Vista Noche", "label": "Noche" }
+    ],
+    "slideInterval": 6000
+  },
+  "manifiesto": {
+    "label": "Manifiesto",
+    "heading1": "Una pieza arquitectónica",
+    "heading2Accent": "diseñada para permanecer",
+    "paragraph": "PRAGA Living no vende apartamentos. Vende arquitectura, diseño, bienestar, permanencia, exclusividad, patrimonio y estilo de vida. Cada espacio ha sido concebido como una obra que trasciende el tiempo, donde la materia se transforma en experiencia y la estructura se convierte en hogar.",
+    "keywords": ["Arquitectura", "Bienestar", "Permanencia", "Exclusividad"]
+  },
+  "arquitectura": {
+    "image": "/images/renders/exterior-golden.png",
+    "label": "Arquitectura",
+    "heading1": "Donde la arquitectura",
+    "heading2Accent": "y la naturaleza se encuentran",
+    "paragraph1": "PRAGA Living integra diseño biophilic en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.",
+    "paragraph2": "Cada residencia ha sido diseñada para maximizar la luz natural, la ventilación cruzada y las vistas panorámicas, creando espacios que respiran y se adaptan al ritmo de quienes los habitan.",
+    "stats": [
+      { "number": "12", "label": "Niveles Residenciales" },
+      { "number": "8", "label": "Tipologías" },
+      { "number": "360°", "label": "Recorridos Virtuales" }
+    ]
+  },
+  "edificio": {
+    "label": "Explorar Edificio",
+    "title": "Digital Twin",
+    "description": "Navega cada nivel del edificio en 3D. Haz clic en cualquier piso para explorar su distribución, amenidades y residencias.",
+    "levels": [
+      {
+        "id": "cobertura",
+        "name": "Cubierta",
+        "type": "Terraza · Jardín Elevado",
+        "icon": "⌂",
+        "description": "Terraza panorámica en la cima del edificio con jardín elevado, zona de descanso y vistas 360° de Caldas. Un oasis en la altura que conecta con el cielo y el paisaje antioqueño.",
+        "features": ["Vista 360°", "Jardín elevado", "Zona lounge", "Iluminación ambiental"],
+        "image": "/images/renders/hero-day.jpg"
+      },
+      {
+        "id": "residencial-11",
+        "name": "Pisos 9–11",
+        "type": "Residencial Premium · 3 Alcobas",
+        "icon": "▦",
+        "description": "Los niveles más exclusivos con apartamentos de 3 alcobas, baños completos, sala-comedor con balcón y cocina integrada. Vistas privilegiadas hacia el valle de Aburrá y los cerros de Caldas.",
+        "features": ["3 Alcobas", "Balcón jardín", "2 Baños", "Vista panorámica"],
+        "image": "/images/renders/apto-97.png"
+      },
+      {
+        "id": "residencial-8",
+        "name": "Pisos 5–8",
+        "type": "Residencial · 2-3 Alcobas",
+        "icon": "▦",
+        "description": "Niveles intermedios con tipologías de 2 y 3 alcobas, ventilación cruzada a través del patio central y balcones con vegetación. Apartamentos por piso organizados en dos alas con vistas a Caldas.",
+        "features": ["2-3 Alcobas", "Patio central", "Ventilación cruzada", "Balcones verdes"],
+        "image": "/images/renders/apto-74.png"
+      },
+      {
+        "id": "residencial-4",
+        "name": "Pisos 1–4",
+        "type": "Residencial · 2 Alcobas",
+        "icon": "▦",
+        "description": "Primeros pisos residenciales con apartamentos tipo de 2 alcobas (~48 m²), acceso directo al atrio y zona social. Distribución eficiente con sala, cocina y baño completo.",
+        "features": ["2 Alcobas ~48m²", "Vista al atrio", "Acceso amenidades", "Distribución eficiente"],
+        "image": "/images/renders/apto-57.png"
+      },
+      {
+        "id": "social",
+        "name": "Zona Social",
+        "type": "Ludoteca · Gimnasio · Vitality Pool · Salón · Sauna · Turco",
+        "icon": "◇",
+        "description": "El corazón social del edificio: Ludoteca infantil, gimnasio completo, Vitality Pool, salón social, vestieres, saunas y baño turco. Todo conectado visualmente con el patio central.",
+        "features": ["Vitality Pool", "Gimnasio", "Sauna/Turco", "Ludoteca"],
+        "image": "/images/renders/coworking.png"
+      },
+      {
+        "id": "comercial",
+        "name": "Nivel Comercial",
+        "type": "Locales 9701/9801 · 558.91 m²",
+        "icon": "□",
+        "description": "Dos locales comerciales de 558.91 m² en la base del edificio, con acceso independiente desde la Calle 133 Sur. Espacios versátiles para café, retail o servicios.",
+        "features": ["2 Locales", "558.91 m²", "Acceso independiente", "Carrera 50"],
+        "image": "/images/renders/lobby.png"
+      },
+      {
+        "id": "acceso",
+        "name": "1° Piso / Acceso",
+        "type": "Lobby · Recepción · Local 1 (43.17 m²)",
+        "icon": "◊",
+        "description": "El primer contacto con PRAGA Living. Lobby de doble altura con recepción 24h, local comercial de 43.17 m², bodega y áreas verdes en fachada. Conexión directa al atrio central.",
+        "features": ["Lobby doble altura", "Recepción 24h", "Local 43.17m²", "Áreas verdes"],
+        "image": "/images/renders/lobby.png"
+      },
+      {
+        "id": "sotanos",
+        "name": "Sótanos 1–3",
+        "type": "Parqueaderos · 17 espacios/nivel · Visitantes · Bodegas",
+        "icon": "▬",
+        "description": "Tres niveles de sótano con parqueaderos para residentes (17 espacios por nivel), visitantes, áreas utilitarias (UTIL 01-05), bodegas y acceso por ascensor y escaleras.",
+        "features": ["17 parqueaderos/nivel", "Visitantes", "Bodegas", "Cuarto técnico"],
+        "image": "/images/renders/exterior-dusk.png"
+      }
+    ],
+    "viewModes": [
+      { "id": "exploded", "name": "Vista Explotada", "icon": "⬒" },
+      { "id": "corte", "name": "Corte Vertical", "icon": "⬡" },
+      { "id": "fachada", "name": "Fachada", "icon": "⬢" }
+    ],
+    "stats": [
+      { "label": "Sótanos", "value": "3" },
+      { "label": "Nivel Acceso", "value": "1" },
+      { "label": "Nivel Comercial", "value": "1" },
+      { "label": "Zona Social", "value": "1" },
+      { "label": "Pisos Residenciales", "value": "11" },
+      { "label": "Total Niveles", "value": "17" }
+    ]
+  },
+  "atrio": {
+    "image": "/images/renders/atrio-main.png",
+    "label": "El Atrio",
+    "heading1": "Un espacio que",
+    "heading2Accent": "conecta y trasciende",
+    "paragraph": "El atrio central de PRAGA Living es el corazón del edificio. Un vacío vertical que conecta todos los niveles, permitiendo que la luz natural descienda desde la cubierta hasta el lobby, mientras la vegetación crea un microecosistema que purifica el aire y renueva el espíritu.",
+    "ctaText": "Recorrer el Atrio 360°",
+    "ctaLink": "#recorridos",
+    "cards": [
+      {
+        "image": "/images/renders/atrium-interior-1.png",
+        "title": "Luz Natural",
+        "description": "La cubierta se abre al cielo, permitiendo que la luz del sol bañe cada nivel del atrio, creando un juego de sombras que cambia con las horas del día."
+      },
+      {
+        "image": "/images/renders/atrium-interior-2.png",
+        "title": "Vegetación Vertical",
+        "description": "Plantas seleccionadas colonizan las barandas y muros del atrio, purificando el aire y creando una conexión orgánica entre la arquitectura y la naturaleza."
+      },
+      {
+        "image": "/images/renders/lobby.png",
+        "title": "Circulación Fluida",
+        "description": "Las circulaciones curvas del atrio invitan al recorrido pausado, transformando el acto de llegar a casa en una experiencia sensorial completa."
+      }
+    ]
+  },
+  "amenidades": {
+    "label": "Amenidades",
+    "title": "Vender estilo de vida",
+    "items": [
+      {
+        "id": "coworking",
+        "name": "Coworking",
+        "description": "Espacio de trabajo colaborativo diseñado para profesionales que buscan inspiración y productividad sin salir de casa. Conectividad de alta velocidad, zonas de concentración y áreas de reunión en un entorno que estimula la creatividad.",
+        "image": "/images/renders/coworking.png",
+        "benefits": ["Fibra óptica", "Salas de reunión", "Zonas silenciosas", "Café incluido"]
+      },
+      {
+        "id": "gimnasio",
+        "name": "Gimnasio",
+        "description": "Equipamiento de última generación en un espacio diseñado para entrenar con vista al exterior. Máquinas cardiovasculares, zona de pesos libres y área funcional para rutinas personalizadas en un entorno que motiva el bienestar físico.",
+        "image": "/images/renders/gimnasio.png",
+        "benefits": ["Equipamiento premium", "Vista exterior", "Zona funcional", "Pesos libres"]
+      },
+      {
+        "id": "salon-social",
+        "name": "Salón Social",
+        "description": "Un espacio versátil para celebraciones, reuniones y eventos íntimos. Diseñado con acabados de lujo, iluminación ambiental y capacidad para adaptarse a cualquier ocasión especial que requiera un marco excepcional.",
+        "image": "/images/renders/salon-social.png",
+        "benefits": ["Cocina integrada", "Terraza", "Sistema audio", "Capacidad 40 personas"]
+      },
+      {
+        "id": "vitality-pool",
+        "name": "Vitality Pool",
+        "description": "Piscina de hidroterapia con vista panorámica a la ciudad. Chorros dirigidos, cascadas y temperatura controlada para la recuperación física y el relajamiento profundo en un ambiente que fusiona agua, cielo y arquitectura.",
+        "image": "/images/renders/vitality-pool.png",
+        "benefits": ["Hidromasaje", "Vista panorámica", "Temperatura controlada", "Cascadas"]
+      },
+      {
+        "id": "sauna",
+        "name": "Sauna & Turco",
+        "description": "Circuito de bienestar que alterna entre el calor seco de la sauna finlandesa y la humedad del baño turco, diseñado para la desintoxicación, relajación muscular y renovación completa del cuerpo y la mente.",
+        "image": "/images/renders/vitality-pool.png",
+        "benefits": ["Sauna seca", "Baño turco", "Zona descanso", "Vestieres"]
+      },
+      {
+        "id": "ludoteca",
+        "name": "Ludoteca",
+        "description": "Espacio seguro y estimulante para los más pequeños, con áreas de juego creativo, zona de lectura y actividades supervisadas. Diseñado para que los niños exploren y crezcan mientras los padres disfrutan tranquilidad.",
+        "image": "/images/renders/coworking.png",
+        "benefits": ["Zona juegos", "Área lectura", "Supervisión", "Materiales didácticos"]
+      }
+    ]
+  },
+  "tipologias": {
+    "label": "Tipologías",
+    "title": "Comparar Residencias",
+    "items": [
+      {
+        "id": "tipo-a",
+        "name": "Tipo A",
+        "area": "75",
+        "bedrooms": "3",
+        "bathrooms": "2",
+        "image": "/images/renders/apto-97.png",
+        "description": "Residencia espaciosa de tres habitaciones con dos baños completos. Suite principal con baño privado, dos habitaciones secundarias, sala-comedor abierta al balcón con vegetación, cocina semi-integrada y zona de ropas. Unidades esquineras con doble orientación y ventilación cruzada natural.",
+        "features": ["3 Habitaciones", "Suite principal", "2 Baños completos", "Balcón con vegetación", "Cocina semi-integrada", "Doble orientación"],
+        "status": "Disponible"
+      },
+      {
+        "id": "tipo-b",
+        "name": "Tipo B",
+        "area": "48",
+        "bedrooms": "2",
+        "bathrooms": "1",
+        "image": "/images/renders/apto-57.png",
+        "description": "Diseño compacto de dos habitaciones optimizado para máxima funcionalidad. Sala-comedor con balcón, cocina integrada y habitación principal con ventilación cruzada. La eficiencia del espacio no sacrifica la calidad de vida ni los acabados premium.",
+        "features": ["2 Habitaciones", "Balcón", "Cocina integrada", "Baño completo", "Ventilación cruzada", "Acabados premium"],
+        "status": "Disponible"
+      },
+      {
+        "id": "tipo-a-premium",
+        "name": "Tipo A Premium",
+        "area": "78",
+        "bedrooms": "3",
+        "bathrooms": "2",
+        "image": "/images/renders/apto-74.png",
+        "description": "La mejor versión del Tipo A en los pisos más altos del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior con piso porcelánico, grifería de diseño y balcón amplio con jardín vertical. La altura marca la diferencia.",
+        "features": ["3 Habitaciones", "Vista Valle de Aburrá", "Piso porcelánico", "Balcón jardín vertical", "Grifería premium", "Acabados superiores"],
+        "status": "Últimas unidades"
+      }
+    ],
+    "ctaText": "Solicitar Información",
+    "ctaLink": "#contacto"
+  },
+  "recorridos": {
+    "label": "Recorridos 360°",
+    "title": "Experimentar Espacios",
+    "spaces": [
+      {
+        "id": "lobby",
+        "name": "Lobby",
+        "image": "/images/renders/lobby.png",
+        "hotspots": [
+          { "id": "lobby-1", "yaw": -30, "pitch": 5, "label": "Recepción", "description": "Recepción con doble altura y acabados en mármol", "linkTo": "atrio" },
+          { "id": "lobby-2", "yaw": 45, "pitch": -10, "label": "Atrio", "description": "Acceso al Atrio central con vegetación interior", "linkTo": "atrio" },
+          { "id": "lobby-3", "yaw": -80, "pitch": 15, "label": "Ascensores", "description": "Núcleo de ascensores privados con acceso directo" },
+          { "id": "lobby-4", "yaw": 100, "pitch": 0, "label": "Lounge", "description": "Área de espera con fireplace integrado" }
+        ]
+      },
+      {
+        "id": "atrio",
+        "name": "Atrio",
+        "image": "/images/renders/atrio-main.png",
+        "hotspots": [
+          { "id": "atrio-1", "yaw": 0, "pitch": 10, "label": "Jardín Interior", "description": "Jardín vertical con especies nativas" },
+          { "id": "atrio-2", "yaw": -60, "pitch": -5, "label": "Lobby", "description": "Regresar al Lobby principal", "linkTo": "lobby" },
+          { "id": "atrio-3", "yaw": 70, "pitch": 0, "label": "Coworking", "description": "Espacio de trabajo colaborativo", "linkTo": "coworking" },
+          { "id": "atrio-4", "yaw": 150, "pitch": 8, "label": "Vitality Pool", "description": "Piscina de bienestar interior" }
+        ]
+      },
+      {
+        "id": "coworking",
+        "name": "Coworking",
+        "image": "/images/renders/coworking.png",
+        "hotspots": [
+          { "id": "cowork-1", "yaw": -20, "pitch": 5, "label": "Zona de Trabajo", "description": "Estaciones de trabajo con vista panorámica" },
+          { "id": "cowork-2", "yaw": 60, "pitch": -8, "label": "Sala de Juntas", "description": "Salas privadas para reuniones ejecutivas" },
+          { "id": "cowork-3", "yaw": -100, "pitch": 10, "label": "Atrio", "description": "Regresar al Atrio central", "linkTo": "atrio" },
+          { "id": "cowork-4", "yaw": 130, "pitch": 0, "label": "Coffee Station", "description": "Cafetería gourmet para residentes" }
+        ]
+      },
+      {
+        "id": "gimnasio",
+        "name": "Gimnasio",
+        "image": "/images/renders/gimnasio.png",
+        "hotspots": [
+          { "id": "gym-1", "yaw": 0, "pitch": 5, "label": "Zona Cardio", "description": "Equipamiento Technogym de última generación" },
+          { "id": "gym-2", "yaw": -50, "pitch": -5, "label": "Pesas Libres", "description": "Área completa de entrenamiento funcional" },
+          { "id": "gym-3", "yaw": 80, "pitch": 10, "label": "Yoga Studio", "description": "Espacio dedicado a yoga y pilates" },
+          { "id": "gym-4", "yaw": -130, "pitch": 0, "label": "Vestidores", "description": "Vestidores con sauna y vapor" }
+        ]
+      },
+      {
+        "id": "salon",
+        "name": "Salón Social",
+        "image": "/images/renders/salon-social.png",
+        "hotspots": [
+          { "id": "salon-1", "yaw": 15, "pitch": 0, "label": "Terraza", "description": "Terraza con vista al skyline de la ciudad" },
+          { "id": "salon-2", "yaw": -70, "pitch": 5, "label": "Cocina Privada", "description": "Cocina de entretenimiento para eventos privados" },
+          { "id": "salon-3", "yaw": 90, "pitch": -10, "label": "Barra", "description": "Barra integrada con iluminación ambiental" },
+          { "id": "salon-4", "yaw": -140, "pitch": 8, "label": "Cine", "description": "Sala de cine privada para 12 personas" }
+        ]
+      },
+      {
+        "id": "studio",
+        "name": "Studio",
+        "image": "/images/renders/studio-33.png",
+        "hotspots": [
+          { "id": "studio-1", "yaw": 0, "pitch": 5, "label": "Zona Principal", "description": "Espacio abierto con iluminación natural" },
+          { "id": "studio-2", "yaw": -45, "pitch": -8, "label": "Cocina Integrada", "description": "Cocina tipo americana con acabados premium" },
+          { "id": "studio-3", "yaw": 70, "pitch": 10, "label": "Balcón", "description": "Balcón privado con vista urbana" }
+        ]
+      },
+      {
+        "id": "apto57",
+        "name": "Apto 57 m²",
+        "image": "/images/renders/apto-57.png",
+        "hotspots": [
+          { "id": "57-1", "yaw": 10, "pitch": 0, "label": "Sala", "description": "Sala con piso porcelanato y ventanales de piso a techo" },
+          { "id": "57-2", "yaw": -55, "pitch": -5, "label": "Cocina", "description": "Cocina con isla y acabados en cuarzo" },
+          { "id": "57-3", "yaw": 80, "pitch": 8, "label": "Recámara", "description": "Recámara principal con walk-in closet" },
+          { "id": "57-4", "yaw": -120, "pitch": 5, "label": "Balcón", "description": "Balcón con vista oriente", "linkTo": "apto74" }
+        ]
+      },
+      {
+        "id": "apto74",
+        "name": "Apto 74 m²",
+        "image": "/images/renders/apto-74.png",
+        "hotspots": [
+          { "id": "74-1", "yaw": -15, "pitch": 5, "label": "Sala-Comedor", "description": "Doble ambiente con iluminación natural cruzada" },
+          { "id": "74-2", "yaw": 50, "pitch": -8, "label": "Cocina", "description": "Cocina abierta con electrodomésticos Miele" },
+          { "id": "74-3", "yaw": -80, "pitch": 10, "label": "Recámara Principal", "description": "Suite con baño completo y vestidor" },
+          { "id": "74-4", "yaw": 120, "pitch": 0, "label": "Segunda Recámara", "description": "Recámara con vista al valle", "linkTo": "apto97" }
+        ]
+      },
+      {
+        "id": "apto97",
+        "name": "Penthouse 97 m²",
+        "image": "/images/renders/apto-97.png",
+        "hotspots": [
+          { "id": "97-1", "yaw": 0, "pitch": 5, "label": "Gran Sala", "description": "Sala con doble altura y chimenea empotrada" },
+          { "id": "97-2", "yaw": -40, "pitch": -10, "label": "Terraza Privada", "description": "Terraza con jacuzzi y vista 360°" },
+          { "id": "97-3", "yaw": 65, "pitch": 8, "label": "Master Suite", "description": "Suite principal con baño de mármol" },
+          { "id": "97-4", "yaw": -110, "pitch": 0, "label": "Estudio", "description": "Espacio flexible para home office", "linkTo": "studio" }
+        ]
+      }
+    ]
+  },
+  "ubicacion": {
+    "label": "Ubicación",
+    "title": "Vender Entorno",
+    "layers": [
+      {
+        "id": "movilidad",
+        "name": "Movilidad",
+        "icon": "→",
+        "color": "#6B8FB5",
+        "points": [
+          { "name": "Parada Bus Urbano", "distance": "84m", "time": "1 min", "description": "Parada de rutas urbanas con conexión al centro de Caldas y municipios cercanos", "lat": 6.08975, "lng": -75.63610 },
+          { "name": "Parada Rutas Veredales", "distance": "120m", "time": "2 min", "description": "Conexión con rutas veredales y transporte rural de la zona sur del Valle de Aburrá", "lat": 6.09007, "lng": -75.63607 },
+          { "name": "Estación La Estrella (Metro)", "distance": "7.2 km", "time": "25 min", "description": "Estación del Metro de Medellín Línea A, accesible vía bus integrado por Carrera 50", "lat": 6.15278, "lng": -75.62633 }
+        ]
+      },
+      {
+        "id": "gastronomia",
+        "name": "Gastronomía",
+        "icon": "◆",
+        "color": "#B56B8F",
+        "points": [
+          { "name": "Zona Gastronómica Caldas", "distance": "200m", "time": "3 min", "description": "Concentración de restaurantes típicos antioqueños y cafés en el centro de Caldas", "lat": 6.09080, "lng": -75.63650 },
+          { "name": "Café Especialidad", "distance": "150m", "time": "2 min", "description": "Café de especialidad y repostería artesanal en el parque principal", "lat": 6.09100, "lng": -75.63500 },
+          { "name": "Pasaje Alejandrino", "distance": "242m", "time": "3 min", "description": "Pasaje gastronómico con variedad de opciones locales e internacionales", "lat": 6.09066, "lng": -75.63650 }
+        ]
+      },
+      {
+        "id": "comercio",
+        "name": "Comercio",
+        "icon": "□",
+        "color": "#8B6B4B",
+        "points": [
+          { "name": "San Gabriel", "distance": "201m", "time": "3 min", "description": "Centro comercial local con supermercado, farmacia y tiendas de servicios", "lat": 6.09051, "lng": -75.63662 },
+          { "name": "Bancolombia", "distance": "273m", "time": "4 min", "description": "Sucursal bancaria con servicios completos y cajero 24h", "lat": 6.09138, "lng": -75.63549 },
+          { "name": "Locería Colombiana", "distance": "500m", "time": "7 min", "description": "Fábrica histórica de Corona con outlet de cerámica y materiales", "lat": 6.09200, "lng": -75.63800 }
+        ]
+      },
+      {
+        "id": "educacion",
+        "name": "Educación",
+        "icon": "△",
+        "color": "#6B8F6B",
+        "points": [
+          { "name": "IE María Auxiliadora", "distance": "152m", "time": "2 min", "description": "Institución educativa de prestigio con programas de preescolar a media técnica", "lat": 6.09024, "lng": -75.63559 },
+          { "name": "Colegio Tercer Milenio", "distance": "288m", "time": "4 min", "description": "Colegio privado con currículo bilingüe y énfasis en tecnología", "lat": 6.09110, "lng": -75.63753 },
+          { "name": "IE Ciencias Aplicadas", "distance": "390m", "time": "5 min", "description": "Institución técnica con programas de formación profesional", "lat": 6.09249, "lng": -75.63563 }
+        ]
+      },
+      {
+        "id": "salud",
+        "name": "Salud",
+        "icon": "○",
+        "color": "#6BB5A0",
+        "points": [
+          { "name": "Policlínico Sur", "distance": "145m", "time": "2 min", "description": "Clínica médica con consultas especializadas y servicios de urgencias", "lat": 6.09002, "lng": -75.63439 },
+          { "name": "Hospital San Vicente de Paúl", "distance": "540m", "time": "7 min", "description": "Hospital principal de Caldas con servicios de alta complejidad", "lat": 6.08720, "lng": -75.63620 },
+          { "name": "Cruz Verde Farmacia", "distance": "134m", "time": "2 min", "description": "Farmacia con servicio de entrega a domicilio", "lat": 6.08972, "lng": -75.63607 }
+        ]
+      },
+      {
+        "id": "naturaleza",
+        "name": "Naturaleza",
+        "icon": "◇",
+        "color": "#4B5646",
+        "points": [
+          { "name": "Parque El Carrusel", "distance": "201m", "time": "3 min", "description": "Parque urbano con glorieta, zonas verdes y senderos peatonales", "lat": 6.08978, "lng": -75.63676 },
+          { "name": "Parque de la Locería", "distance": "488m", "time": "6 min", "description": "Parque histórico recientemente renovado con áreas deportivas y culturales", "lat": 6.09162, "lng": -75.63865 },
+          { "name": "Parque Santander", "distance": "400m", "time": "5 min", "description": "Parque principal del centro de Caldas frente a la Alcaldía", "lat": 6.09200, "lng": -75.63700 }
+        ]
+      }
+    ]
+  },
+  "galeria": {
+    "label": "Galería",
+    "title": "Visualizar Proyecto",
+    "categories": ["Exteriores", "Interiores", "Atrio", "Amenidades", "Tipologías", "Videos"],
+    "items": [
+      { "id": 1, "category": "Exteriores", "src": "/images/renders/hero-day.jpg", "title": "Fachada Principal - Día" },
+      { "id": 2, "category": "Exteriores", "src": "/images/renders/hero-sunset.jpg", "title": "Vista Atardecer" },
+      { "id": 3, "category": "Exteriores", "src": "/images/renders/hero-night.jpg", "title": "Vista Nocturna" },
+      { "id": 4, "category": "Exteriores", "src": "/images/renders/exterior-dusk.png", "title": "Fachada - Atardecer" },
+      { "id": 5, "category": "Exteriores", "src": "/images/renders/exterior-golden.png", "title": "Fachada - Golden Hour" },
+      { "id": 6, "category": "Interiores", "src": "/images/renders/lobby.png", "title": "Lobby Principal" },
+      { "id": 7, "category": "Atrio", "src": "/images/renders/atrio-main.png", "title": "Atrio Central" },
+      { "id": 8, "category": "Atrio", "src": "/images/renders/atrium-interior-1.png", "title": "Atrio - Vista Inferior" },
+      { "id": 9, "category": "Atrio", "src": "/images/renders/atrium-interior-2.png", "title": "Atrio - Vista Superior" },
+      { "id": 10, "category": "Amenidades", "src": "/images/renders/coworking.png", "title": "Coworking" },
+      { "id": 11, "category": "Amenidades", "src": "/images/renders/gimnasio.png", "title": "Gimnasio" },
+      { "id": 12, "category": "Amenidades", "src": "/images/renders/salon-social.png", "title": "Salón Social" },
+      { "id": 13, "category": "Amenidades", "src": "/images/renders/vitality-pool.png", "title": "Vitality Pool" },
+      { "id": 14, "category": "Tipologías", "src": "/images/renders/studio-33.png", "title": "Studio 33 m²" },
+      { "id": 15, "category": "Tipologías", "src": "/images/renders/apto-57.png", "title": "Apartamento 57 m²" },
+      { "id": 16, "category": "Tipologías", "src": "/images/renders/apto-74.png", "title": "Apartamento 74 m²" },
+      { "id": 17, "category": "Tipologías", "src": "/images/renders/apto-97.png", "title": "Penthouse 97 m²" }
+    ]
+  },
+  "inversion": {
+    "label": "Inversión",
+    "title": "Generar Decisión",
+    "indicators": [
+      { "label": "Valorización Anual", "value": "+12.5%", "description": "Incremento promedio del valor inmobiliario en la zona durante los últimos 5 años, superando el promedio de la ciudad." },
+      { "label": "Renta Estimada", "value": "6.8%", "description": "Retorno estimado sobre inversión por arrendamiento, basado en análisis del mercado local y comparables de la zona." },
+      { "label": "Demanda Zona", "value": "94%", "description": "Índice de ocupación en la zona, demostrando alta demanda y sostenibilidad del mercado inmobiliario local." },
+      { "label": "Plusvalía Proyectada", "value": "+35%", "description": "Plusvalía esperada en 5 años según tendencias de desarrollo urbano y proyectos de infraestructura planificados." }
+    ],
+    "sections": [
+      {
+        "title": "Ubicación Estratégica",
+        "description": "PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura en curso garantizan la revalorización continua del entorno."
+      },
+      {
+        "title": "Escasez de Oferta",
+        "description": "La oferta de residencias premium con características biophilic y amenidades de nivel hotelero es limitada en el mercado. PRAGA Living representa una oportunidad única de acceder a un producto diferenciado que no tendrá réplicas en la zona, protegiendo su valor a largo plazo."
+      },
+      {
+        "title": "Arquitectura como Valor",
+        "description": "A diferencia de proyectos inmobiliarios tradicionales, PRAGA Living incorpora arquitectura de autor como factor de valoración. La calidad del diseño, los materiales y la construcción se traducen en un patrimonio que se aprecia con el tiempo, no solo en metros cuadrados."
+      },
+      {
+        "title": "Proyección de Mercado",
+        "description": "El mercado inmobiliario premium en la zona muestra tendencias de crecimiento sostenido. La combinación de ubicación, diseño y exclusividad posiciona a PRAGA Living como una de las opciones de inversión más atractivas del mercado actual."
+      }
+    ],
+    "ctaText": "Solicitar Información de Inversión",
+    "ctaLink": "#contacto"
+  },
+  "contacto": {
+    "label": "Contacto",
+    "title": "Agendar Visita",
+    "intro": "Nuestro equipo de asesores está disponible para acompañarle en cada paso del proceso. Desde la primera consulta hasta la firma de su nueva residencia, le garantizamos una experiencia personalizada y discreta.",
+    "methods": [
+      { "label": "Llamada", "value": "+57 601 234 5678", "href": "tel:+576012345678", "icon": "phone" },
+      { "label": "Email", "value": "info@pragaliving.com", "href": "mailto:info@pragaliving.com", "icon": "email" },
+      { "label": "WhatsApp", "value": "+57 300 123 4567", "href": "https://wa.me/573001234567?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20PRAGA%20Living", "icon": "whatsapp" }
+    ],
+    "schedule": [
+      { "days": "Lunes a Viernes", "hours": "8:00 AM - 6:00 PM" },
+      { "days": "Sábados", "hours": "9:00 AM - 2:00 PM" },
+      { "days": "Visitas Privadas", "hours": "Bajo cita" }
+    ],
+    "interestOptions": ["Studio 33m²", "Studio Plus 35m²", "Apartamento 2H 57m²", "Apartamento Premium 2H 74m²", "Penthouse 3H 97m²", "General"],
+    "whatsappMessage": "Hola, me interesa conocer más sobre PRAGA Living"
+  },
+  "footer": {
+    "tagline": "Arquitectura para quienes valoran lo excepcional. Una pieza arquitectónica diseñada para permanecer.",
+    "linkGroups": [
+      {
+        "title": "Proyecto",
+        "links": [
+          { "label": "Arquitectura", "href": "#arquitectura" },
+          { "label": "Amenidades", "href": "#amenidades" },
+          { "label": "Tipologías", "href": "#tipologias" },
+          { "label": "Planta Interactiva", "href": "#planta" }
+        ]
+      },
+      {
+        "title": "Explorar",
+        "links": [
+          { "label": "Recorridos 360°", "href": "#recorridos" },
+          { "label": "Galería", "href": "#galeria" },
+          { "label": "Ubicación", "href": "#ubicacion" },
+          { "label": "Inversión", "href": "#inversion" }
+        ]
+      },
+      {
+        "title": "Contacto",
+        "links": [
+          { "label": "Agendar Visita", "href": "#contacto" },
+          { "label": "WhatsApp", "href": "https://wa.me/573001234567" },
+          { "label": "Llamada", "href": "tel:+576012345678" },
+          { "label": "Email", "href": "mailto:info@pragaliving.com" }
+        ]
+      }
+    ],
+    "legalLinks": ["Política de Privacidad", "Términos de Uso"],
+    "copyright": "© {year} PRAGA Living. Todos los derechos reservados."
+  },
+  "chat": {
+    "title": "Asistente PRAGA",
+    "welcomeMessage": "Bienvenido a PRAGA Living. Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?",
+    "quickQuestions": [
+      "¿Cuáles son las tipologías disponibles?",
+      "¿Qué amenidades incluye el proyecto?",
+      "¿Cuál es el precio de las residencias?",
+      "¿Cómo agendo una visita?"
+    ],
+    "fallbackResponses": {
+      "tipologías": "PRAGA Living ofrece 8 tipologías desde Studio de 33 m² hasta Penthouse de 97 m². Cada residencia está diseñada con acabados premium, balcones privados y ventilación cruzada. ¿Te gustaría conocer más detalles de alguna en particular?",
+      "amenidades": "Nuestras amenidades incluyen: Coworking, Gimnasio premium, Salón Social, Ludoteca, Sauna, Baño Turco, Vitality Pool, Hidromasaje, Hidroterapia y Zona de Descanso. Todo diseñado para un estilo de vida excepcional.",
+      "precio": "Los precios varían según la tipología y el piso. Te recomiendo agendar una visita con nuestros asesores para recibir información personalizada y actualizada. ¿Te gustaría que te contacte un asesor?",
+      "visita": "Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 123 4567, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 601 234 5678. ¿Cuál prefieres?"
+    }
+  },
+  "navigation": {
+    "items": [
+      { "label": "Inicio", "href": "#hero" },
+      { "label": "Arquitectura", "href": "#arquitectura" },
+      { "label": "Edificio", "href": "#edificio" },
+      { "label": "Atrio", "href": "#atrio" },
+      { "label": "Amenidades", "href": "#amenidades" },
+      { "label": "Tipologías", "href": "#tipologias" },
+      { "label": "Planta", "href": "#planta" },
+      { "label": "360°", "href": "#recorridos" },
+      { "label": "Ubicación", "href": "#ubicacion" },
+      { "label": "Galería", "href": "#galeria" },
+      { "label": "Inversión", "href": "#inversion" },
+      { "label": "Contacto", "href": "#contacto" }
+    ],
+    "ctaText": "Agendar Visita",
+    "ctaLink": "#contacto"
+  }
+}

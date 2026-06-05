@@ -2,8 +2,24 @@
 
 import { useRef } from 'react'
 import { motion, useInView, useScroll, useTransform } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 export default function Arquitectura() {
+  const { config } = useSiteConfig()
+  const arqConfig = config?.arquitectura
+
+  const image = arqConfig?.image || '/images/renders/exterior-golden.png'
+  const label = arqConfig?.label || 'Arquitectura'
+  const heading1 = arqConfig?.heading1 || 'Donde la arquitectura'
+  const heading2Accent = arqConfig?.heading2Accent || 'y la naturaleza se encuentran'
+  const paragraph1 = arqConfig?.paragraph1 || 'PRAGA Living integra diseño biophilic en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.'
+  const paragraph2 = arqConfig?.paragraph2 || 'Cada residencia ha sido diseñada para maximizar la luz natural, la ventilación cruzada y las vistas panorámicas, creando espacios que respiran y se adaptan al ritmo de quienes los habitan.'
+  const stats = arqConfig?.stats || [
+    { number: '12', label: 'Niveles Residenciales' },
+    { number: '8', label: 'Tipologías' },
+    { number: '360°', label: 'Recorridos Virtuales' },
+  ]
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const { scrollYProgress } = useScroll({
@@ -25,7 +41,7 @@ export default function Arquitectura() {
           >
             <motion.div style={{ y: parallaxY }} className="relative">
               <img
-                src="/images/renders/exterior-golden.png"
+                src={image}
                 alt="PRAGA Living Exterior"
                 className="w-full h-[500px] md:h-[600px] object-cover"
               />
@@ -43,7 +59,7 @@ export default function Arquitectura() {
               transition={{ duration: 0.8 }}
               className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
             >
-              Arquitectura
+              {label}
             </motion.p>
 
             <motion.h2
@@ -52,9 +68,9 @@ export default function Arquitectura() {
               transition={{ duration: 1, delay: 0.2 }}
               className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#111111] font-light leading-tight mb-8"
             >
-              Donde la arquitectura
+              {heading1}
               <br />
-              <span className="text-[#8B6B4B]">y la naturaleza se encuentran</span>
+              <span className="text-[#8B6B4B]">{heading2Accent}</span>
             </motion.h2>
 
             <motion.div
@@ -70,10 +86,7 @@ export default function Arquitectura() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="font-[family-name:var(--font-inter)] text-sm text-[#111111]/70 leading-relaxed mb-6"
             >
-              PRAGA Living integra diseño biophilic en cada nivel del edificio. Fachadas vegetales, 
-              balcones con jardines privados y un atrio central que conecta visualmente todos los 
-              pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino 
-              parte esencial de la experiencia arquitectónica.
+              {paragraph1}
             </motion.p>
 
             <motion.p
@@ -82,9 +95,7 @@ export default function Arquitectura() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="font-[family-name:var(--font-inter)] text-sm text-[#111111]/70 leading-relaxed mb-10"
             >
-              Cada residencia ha sido diseñada para maximizar la luz natural, la ventilación 
-              cruzada y las vistas panorámicas, creando espacios que respiran y se adaptan 
-              al ritmo de quienes los habitan.
+              {paragraph2}
             </motion.p>
 
             <motion.div
@@ -93,11 +104,7 @@ export default function Arquitectura() {
               transition={{ duration: 0.8, delay: 1 }}
               className="grid grid-cols-3 gap-6"
             >
-              {[
-                { number: '12', label: 'Niveles Residenciales' },
-                { number: '8', label: 'Tipologías' },
-                { number: '360°', label: 'Recorridos Virtuales' },
-              ].map((stat, i) => (
+              {stats.map((stat: { number: string; label: string }, i: number) => (
                 <div key={i} className="text-center">
                   <p className="font-[family-name:var(--font-cormorant)] text-3xl md:text-4xl text-[#8B6B4B] font-light">
                     {stat.number}

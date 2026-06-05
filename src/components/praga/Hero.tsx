@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const heroImages = [
+const defaultHeroImages = [
   { src: '/images/renders/hero-day.jpg', alt: 'PRAGA Living Día', label: 'Día' },
   { src: '/images/renders/hero-sunset.jpg', alt: 'PRAGA Living Atardecer', label: 'Atardecer' },
   { src: '/images/renders/hero-night.jpg', alt: 'PRAGA Living Noche', label: 'Noche' },
@@ -39,6 +40,18 @@ const MoonIcon = () => (
 const timeOfDayIcons = [SunIcon, SunsetIcon, MoonIcon]
 
 export default function Hero() {
+  const { config } = useSiteConfig()
+  const heroConfig = config?.hero
+
+  const heroImages = heroConfig?.images || defaultHeroImages
+  const subtitle = heroConfig?.subtitle || 'Residencias Premium'
+  const title = heroConfig?.title || 'PRAGA'
+  const titleAccent = heroConfig?.titleAccent || 'Living'
+  const tagline = heroConfig?.tagline || 'Arquitectura para quienes valoran lo excepcional'
+  const ctaPrimary = heroConfig?.ctaPrimary || { text: 'Explorar Residencias', link: '#tipologias' }
+  const ctaSecondary = heroConfig?.ctaSecondary || { text: 'Recorrer Edificio', link: '#atrio' }
+  const slideInterval = heroConfig?.slideInterval || 6000
+
   const [currentImage, setCurrentImage] = useState(0)
   const containerRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
@@ -53,14 +66,14 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % heroImages.length)
-    }, 6000)
+    }, slideInterval)
     return () => clearInterval(interval)
-  }, [])
+  }, [heroImages.length, slideInterval])
 
   return (
     <section id="hero" ref={containerRef} className="relative h-screen overflow-hidden">
       {/* Background Images */}
-      {heroImages.map((img, i) => (
+      {heroImages.map((img: { src: string; alt: string; label: string }, i: number) => (
         <motion.div
           key={i}
           className="absolute inset-0"
@@ -150,7 +163,7 @@ export default function Hero() {
         >
           <div className="w-[60px] h-[1px] bg-[#8B6B4B] mx-auto mb-8" />
           <p className="font-[family-name:var(--font-inter)] text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B]">
-            Residencias Premium
+            {subtitle}
           </p>
         </motion.div>
 
@@ -162,7 +175,7 @@ export default function Hero() {
             transition={{ duration: 1.4, delay: 2.8, ease: [0.76, 0, 0.24, 1] }}
             className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl lg:text-8xl tracking-[0.15em] text-[#F5F1EA] font-light leading-[0.9]"
           >
-            PRAGA
+            {title}
           </motion.h1>
         </div>
 
@@ -173,7 +186,7 @@ export default function Hero() {
           transition={{ duration: 1.2, delay: 3.4, ease: [0.76, 0, 0.24, 1] }}
           className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl tracking-[0.3em] text-[#D8D1C8] font-light mt-2"
         >
-          Living
+          {titleAccent}
         </motion.p>
 
         <motion.p
@@ -182,7 +195,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 3.8, ease: [0.76, 0, 0.24, 1] }}
           className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl text-[#D8D1C8]/80 font-light mt-8 max-w-xl italic"
         >
-          Arquitectura para quienes valoran lo excepcional
+          {tagline}
         </motion.p>
 
         <motion.div
@@ -192,16 +205,16 @@ export default function Hero() {
           className="flex flex-col sm:flex-row gap-4 mt-12"
         >
           <a
-            href="#tipologias"
+            href={ctaPrimary.link}
             className="text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3.5 hover:bg-[#7A5C3E] transition-all duration-300"
           >
-            Explorar Residencias
+            {ctaPrimary.text}
           </a>
           <a
-            href="#atrio"
+            href={ctaSecondary.link}
             className="text-[11px] tracking-[0.2em] uppercase border border-[#F5F1EA]/30 text-[#F5F1EA] px-8 py-3.5 hover:border-[#8B6B4B] hover:text-[#8B6B4B] transition-all duration-300"
           >
-            Recorrer Edificio
+            {ctaSecondary.text}
           </a>
         </motion.div>
 
@@ -212,8 +225,8 @@ export default function Hero() {
           transition={{ delay: 5, duration: 1 }}
           className="absolute bottom-32 flex items-center gap-1"
         >
-          {heroImages.map((img, i) => {
-            const IconComponent = timeOfDayIcons[i]
+          {heroImages.map((img: { src: string; alt: string; label: string }, i: number) => {
+            const IconComponent = timeOfDayIcons[i % timeOfDayIcons.length]
             return (
               <button
                 key={i}

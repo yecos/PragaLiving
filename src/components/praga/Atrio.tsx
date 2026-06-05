@@ -2,8 +2,39 @@
 
 import { useRef } from 'react'
 import { motion, useInView, useScroll, useTransform } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
+
+const defaultCards = [
+  {
+    image: '/images/renders/atrium-interior-1.png',
+    title: 'Luz Natural',
+    description: 'La cubierta se abre al cielo, permitiendo que la luz del sol bañe cada nivel del atrio, creando un juego de sombras que cambia con las horas del día.'
+  },
+  {
+    image: '/images/renders/atrium-interior-2.png',
+    title: 'Vegetación Vertical',
+    description: 'Plantas seleccionadas colonizan las barandas y muros del atrio, purificando el aire y creando una conexión orgánica entre la arquitectura y la naturaleza.'
+  },
+  {
+    image: '/images/renders/lobby.png',
+    title: 'Circulación Fluida',
+    description: 'Las circulaciones curvas del atrio invitan al recorrido pausado, transformando el acto de llegar a casa en una experiencia sensorial completa.'
+  },
+]
 
 export default function Atrio() {
+  const { config } = useSiteConfig()
+  const atrioConfig = config?.atrio
+
+  const image = atrioConfig?.image || '/images/renders/atrio-main.png'
+  const label = atrioConfig?.label || 'El Atrio'
+  const heading1 = atrioConfig?.heading1 || 'Un espacio que'
+  const heading2Accent = atrioConfig?.heading2Accent || 'conecta y trasciende'
+  const paragraph = atrioConfig?.paragraph || 'El atrio central de PRAGA Living es el corazón del edificio. Un vacío vertical que conecta todos los niveles, permitiendo que la luz natural descienda desde la cubierta hasta el lobby, mientras la vegetación crea un microecosistema que purifica el aire y renueva el espíritu.'
+  const ctaText = atrioConfig?.ctaText || 'Recorrer el Atrio 360°'
+  const ctaLink = atrioConfig?.ctaLink || '#recorridos'
+  const cards = atrioConfig?.cards || defaultCards
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const { scrollYProgress } = useScroll({
@@ -19,7 +50,7 @@ export default function Atrio() {
       <div className="relative h-[80vh] md:h-screen overflow-hidden">
         <motion.div style={{ scale }} className="absolute inset-0">
           <img
-            src="/images/renders/atrio-main.png"
+            src={image}
             alt="PRAGA Living Atrio"
             className="w-full h-full object-cover"
           />
@@ -34,7 +65,7 @@ export default function Atrio() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            El Atrio
+            {label}
           </motion.p>
 
           <motion.h2
@@ -43,9 +74,9 @@ export default function Atrio() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-4xl md:text-6xl lg:text-7xl text-[#F5F1EA] font-light leading-[0.95] max-w-3xl"
           >
-            Un espacio que
+            {heading1}
             <br />
-            <span className="text-[#8B6B4B]">conecta y trasciende</span>
+            <span className="text-[#8B6B4B]">{heading2Accent}</span>
           </motion.h2>
 
           <motion.p
@@ -54,10 +85,7 @@ export default function Atrio() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="font-[family-name:var(--font-inter)] text-sm text-[#D8D1C8]/70 leading-relaxed max-w-xl mt-6"
           >
-            El atrio central de PRAGA Living es el corazón del edificio. Un vacío vertical 
-            que conecta todos los niveles, permitiendo que la luz natural descienda desde la 
-            cubierta hasta el lobby, mientras la vegetación crea un microecosistema que purifica 
-            el aire y renueva el espíritu.
+            {paragraph}
           </motion.p>
 
           <motion.div
@@ -66,8 +94,8 @@ export default function Atrio() {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="mt-8"
           >
-            <a href="#recorridos" className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase text-[#8B6B4B] hover:text-[#C4A265] transition-colors">
-              Recorrer el Atrio 360°
+            <a href={ctaLink} className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase text-[#8B6B4B] hover:text-[#C4A265] transition-colors">
+              {ctaText}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -80,23 +108,7 @@ export default function Atrio() {
       <div className="bg-[#111111] py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                image: '/images/renders/atrium-interior-1.png',
-                title: 'Luz Natural',
-                description: 'La cubierta se abre al cielo, permitiendo que la luz del sol bañe cada nivel del atrio, creando un juego de sombras que cambia con las horas del día.'
-              },
-              {
-                image: '/images/renders/atrium-interior-2.png',
-                title: 'Vegetación Vertical',
-                description: 'Plantas seleccionadas colonizan las barandas y muros del atrio, purificando el aire y creando una conexión orgánica entre la arquitectura y la naturaleza.'
-              },
-              {
-                image: '/images/renders/lobby.png',
-                title: 'Circulación Fluida',
-                description: 'Las circulaciones curvas del atrio invitan al recorrido pausado, transformando el acto de llegar a casa en una experiencia sensorial completa.'
-              },
-            ].map((item, i) => (
+            {cards.map((item: { image: string; title: string; description: string }, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}

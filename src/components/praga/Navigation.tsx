@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const navItems = [
+const defaultNavItems = [
   { label: 'Inicio', href: '#hero' },
   { label: 'Arquitectura', href: '#arquitectura' },
   { label: 'Edificio', href: '#edificio' },
@@ -19,6 +20,13 @@ const navItems = [
 ]
 
 export default function Navigation() {
+  const { config } = useSiteConfig()
+  const navConfig = config?.navigation
+
+  const navItems = navConfig?.items || defaultNavItems
+  const ctaText = navConfig?.ctaText || 'Agendar Visita'
+  const ctaLink = navConfig?.ctaLink || '#contacto'
+
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('hero')
@@ -41,7 +49,7 @@ export default function Navigation() {
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [navItems])
 
   const scrollTo = (href: string) => {
     setMenuOpen(false)
@@ -100,10 +108,10 @@ export default function Navigation() {
 
           <div className="hidden lg:flex items-center gap-4">
             <button
-              onClick={() => scrollTo('#contacto')}
+              onClick={() => scrollTo(ctaLink)}
               className="text-[11px] tracking-[0.15em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-6 py-2.5 hover:bg-[#7A5C3E] transition-colors duration-300"
             >
-              Agendar Visita
+              {ctaText}
             </button>
           </div>
 
@@ -157,10 +165,10 @@ export default function Navigation() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: navItems.length * 0.05 }}
-                onClick={() => scrollTo('#contacto')}
+                onClick={() => scrollTo(ctaLink)}
                 className="mt-4 text-[11px] tracking-[0.15em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3 hover:bg-[#7A5C3E] transition-colors"
               >
-                Agendar Visita
+                {ctaText}
               </motion.button>
             </div>
           </motion.div>

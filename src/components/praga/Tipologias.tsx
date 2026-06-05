@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const typologies = [
+const defaultTypologies = [
   {
     id: 'tipo-a',
     name: 'Tipo A',
@@ -40,6 +41,15 @@ const typologies = [
 ]
 
 export default function Tipologias() {
+  const { config } = useSiteConfig()
+  const tipoConfig = config?.tipologias
+
+  const label = tipoConfig?.label || 'Tipologías'
+  const title = tipoConfig?.title || 'Comparar Residencias'
+  const typologies = tipoConfig?.items || defaultTypologies
+  const ctaText = tipoConfig?.ctaText || 'Solicitar Información'
+  const ctaLink = tipoConfig?.ctaLink || '#contacto'
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const [selected, setSelected] = useState(0)
@@ -56,7 +66,7 @@ export default function Tipologias() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Tipologías
+            {label}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -64,7 +74,7 @@ export default function Tipologias() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#F5F1EA] font-light"
           >
-            Comparar Residencias
+            {title}
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
@@ -99,7 +109,7 @@ export default function Tipologias() {
         {viewMode === 'grid' ? (
           /* Grid view */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {typologies.map((typo, i) => (
+            {typologies.map((typo: typeof defaultTypologies[0], i: number) => (
               <motion.div
                 key={typo.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -143,7 +153,7 @@ export default function Tipologias() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Selector column */}
             <div className="lg:col-span-1 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible">
-              {typologies.map((typo, i) => (
+              {typologies.map((typo: typeof defaultTypologies[0], i: number) => (
                 <button
                   key={typo.id}
                   onClick={() => setSelected(i)}
@@ -216,7 +226,7 @@ export default function Tipologias() {
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-8">
-                      {typologies[selected].features.map((f, i) => (
+                      {typologies[selected].features.map((f: string, i: number) => (
                         <span key={i} className="text-[10px] tracking-[0.1em] uppercase border border-[#8B6B4B]/30 text-[#8B6B4B] px-3 py-1.5">
                           {f}
                         </span>
@@ -224,10 +234,10 @@ export default function Tipologias() {
                     </div>
 
                     <a
-                      href="#contacto"
+                      href={ctaLink}
                       className="inline-block text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3.5 hover:bg-[#7A5C3E] transition-all duration-300 w-fit"
                     >
-                      Solicitar Información
+                      {ctaText}
                     </a>
                   </div>
                 </motion.div>

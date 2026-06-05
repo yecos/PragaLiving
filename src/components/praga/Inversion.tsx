@@ -2,15 +2,16 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const indicators = [
+const defaultIndicators = [
   { label: 'Valorización Anual', value: '+12.5%', description: 'Incremento promedio del valor inmobiliario en la zona durante los últimos 5 años, superando el promedio de la ciudad.' },
   { label: 'Renta Estimada', value: '6.8%', description: 'Retorno estimado sobre inversión por arrendamiento, basado en análisis del mercado local y comparables de la zona.' },
   { label: 'Demanda Zona', value: '94%', description: 'Índice de ocupación en la zona, demostrando alta demanda y sostenibilidad del mercado inmobiliario local.' },
   { label: 'Plusvalía Proyectada', value: '+35%', description: 'Plusvalía esperada en 5 años según tendencias de desarrollo urbano y proyectos de infraestructura planificados.' },
 ]
 
-const investmentSections = [
+const defaultSections = [
   {
     title: 'Ubicación Estratégica',
     description: 'PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura en curso garantizan la revalorización continua del entorno.',
@@ -30,6 +31,16 @@ const investmentSections = [
 ]
 
 export default function Inversion() {
+  const { config } = useSiteConfig()
+  const invConfig = config?.inversion
+
+  const label = invConfig?.label || 'Inversión'
+  const title = invConfig?.title || 'Generar Decisión'
+  const indicators = invConfig?.indicators || defaultIndicators
+  const investmentSections = invConfig?.sections || defaultSections
+  const ctaText = invConfig?.ctaText || 'Solicitar Información de Inversión'
+  const ctaLink = invConfig?.ctaLink || '#contacto'
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
@@ -44,7 +55,7 @@ export default function Inversion() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Inversión
+            {label}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -52,7 +63,7 @@ export default function Inversion() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#111111] font-light"
           >
-            Generar Decisión
+            {title}
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
@@ -64,7 +75,7 @@ export default function Inversion() {
 
         {/* Key indicators */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
-          {indicators.map((indicator, i) => (
+          {indicators.map((indicator: { label: string; value: string; description: string }, i: number) => (
             <motion.div
               key={indicator.label}
               initial={{ opacity: 0, y: 30 }}
@@ -87,7 +98,7 @@ export default function Inversion() {
 
         {/* Investment sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {investmentSections.map((section, i) => (
+          {investmentSections.map((section: { title: string; description: string }, i: number) => (
             <motion.div
               key={section.title}
               initial={{ opacity: 0, y: 30 }}
@@ -119,10 +130,10 @@ export default function Inversion() {
           className="text-center mt-16"
         >
           <a
-            href="#contacto"
+            href={ctaLink}
             className="inline-block text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-10 py-4 hover:bg-[#7A5C3E] transition-all duration-300"
           >
-            Solicitar Información de Inversión
+            {ctaText}
           </a>
         </motion.div>
       </div>

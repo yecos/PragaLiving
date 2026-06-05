@@ -2,8 +2,17 @@
 
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 export default function WhatsAppButton() {
+  const { config } = useSiteConfig()
+  const generalConfig = config?.general
+  const whatsapp = generalConfig?.whatsapp || '+57 300 123 4567'
+  const contactoConfig = config?.contacto
+  const message = contactoConfig?.whatsappMessage || 'Hola, me interesa conocer más sobre PRAGA Living'
+
+  const waLink = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`
+
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -18,7 +27,7 @@ export default function WhatsAppButton() {
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-      href="https://wa.me/573001234567"
+      href={waLink}
       target="_blank"
       className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300 group"
       whileHover={{ scale: 1.1 }}

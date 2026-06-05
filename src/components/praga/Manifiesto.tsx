@@ -2,8 +2,18 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 export default function Manifiesto() {
+  const { config } = useSiteConfig()
+  const manifiestoConfig = config?.manifiesto
+
+  const label = manifiestoConfig?.label || 'Manifiesto'
+  const heading1 = manifiestoConfig?.heading1 || 'Una pieza arquitectónica'
+  const heading2Accent = manifiestoConfig?.heading2Accent || 'diseñada para permanecer'
+  const paragraph = manifiestoConfig?.paragraph || 'PRAGA Living no vende apartamentos. Vende arquitectura, diseño, bienestar, permanencia, exclusividad, patrimonio y estilo de vida. Cada espacio ha sido concebido como una obra que trasciende el tiempo, donde la materia se transforma en experiencia y la estructura se convierte en hogar.'
+  const keywords = manifiestoConfig?.keywords || ['Arquitectura', 'Bienestar', 'Permanencia', 'Exclusividad']
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
@@ -19,7 +29,7 @@ export default function Manifiesto() {
           transition={{ duration: 0.8 }}
           className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-12"
         >
-          Manifiesto
+          {label}
         </motion.p>
 
         <motion.h2
@@ -28,9 +38,9 @@ export default function Manifiesto() {
           transition={{ duration: 1, delay: 0.2 }}
           className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl lg:text-6xl text-[#F5F1EA] font-light leading-tight tracking-wide"
         >
-          Una pieza arquitectónica
+          {heading1}
           <br />
-          <span className="text-gradient-bronce">diseñada para permanecer</span>
+          <span className="text-gradient-bronce">{heading2Accent}</span>
         </motion.h2>
 
         <motion.div
@@ -46,10 +56,7 @@ export default function Manifiesto() {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="font-[family-name:var(--font-inter)] text-sm md:text-base text-[#D8D1C8]/70 leading-relaxed max-w-2xl mx-auto"
         >
-          PRAGA Living no vende apartamentos. Vende arquitectura, diseño, bienestar, 
-          permanencia, exclusividad, patrimonio y estilo de vida. Cada espacio ha sido 
-          concebido como una obra que trasciende el tiempo, donde la materia se transforma 
-          en experiencia y la estructura se convierte en hogar.
+          {paragraph}
         </motion.p>
 
         <motion.div
@@ -58,7 +65,7 @@ export default function Manifiesto() {
           transition={{ duration: 0.8, delay: 1 }}
           className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
-          {['Arquitectura', 'Bienestar', 'Permanencia', 'Exclusividad'].map((word, i) => (
+          {keywords.map((word: string, i: number) => (
             <motion.div
               key={word}
               initial={{ opacity: 0, y: 15 }}
