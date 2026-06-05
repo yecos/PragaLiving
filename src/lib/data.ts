@@ -665,20 +665,35 @@ export async function updateSiteConfig(section: string, data: unknown) {
 // ==========================================
 
 export async function getFloorPlans() {
-  // 1. Try Supabase first
+  // 1. Try site_config in Supabase (stores entire floor plan config as JSONB)
   const hasSupabase = await checkSupabase()
   if (hasSupabase && supabase) {
     try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('data')
+        .eq('section', 'floor_plans')
+        .single()
+
+      if (!error && data?.data?.floors && Array.isArray(data.data.floors) && data.data.floors.length > 0) {
+        return data.data.floors
+      }
+    } catch {
+      // Fall through
+    }
+
+    // 2. Fallback: try floor_plans table (legacy, may have incomplete data)
+    try {
       const { data, error } = await supabase.from('floor_plans').select('*').order('floor_number', { ascending: true })
       if (!error && data && data.length > 0) {
-        // Map to expected format
+        // Map to expected FloorConfig format
         return data.map(row => ({
-          id: row.id,
-          floorNumber: row.floor_number,
-          floorName: row.floor_name,
-          image: row.image,
-          apartments: row.apartments,
-          updatedAt: row.updated_at,
+          id: row.floor_id || `piso-${row.floor_number}`,
+          name: row.floor_name || `Piso ${row.floor_number}`,
+          typeLabel: row.type_label || (row.is_residential ? 'Residencial' : 'Áreas Comunes'),
+          isResidential: row.is_residential !== undefined ? row.is_residential : (row.floor_number > 0),
+          image: row.image || '',
+          apartments: row.apartments || [],
         }))
       }
     } catch {
@@ -686,7 +701,7 @@ export async function getFloorPlans() {
     }
   }
 
-  // 2. Fallback: load from JSON
+  // 3. Fallback: load from JSON
   try {
     const floorPlans = await import('@/data/floor-plans.json')
     return (floorPlans.default || floorPlans).floors || []
@@ -696,7 +711,7 @@ export async function getFloorPlans() {
 }
 
 export async function updateFloorPlan(floorNumber: number, data: { image?: string; apartments?: unknown }) {
-  // 1. Try Supabase first
+  // 1. Try Supabase first (legacy table approach)
   const hasSupabase = await checkSupabase()
   if (hasSupabase && supabase) {
     try {
@@ -717,4 +732,9 @@ export async function updateFloorPlan(floorNumber: number, data: { image?: strin
 
   // 2. Fallback: not persistable
   return { success: false, error: 'No database available to persist floor plan' }
+}
+
+export async function saveFloorPlansConfig(config: { floors: unknown[] }) {
+  // Save entire floor plan config to site_config (primary method)
+  return updateSiteConfig('floor_plans', config)
 }

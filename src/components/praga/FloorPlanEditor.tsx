@@ -396,7 +396,31 @@ export default function FloorPlanEditor() {
       }
     })
     setConfig(newConfig)
+    // Auto-save with debounce via the config change effect below
   }, [selectedAptId, currentFloor, config, selectedFloorIndex])
+
+  // Auto-save when config changes (debounced)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    // Don't save on initial load or when loading
+    if (loading || !config.floors.length) return
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+
+    // Debounce: save 1 second after last change
+    saveTimeoutRef.current = setTimeout(() => {
+      void saveConfig(config)
+    }, 1000)
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [config, loading, saveConfig])
 
   const deleteApartment = useCallback(() => {
     if (!selectedAptId || !confirm('¿Eliminar este apartamento?')) return
