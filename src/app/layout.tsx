@@ -5,6 +5,8 @@ import fs from "fs";
 import path from "path";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import SessionProvider from "@/components/providers/SessionProvider";
+import GoogleAnalytics from "@/components/praga/GoogleAnalytics";
 
 const configPath = path.join(process.cwd(), "src", "data", "site-config.json");
 let siteConfig: Record<string, any> = {};
@@ -78,8 +80,11 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${cormorant.variable} antialiased bg-[#F5F1EA] text-[#111111]`}
       >
-        {children}
-        <Toaster />
+        <GoogleAnalytics />
+        <SessionProvider>
+          {children}
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

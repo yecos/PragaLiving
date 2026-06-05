@@ -306,6 +306,10 @@ function GeneralEditor({ data, onChange, onSave, saving }: { data: any; onChange
         <TextField label="Dirección" value={data.address} onChange={v => upd('address', v)} />
         <TextField label="Altitud" value={data.altitude} onChange={v => upd('altitude', v)} />
       </div>
+      <div className="border-t border-[#D8D1C8]/10 pt-4 mt-4">
+        <p className="text-[10px] tracking-[0.15em] uppercase text-[#8B6B4B] mb-3">Integraciones</p>
+        <TextField label="Google Analytics Measurement ID" value={data.gaMeasurementId || ''} onChange={v => upd('gaMeasurementId', v)} placeholder="G-XXXXXXXXXX" />
+      </div>
       <ImageField label="Logo" value={data.logo} onChange={v => upd('logo', v)} category="logos" />
       <div className="grid grid-cols-2 gap-4">
         <NumberField label="Latitud" value={data.coordinates?.[0] || 0} onChange={v => onChange({ ...data, coordinates: [v, data.coordinates?.[1] || 0] })} />
@@ -834,6 +838,7 @@ function ContactoEditor({ data, onChange, onSave, saving }: { data: any; onChang
       <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] mb-4">Contacto</h3>
       <TextField label="Etiqueta" value={d.label} onChange={v => { d.label = v; onChange(d) }} />
       <TextField label="Título" value={d.title} onChange={v => { d.title = v; onChange(d) }} />
+      <TextField label="Email de Notificaciones" value={d.notificationEmail} onChange={v => { d.notificationEmail = v; onChange(d) }} placeholder="Email donde recibir notificaciones de nuevos leads" />
       <TextField label="Introducción" value={d.intro} onChange={v => { d.intro = v; onChange(d) }} multiline />
       <TextField label="Mensaje WhatsApp" value={d.whatsappMessage} onChange={v => { d.whatsappMessage = v; onChange(d) }} />
       <div>

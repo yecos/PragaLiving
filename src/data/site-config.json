@@ -8,7 +8,8 @@
     "email": "info@pragaliving.com",
     "address": "Cl. 133 Sur #49-94, Caldas, Antioquia",
     "coordinates": [6.08895, -75.63514],
-    "altitude": "1,750m s.n.m."
+    "altitude": "1,750m s.n.m.",
+    "gaMeasurementId": ""
   },
   "hero": {
     "subtitle": "Residencias Premium",
@@ -484,6 +485,7 @@
   "contacto": {
     "label": "Contacto",
     "title": "Agendar Visita",
+    "notificationEmail": "info@pragaliving.com",
     "intro": "Nuestro equipo de asesores está disponible para acompañarle en cada paso del proceso. Desde la primera consulta hasta la firma de su nueva residencia, le garantizamos una experiencia personalizada y discreta.",
     "methods": [
       { "label": "Llamada", "value": "+57 601 234 5678", "href": "tel:+576012345678", "icon": "phone" },

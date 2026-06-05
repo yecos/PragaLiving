@@ -1,7 +1,8 @@
-// Centralized data layer that works both with Prisma (local dev) and hardcoded fallback (Vercel production)
-// Vercel serverless functions can't access local SQLite files, so we provide fallback data
+// Centralized data layer that works with Supabase, Prisma (local dev), and hardcoded fallback (Vercel production)
+// Priority: Supabase → Prisma → Hardcoded fallback
 
 import { PrismaClient } from '@prisma/client'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
 const prisma = new PrismaClient()
 
@@ -127,9 +128,30 @@ let fallbackLeads: Array<{
 const fallbackApartmentOverrides = new Map<string, { status?: string; price?: number }>()
 
 // ==========================================
-// HELPER: Try Prisma, fallback to hardcoded
+// HELPER: Check Supabase availability
 // ==========================================
 
+let supabaseChecked = false
+let supabaseAvailable = false
+
+async function checkSupabase(): Promise<boolean> {
+  if (supabaseChecked) return supabaseAvailable
+  if (!isSupabaseConfigured() || !supabase) {
+    supabaseAvailable = false
+    supabaseChecked = true
+    return false
+  }
+  try {
+    const { error } = await supabase.from('apartments').select('id').limit(1)
+    supabaseAvailable = !error
+  } catch {
+    supabaseAvailable = false
+  }
+  supabaseChecked = true
+  return supabaseAvailable
+}
+
+// HELPER: Try Prisma, fallback to hardcoded
 let dbAvailable: boolean | null = null
 
 async function checkDb(): Promise<boolean> {
@@ -145,12 +167,85 @@ async function checkDb(): Promise<boolean> {
 }
 
 // ==========================================
+// HELPERS: Map Supabase rows to expected shape
+// ==========================================
+
+function mapSupabaseApartment(row: any) {
+  return {
+    id: row.id,
+    name: row.name,
+    area: Number(row.area),
+    bedrooms: row.bedrooms,
+    bathrooms: row.bathrooms,
+    floor: row.floor,
+    view: row.view,
+    typology: row.typology,
+    status: row.status,
+    price: Number(row.price),
+    image: row.image,
+    plan360Url: row.plan_360_url,
+    features: typeof row.features === 'object' ? JSON.stringify(row.features) : row.features,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapSupabaseLead(row: any) {
+  return {
+    id: row.id,
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    interest: row.interest,
+    message: row.message,
+    source: row.source,
+    status: row.status,
+    notes: row.notes,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapSupabaseAmenity(row: any) {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    icon: row.icon,
+    category: row.category,
+    image: row.image,
+    active: row.active,
+    order: row.order,
+    createdAt: row.created_at,
+    updatedAt: row.created_at,
+  }
+}
+
+// ==========================================
 // EXPORTED DATA FUNCTIONS
 // ==========================================
 
 export async function getApartments(filters?: { status?: string; floor?: number; typology?: string }) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      let query = supabase.from('apartments').select('*').order('floor', { ascending: true }).order('name', { ascending: true })
+      if (filters?.status) query = query.eq('status', filters.status)
+      if (filters?.floor) query = query.eq('floor', filters.floor)
+      if (filters?.typology) query = query.eq('typology', filters.typology)
 
+      const { data, error } = await query
+      if (!error && data && data.length > 0) {
+        return data.map(mapSupabaseApartment)
+      }
+    } catch {
+      // Fall through to Prisma
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       const where: Record<string, unknown> = {}
@@ -168,7 +263,7 @@ export async function getApartments(filters?: { status?: string; floor?: number;
     }
   }
 
-  // Fallback
+  // 3. Fallback
   let apts = generateFallbackApartments()
   if (filters?.status) apts = apts.filter(a => a.status === filters.status)
   if (filters?.floor) apts = apts.filter(a => a.floor === filters.floor)
@@ -182,8 +277,21 @@ export async function getApartments(filters?: { status?: string; floor?: number;
 }
 
 export async function getApartmentById(id: string) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase.from('apartments').select('*').eq('id', id).single()
+      if (!error && data) {
+        return mapSupabaseApartment(data)
+      }
+    } catch {
+      // Fall through
+    }
+  }
 
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       return await prisma.apartment.findUnique({ where: { id } })
@@ -192,7 +300,7 @@ export async function getApartmentById(id: string) {
     }
   }
 
-  // Fallback
+  // 3. Fallback
   const apts = generateFallbackApartments()
   const apt = apts.find(a => a.id === id)
   if (apt) {
@@ -203,8 +311,31 @@ export async function getApartmentById(id: string) {
 }
 
 export async function updateApartment(id: string, data: { status?: string; price?: number }) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+      if (data.status) updateData.status = data.status
+      if (data.price !== undefined) updateData.price = data.price
 
+      const { data: updated, error } = await supabase
+        .from('apartments')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (!error && updated) {
+        return mapSupabaseApartment(updated)
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       const updateData: Record<string, unknown> = {}
@@ -216,7 +347,7 @@ export async function updateApartment(id: string, data: { status?: string; price
     }
   }
 
-  // Fallback: store override
+  // 3. Fallback: store override
   const existing = fallbackApartmentOverrides.get(id) || {}
   fallbackApartmentOverrides.set(id, { ...existing, ...data })
 
@@ -227,8 +358,21 @@ export async function updateApartment(id: string, data: { status?: string; price
 }
 
 export async function getAmenities() {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase.from('amenities').select('*').order('order', { ascending: true })
+      if (!error && data && data.length > 0) {
+        return data.map(mapSupabaseAmenity)
+      }
+    } catch {
+      // Fall through
+    }
+  }
 
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       return await prisma.amenity.findMany({ orderBy: { order: 'asc' } })
@@ -237,12 +381,29 @@ export async function getAmenities() {
     }
   }
 
+  // 3. Fallback
   return generateFallbackAmenities()
 }
 
 export async function getLeads(filters?: { status?: string }) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      let query = supabase.from('leads').select('*').order('created_at', { ascending: false })
+      if (filters?.status) query = query.eq('status', filters.status)
 
+      const { data, error } = await query
+      if (!error && data) {
+        return data.map(mapSupabaseLead)
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       const where: Record<string, unknown> = {}
@@ -256,15 +417,43 @@ export async function getLeads(filters?: { status?: string }) {
     }
   }
 
-  // Fallback
+  // 3. Fallback
   let leads = fallbackLeads
   if (filters?.status) leads = leads.filter(l => l.status === filters.status)
   return leads
 }
 
 export async function createLead(data: { name: string; phone: string; email: string; interest?: string; message?: string; source?: string }) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const insertData = {
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        interest: data.interest || null,
+        message: data.message || null,
+        source: data.source || 'website',
+        status: 'new',
+      }
 
+      const { data: created, error } = await supabase
+        .from('leads')
+        .insert(insertData)
+        .select()
+        .single()
+
+      if (!error && created) {
+        return mapSupabaseLead(created)
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       return await prisma.lead.create({
@@ -283,7 +472,7 @@ export async function createLead(data: { name: string; phone: string; email: str
     }
   }
 
-  // Fallback
+  // 3. Fallback
   const lead = {
     id: `lead-${Date.now()}`,
     name: data.name,
@@ -301,8 +490,31 @@ export async function createLead(data: { name: string; phone: string; email: str
 }
 
 export async function updateLead(id: string, data: { status?: string; notes?: string }) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+      if (data.status) updateData.status = data.status
+      if (data.notes !== undefined) updateData.notes = data.notes
 
+      const { data: updated, error } = await supabase
+        .from('leads')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (!error && updated) {
+        return mapSupabaseLead(updated)
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       const updateData: Record<string, unknown> = {}
@@ -314,7 +526,7 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
     }
   }
 
-  // Fallback
+  // 3. Fallback
   const lead = fallbackLeads.find(l => l.id === id)
   if (lead) {
     if (data.status) lead.status = data.status
@@ -325,8 +537,27 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
 }
 
 export async function verifyAdmin(username: string, password: string) {
-  const hasDb = await checkDb()
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('username', username)
+        .single()
 
+      if (!error && data && data.password === password) {
+        return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
+      }
+      // If Supabase query succeeded but credentials don't match, fall through to Prisma
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
   if (hasDb) {
     try {
       const admin = await prisma.adminUser.findUnique({ where: { username } })
@@ -339,9 +570,151 @@ export async function verifyAdmin(username: string, password: string) {
     }
   }
 
-  // Fallback: check hardcoded credentials
+  // 3. Fallback: check hardcoded credentials
   if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
     return { success: true, user: { id: 'admin-1', username: ADMIN_CREDENTIALS.username, name: ADMIN_CREDENTIALS.name, role: ADMIN_CREDENTIALS.role } }
   }
   return { success: false, error: 'Credenciales inválidas' }
+}
+
+// ==========================================
+// SITE CONFIG (Supabase → JSON fallback)
+// ==========================================
+
+export async function getSiteConfig(section: string) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('data')
+        .eq('section', section)
+        .single()
+
+      if (!error && data) {
+        return data.data
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Try Prisma — not applicable (site_config uses JSON), fall through
+
+  // 3. Fallback: load from JSON
+  try {
+    const siteConfig = await import('@/data/site-config.json')
+    return (siteConfig.default || siteConfig)[section] || null
+  } catch {
+    return null
+  }
+}
+
+export async function getAllSiteConfig() {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase.from('site_config').select('*')
+      if (!error && data && data.length > 0) {
+        const config: Record<string, unknown> = {}
+        for (const row of data) {
+          config[row.section] = row.data
+        }
+        return config
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Fallback: load from JSON
+  try {
+    const siteConfig = await import('@/data/site-config.json')
+    return siteConfig.default || siteConfig
+  } catch {
+    return {}
+  }
+}
+
+export async function updateSiteConfig(section: string, data: unknown) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { error } = await supabase
+        .from('site_config')
+        .upsert(
+          { section, data, updated_at: new Date().toISOString() },
+          { onConflict: 'section' }
+        )
+
+      if (!error) return { success: true }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Fallback: not persistable
+  return { success: false, error: 'No database available to persist config' }
+}
+
+// ==========================================
+// FLOOR PLANS (Supabase → JSON fallback)
+// ==========================================
+
+export async function getFloorPlans() {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase.from('floor_plans').select('*').order('floor_number', { ascending: true })
+      if (!error && data && data.length > 0) {
+        // Map to expected format
+        return data.map(row => ({
+          id: row.id,
+          floorNumber: row.floor_number,
+          floorName: row.floor_name,
+          image: row.image,
+          apartments: row.apartments,
+          updatedAt: row.updated_at,
+        }))
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Fallback: load from JSON
+  try {
+    const floorPlans = await import('@/data/floor-plans.json')
+    return (floorPlans.default || floorPlans).floors || []
+  } catch {
+    return []
+  }
+}
+
+export async function updateFloorPlan(floorNumber: number, data: { image?: string; apartments?: unknown }) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+      if (data.image !== undefined) updateData.image = data.image
+      if (data.apartments !== undefined) updateData.apartments = data.apartments
+
+      const { error } = await supabase
+        .from('floor_plans')
+        .update(updateData)
+        .eq('floor_number', floorNumber)
+
+      if (!error) return { success: true }
+    } catch {
+      // Fall through
+    }
+  }
+
+  // 2. Fallback: not persistable
+  return { success: false, error: 'No database available to persist floor plan' }
 }

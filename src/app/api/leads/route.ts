@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getLeads, createLead, updateLead } from '@/lib/data'
+import { getLeads, createLead, updateLead, getSiteConfig } from '@/lib/data'
+import { sendEmail, isNewLeadEmail } from '@/lib/email'
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,6 +27,26 @@ export async function POST(req: NextRequest) {
     }
 
     const lead = await createLead({ name, phone, email, interest, message, source })
+
+    // Send email notification (non-blocking)
+    try {
+      const [generalConfig, contactoConfig] = await Promise.all([
+        getSiteConfig('general'),
+        getSiteConfig('contacto'),
+      ])
+      const notificationEmail = (contactoConfig as any)?.notificationEmail || process.env.SALES_EMAIL || (generalConfig as any)?.email
+      const projectName = (generalConfig as any)?.projectName || 'PRAGA Living'
+
+      if (notificationEmail) {
+        sendEmail({
+          to: notificationEmail,
+          subject: `[${projectName}] Nuevo Lead: ${name}`,
+          html: isNewLeadEmail({ name, phone, email, interest: interest || null, message: message || null }),
+        }).catch(err => console.error('[Leads API] Email notification failed:', err))
+      }
+    } catch (emailError) {
+      console.error('[Leads API] Failed to prepare email notification:', emailError)
+    }
 
     return NextResponse.json({
       success: true,

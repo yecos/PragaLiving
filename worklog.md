@@ -611,3 +611,38 @@ Stage Summary:
 - Login fixed for environments where DB exists but admin table is empty
 - SEO metadata now configurable from admin panel
 - Live preview available via "Abrir Sitio" button
+---
+Task ID: 2
+Agent: Main Agent
+Task: Implement 5 major features: Supabase persistence, NextAuth, PDF quotes, Resend email, Google Analytics
+
+Work Log:
+- Installed @supabase/supabase-js, @supabase/ssr, resend packages
+- Created Supabase client utilities (supabase.ts, supabase-server.ts)
+- Created complete SQL schema (supabase/schema.sql) with 7 tables
+- Created seed script (supabase/seed.ts) for initial data population
+- Updated data.ts to try Supabase first, then Prisma, then hardcoded fallback
+- Updated site-config and floor-plans APIs to use Supabase when available
+- Created NextAuth route handler with CredentialsProvider
+- Created SessionProvider wrapper component
+- Updated layout.tsx with SessionProvider
+- Created auth middleware for /admin protection
+- Updated AdminPanel to use NextAuth session (signIn/signOut)
+- Fixed Resend lazy initialization to avoid build errors without API key
+- Created quotes store, API endpoints (GET/POST/PUT)
+- Created PDF generation endpoint with professional branded layout
+- Added Cotizaciones tab to AdminPanel with full CRUD and PDF download
+- Created email utility with branded HTML template for lead notifications
+- Updated leads API to send email notifications on new leads
+- Added notificationEmail field to site-config and ContactoEditor
+- Created GoogleAnalytics component with env var support
+- Added GA to layout.tsx
+- Made GA Measurement ID configurable from admin
+- All builds pass, all APIs tested and working
+
+Stage Summary:
+- 5 major features implemented and verified
+- App works with or without external services configured (graceful degradation)
+- Build compiles successfully with all new routes
+- Total new API routes: /api/auth/[...nextauth], /api/quotes, /api/quotes/[id]/pdf, /api/media
+- Admin panel now has 10 tabs: Dashboard, Apartamentos, Plantas, Leads, Amenidades, Contenido, Ubicación, Configuración, Medios, Cotizaciones
