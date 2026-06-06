@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRAGA Living - Auditoria Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: 794px 1123px; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 794px; height: 1123px; overflow: hidden; background: #f0f2f3; }
+  
+  .cover {
+    width: 794px;
+    height: 1123px;
+    position: relative;
+    background: #f0f2f3;
+    overflow: hidden;
+  }
+
+  /* Layer 0: Background */
+  .bg-accent-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    background: #197898;
+  }
+  .bg-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: #197898;
+  }
+
+  /* Layer 1: Decorative */
+  .deco-line-1 {
+    position: absolute;
+    top: 320px;
+    left: 60px;
+    width: 200px;
+    height: 2px;
+    background: rgba(25, 120, 152, 0.2);
+  }
+  .deco-line-2 {
+    position: absolute;
+    top: 680px;
+    right: 60px;
+    width: 300px;
+    height: 1px;
+    background: rgba(25, 120, 152, 0.15);
+  }
+  .deco-circle {
+    position: absolute;
+    top: 100px;
+    right: 80px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 1px solid rgba(25, 120, 152, 0.08);
+  }
+
+  /* Layer 2: Content */
+  .kicker {
+    position: absolute;
+    top: 180px;
+    left: 60px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(25, 120, 152, 0.6);
+  }
+  
+  .hero-title {
+    position: absolute;
+    top: 340px;
+    left: 60px;
+    right: 60px;
+  }
+  .hero-title h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 46px;
+    font-weight: 700;
+    color: #232527;
+    line-height: 1.15;
+    margin-bottom: 0;
+  }
+  
+  .hero-meta {
+    position: absolute;
+    top: 540px;
+    left: 60px;
+    right: 60px;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: #7a8187;
+    line-height: 1.6;
+  }
+
+  .summary-box {
+    position: absolute;
+    top: 700px;
+    left: 60px;
+    right: 60px;
+    background: rgba(25, 120, 152, 0.04);
+    border-left: 3px solid #197898;
+    padding: 20px 24px;
+  }
+  .summary-box p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #232527;
+    line-height: 1.7;
+  }
+  .summary-box .stat {
+    font-weight: 600;
+    color: #197898;
+  }
+
+  .footer-info {
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    right: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .footer-left {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #7a8187;
+    letter-spacing: 1px;
+  }
+  .footer-right {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #7a8187;
+    text-align: right;
+  }
+  .footer-right .date {
+    font-size: 13px;
+    font-weight: 600;
+    color: #232527;
+  }
+
+  /* Severity badges */
+  .badges {
+    position: absolute;
+    top: 640px;
+    left: 60px;
+    display: flex;
+    gap: 12px;
+  }
+  .badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .badge-crit { background: rgba(192, 57, 43, 0.1); color: #c0392b; }
+  .badge-alto { background: rgba(211, 84, 0, 0.1); color: #d35400; }
+  .badge-medio { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+  .badge-bajo { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <!-- Background layer -->
+  <div class="bg-accent-bar"></div>
+  <div class="bg-bottom-bar"></div>
+  
+  <!-- Decorative layer -->
+  <div class="deco-circle"></div>
+  <div class="deco-line-1"></div>
+  <div class="deco-line-2"></div>
+
+  <!-- Content -->
+  <div class="kicker">AUDITORIA TECNICA COMPLETA</div>
+  
+  <div class="hero-title">
+    <h1>PRAGA Living</h1>
+  </div>
+
+  <div class="hero-meta">
+    Revision exhaustiva de seguridad, bugs, rendimiento<br>
+    y calidad de codigo de la plataforma inmobiliaria
+  </div>
+
+  <div class="badges">
+    <span class="badge badge-crit">8 CRITICOS</span>
+    <span class="badge badge-alto">12 ALTOS</span>
+    <span class="badge badge-medio">15 MEDIOS</span>
+    <span class="badge badge-bajo">12 BAJOS</span>
+  </div>
+
+  <div class="summary-box">
+    <p>
+      Se identificaron <span class="stat">47 hallazgos</span> en la plataforma Next.js 16 + Supabase + Three.js.
+      Los criticos incluyen contrasenas en texto plano, service role key expuesta, datos volatiles en memoria,
+      y ausencia de rate limiting. El plan de accion abarca 5 sprints con correccion inmediata de seguridad.
+    </p>
+  </div>
+
+  <div class="footer-info">
+    <div class="footer-left">
+      CALDAS, ANTIOQUIA<br>
+      COLOMBIA
+    </div>
+    <div class="footer-right">
+      <div class="date">Junio 2026</div>
+      Z.ai Technical Audit
+    </div>
+  </div>
+</div>
+</body>
+</html>
