@@ -49,3 +49,23 @@ Stage Summary:
 - Fix: Added `parseSiteConfigValue()` to handle both string and object cases
 - Enhancement: Added admin client with `SUPABASE_SERVICE_ROLE_KEY` for reliable writes
 - Production verified: GET returns 19 floors with polygon data, POST saves successfully
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Implement visual improvements and bug fixes from audit review
+
+Work Log:
+- Reviewed all 4 bugs identified in the audit
+- Bug #1: Fixed duplicate images in Amenidades (Sauna uses vitality-pool placeholder, Ludoteca uses coworking placeholder - no dedicated renders exist)
+- Bug #2: Moved `<style jsx>` keyframes from Hero.tsx to globals.css to avoid hydration warnings
+- Bug #3: Replaced rigid setTimeout loader with smart dual-condition loader (minTime + hero-ready event)
+- Bug #4: Applied glassmorphic panel to PlantaInteractiva UnitDetailPanel
+- Upgraded Amenidades to luxury accordion layout (sticky image viewer + interactive list)
+- Upgraded Hero with glassmorphism CTAs, pill-style time indicator, parallax improvements
+- Build successful, pushed to GitHub
+
+Stage Summary:
+- All 4 bugs fixed
+- 3 major visual upgrades applied (Amenidades, Hero, PlantaInteractiva)
+- Production deployment in progress via Vercel auto-deploy
