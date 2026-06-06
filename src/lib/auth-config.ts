@@ -1,19 +1,12 @@
 // ============================================
 // NextAuth Configuration for PRAGA Living
 // ============================================
-// Credentials provider with Supabase + fallback to hardcoded admin
+// Credentials provider with Supabase + bcrypt password verification
+// NO hardcoded credentials — uses environment variables
 
 import NextAuth, { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { isSupabaseConfigured, createAdminSupabaseClient } from './supabase'
-
-// Hardcoded admin credentials (fallback when Supabase is not configured)
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'praga2024',
-  name: 'Administrador PRAGA',
-  role: 'admin',
-}
+import { verifyAdmin } from './data'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -28,39 +21,14 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Try Supabase first
-        if (isSupabaseConfigured()) {
-          try {
-            const supabase = createAdminSupabaseClient()
-            const { data: admin, error } = await supabase
-              .from('admin_users')
-              .select('*')
-              .eq('username', credentials.username)
-              .single()
-
-            if (!error && admin && admin.password === credentials.password) {
-              return {
-                id: admin.id,
-                name: admin.name,
-                email: `${admin.username}@pragaliving.com`,
-                role: admin.role,
-              }
-            }
-          } catch (err) {
-            console.error('Supabase auth error, falling back:', err)
-          }
-        }
-
-        // Fallback to hardcoded credentials
-        if (
-          credentials.username === ADMIN_CREDENTIALS.username &&
-          credentials.password === ADMIN_CREDENTIALS.password
-        ) {
+        // Use the centralized verifyAdmin (supports bcrypt hashing + Supabase + Prisma + env fallback)
+        const result = await verifyAdmin(credentials.username, credentials.password)
+        if (result.success && result.user) {
           return {
-            id: 'admin-1',
-            name: ADMIN_CREDENTIALS.name,
-            email: 'admin@pragaliving.com',
-            role: 'admin',
+            id: result.user.id,
+            name: result.user.name,
+            email: `${result.user.username}@pragaliving.com`,
+            role: result.user.role,
           }
         }
 
@@ -91,6 +59,7 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
+  // SECURITY: No fallback — if NEXTAUTH_SECRET is not set, the app MUST fail to start
   secret: process.env.NEXTAUTH_SECRET,
 }
 

@@ -270,7 +270,7 @@ export default function FloorPlanEditor() {
           const newApt: ApartmentZone = {
             id: generateId(),
             polygon: [...drawingPoints],
-            name: `Apto ${currentFloor?.apartments.length + 1 ?? 1}`,
+            name: `Apto ${(currentFloor?.apartments.length ?? 0) + 1}`,
             area: 0,
             bedrooms: 1,
             bathrooms: 1,
@@ -322,7 +322,7 @@ export default function FloorPlanEditor() {
       const newApt: ApartmentZone = {
         id: generateId(),
         polygon: [...drawingPoints],
-        name: `Apto ${currentFloor?.apartments.length + 1 ?? 1}`,
+        name: `Apto ${(currentFloor?.apartments.length ?? 0) + 1}`,
         area: 0,
         bedrooms: 1,
         bathrooms: 1,

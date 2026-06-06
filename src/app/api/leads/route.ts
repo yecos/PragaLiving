@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getLeads, createLead, updateLead, getSiteConfig } from '@/lib/data'
 import { sendEmail, isNewLeadEmail } from '@/lib/email'
+import { leadsRateLimit, getClientId } from '@/lib/rate-limit'
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +16,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limiting — 5 lead submissions per minute per client
+  const clientId = getClientId(req)
+  const { allowed, resetAt } = leadsRateLimit(clientId)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes. Por favor espera un momento.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+    )
+  }
+
   try {
     const body = await req.json()
     const { name, phone, email, interest, message, source } = body

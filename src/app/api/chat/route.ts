@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { chatRateLimit, getClientId } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  // Rate limiting — 8 messages per minute per client
+  const clientId = getClientId(req)
+  const { allowed, remaining, resetAt } = chatRateLimit(clientId)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes. Por favor espera un momento.', retryAfter: Math.ceil((resetAt - Date.now()) / 1000) },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+    )
+  }
+
   try {
     const { message } = await req.json()
 
@@ -39,7 +50,7 @@ Responde en español, de forma concisa pero elegante. Si no sabes algo específi
 
     return NextResponse.json({ message: reply })
   } catch (error) {
-    // Return a helpful fallback response
+    // Contextual fallback responses
     const fallbackResponses: Record<string, string> = {
       default: 'Gracias por tu interés en PRAGA Living. Un asesor se pondrá en contacto contigo pronto para brindarte información personalizada. También puedes explorar nuestras tipologías y amenidades en esta plataforma, o escribirnos por WhatsApp al +57 300 123 4567.'
     }

@@ -29,6 +29,9 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = createAdminSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase no configurado' }, { status: 500 })
+    }
     let query = supabase.from('floor_images').select('*').order('order', { ascending: true })
 
     if (floorId) {
@@ -60,6 +63,9 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createAdminSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase no configurado' }, { status: 500 })
+    }
 
     const { data, error } = await supabase
       .from('floor_images')
@@ -95,6 +101,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const supabase = createAdminSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase no configurado' }, { status: 500 })
+    }
     const updates: Record<string, unknown> = {}
     if (label !== undefined) updates.label = label
     if (order !== undefined) updates.order = order
@@ -130,6 +139,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     const supabase = createAdminSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase no configurado' }, { status: 500 })
+    }
 
     // First get the image to potentially delete from storage
     const { data: imageData } = await supabase

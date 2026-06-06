@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAdmin } from '@/lib/data'
+import { adminRateLimit, getClientId } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  // Rate limiting — 5 login attempts per 15 seconds per client
+  const clientId = getClientId(req)
+  const { allowed, resetAt } = adminRateLimit(clientId)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Demasiados intentos. Por favor espera antes de intentar de nuevo.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) } }
+    )
+  }
+
   try {
     const body = await req.json()
     const { username, password } = body

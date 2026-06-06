@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -64,7 +64,7 @@ function WhatsAppIcon() {
   )
 }
 
-const iconMap: Record<string, () => JSX.Element> = { phone: PhoneIcon, email: EmailIcon, whatsapp: WhatsAppIcon }
+const iconMap: Record<string, () => React.ReactElement> = { phone: PhoneIcon, email: EmailIcon, whatsapp: WhatsAppIcon }
 
 export default function Contacto() {
   const { config } = useSiteConfig()

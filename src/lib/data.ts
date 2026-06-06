@@ -1,10 +1,13 @@
 // Centralized data layer that works with Supabase, Prisma (local dev), and hardcoded fallback (Vercel production)
 // Priority: Supabase → Prisma → Hardcoded fallback
+// v2: Security fixes (bcrypt), cached fallbacks, TTL on Supabase check, unified PrismaClient, fixed amenities
 
-import { PrismaClient } from '@prisma/client'
+import { db } from '@/lib/db'
 import { supabase, isSupabaseConfigured, createFreshSupabaseClient, createAdminSupabaseClient } from '@/lib/supabase'
+import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient()
+// Use the singleton PrismaClient from db.ts (fixes double-instance bug)
+const prisma = db
 
 // ==========================================
 // HARDCODED FALLBACK DATA (for production)
@@ -12,7 +15,20 @@ const prisma = new PrismaClient()
 
 const unitCode = (floor: number, unit: number) => `P${floor}-${String(unit).padStart(2, '0')}`
 
-function generateFallbackApartments() {
+// Cached fallback apartments — generated once, reused on subsequent calls
+let _cachedApartments: Array<{
+  id: string; name: string; area: number; bedrooms: number; bathrooms: number;
+  floor: number; view: string; typology: string; status: string; price: number;
+  image: string | null; plan360Url: string | null; features: string | null;
+}> | null = null
+
+function generateFallbackApartments(): Array<{
+  id: string; name: string; area: number; bedrooms: number; bathrooms: number;
+  floor: number; view: string; typology: string; status: string; price: number;
+  image: string | null; plan360Url: string | null; features: string | null;
+}> {
+  if (_cachedApartments) return _cachedApartments
+
   const apartments: Array<{
     id: string; name: string; area: number; bedrooms: number; bathrooms: number;
     floor: number; view: string; typology: string; status: string; price: number;
@@ -92,32 +108,32 @@ function generateFallbackApartments() {
     if (idx < apartments.length) apartments[idx].status = 'reserved'
   }
 
+  _cachedApartments = apartments
   return apartments
 }
 
 function generateFallbackAmenities() {
   return [
-    { id: 'fa-1', name: 'Ludoteca', description: 'Zona de juego y aprendizaje para los más pequeños. Segura, divertida y diseñada para estimular la creatividad infantil.', icon: 'Gamepad2', category: 'leisure', image: '/images/renders/atrio-main.png', active: true, order: 1 },
+    { id: 'fa-1', name: 'Ludoteca', description: 'Zona de juego y aprendizaje para los más pequeños. Segura, divertida y diseñada para estimular la creatividad infantil.', icon: 'Gamepad2', category: 'leisure', image: '/images/renders/ludoteca.png', active: true, order: 1 },
     { id: 'fa-2', name: 'Gimnasio', description: 'Gimnasio equipado con máquinas de última generación, zona de pesos libres y área de entrenamiento funcional.', icon: 'Dumbbell', category: 'wellness', image: '/images/renders/gimnasio.png', active: true, order: 2 },
     { id: 'fa-3', name: 'Vitality Pool', description: 'Piscina de vitalidad con hidromasaje y cromoterapia. Un oasis de relajación con vistas al atrio central.', icon: 'Waves', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 3 },
     { id: 'fa-4', name: 'Salón Social', description: 'Espacio elegante para reuniones, celebraciones y eventos. Con cocina de apoyo, terraza y capacidad para 40 personas.', icon: 'Wine', category: 'social', image: '/images/renders/salon-social.png', active: true, order: 4 },
-    { id: 'fa-5', name: 'Sauna', description: 'Sauna seco con maderas aromáticas para la relajación profunda. Un ritual de bienestar que renueva cuerpo y mente.', icon: 'Thermometer', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 5 },
-    { id: 'fa-6', name: 'Baño Turco', description: 'Baño turco con aromaterapia para purificar y relajar. La tradición milenaria del hammam en tu edificio.', icon: 'Cloud', category: 'wellness', image: '/images/renders/vitality-pool.png', active: true, order: 6 },
-    { id: 'fa-7', name: 'Vestieres', description: 'Vestieres completos con casilleros, duchas y zona de cambio para uso antes y después de las amenidades.', icon: 'Shirt', category: 'wellness', image: '/images/renders/coworking.png', active: true, order: 7 },
+    { id: 'fa-5', name: 'Sauna', description: 'Sauna seco con maderas aromáticas para la relajación profunda. Un ritual de bienestar que renueva cuerpo y mente.', icon: 'Thermometer', category: 'wellness', image: '/images/renders/sauna.png', active: true, order: 5 },
+    { id: 'fa-6', name: 'Baño Turco', description: 'Baño turco con aromaterapia para purificar y relajar. La tradición milenaria del hammam en tu edificio.', icon: 'Cloud', category: 'wellness', image: '/images/renders/bano-turco.png', active: true, order: 6 },
+    { id: 'fa-7', name: 'Vestieres', description: 'Vestieres completos con casilleros, duchas y zona de cambio para uso antes y después de las amenidades.', icon: 'Shirt', category: 'wellness', image: '/images/renders/vestieres.png', active: true, order: 7 },
     { id: 'fa-8', name: 'Sala Coworking', description: 'Espacio de trabajo compartido con internet de alta velocidad, zonas de reunión individual y grupal para profesionales y emprendedores.', icon: 'Laptop', category: 'service', image: '/images/renders/coworking.png', active: true, order: 8 },
     { id: 'fa-9', name: 'Lobby Doble Altura', description: 'Lobby de doble altura con recepción 24h, conexión directa al atrio central y diseño que marca la diferencia.', icon: 'DoorOpen', category: 'social', image: '/images/renders/lobby.png', active: true, order: 9 },
-    { id: 'fa-10', name: 'Terraza Cubierta / Jardín Elevado', description: 'Terraza panorámica en la cubierta con jardín elevado, zona lounge y vistas 360° de Caldas y el Valle de Aburrá.', icon: 'Sun', category: 'leisure', image: '/images/renders/hero-day.jpg', active: true, order: 10 },
+    { id: 'fa-10', name: 'Terraza Cubierta / Jardín Elevado', description: 'Terraza panorámica en la cubierta con jardín elevado, zona lounge y vistas 360° de Caldas y el Valle de Aburrá.', icon: 'Sun', category: 'leisure', image: '/images/renders/terraza.png', active: true, order: 10 },
   ]
 }
 
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'praga2024',
-  name: 'Administrador PRAGA',
-  role: 'admin',
-}
+// SECURITY: Admin credentials are now loaded from environment variables only
+// No hardcoded passwords in source code
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin'
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || ''  // bcrypt hash
 
 // In-memory stores for fallback mode (leads created in production)
+// NOTE: These are volatile — data is lost on server restart. Supabase is the primary store.
 let fallbackLeads: Array<{
   id: string; name: string; phone: string; email: string;
   interest: string | null; message: string | null; source: string;
@@ -128,17 +144,21 @@ let fallbackLeads: Array<{
 const fallbackApartmentOverrides = new Map<string, { status?: string; price?: number }>()
 
 // ==========================================
-// HELPER: Check Supabase availability
+// HELPER: Check Supabase availability (with TTL cache)
 // ==========================================
 
-let supabaseChecked = false
+let supabaseCheckedAt = 0
 let supabaseAvailable = false
+const SUPABASE_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 async function checkSupabase(): Promise<boolean> {
-  if (supabaseChecked) return supabaseAvailable
+  const now = Date.now()
+  if (now - supabaseCheckedAt < SUPABASE_CACHE_TTL && supabaseCheckedAt > 0) {
+    return supabaseAvailable
+  }
   if (!isSupabaseConfigured() || !supabase) {
     supabaseAvailable = false
-    supabaseChecked = true
+    supabaseCheckedAt = now
     return false
   }
   try {
@@ -147,21 +167,26 @@ async function checkSupabase(): Promise<boolean> {
   } catch {
     supabaseAvailable = false
   }
-  supabaseChecked = true
+  supabaseCheckedAt = now
   return supabaseAvailable
 }
 
 // HELPER: Try Prisma, fallback to hardcoded
 let dbAvailable: boolean | null = null
+let dbCheckedAt = 0
+const DB_CACHE_TTL = 5 * 60 * 1000
 
 async function checkDb(): Promise<boolean> {
-  if (dbAvailable !== null) return dbAvailable
+  const now = Date.now()
+  if (dbAvailable !== null && now - dbCheckedAt < DB_CACHE_TTL) return dbAvailable
   try {
     await prisma.$queryRaw`SELECT 1`
     dbAvailable = true
+    dbCheckedAt = now
     return true
   } catch {
     dbAvailable = false
+    dbCheckedAt = now
     return false
   }
 }
@@ -222,6 +247,168 @@ function mapSupabaseAmenity(row: any) {
 }
 
 // ==========================================
+// QUOTES — Now persisted to Supabase
+// ==========================================
+
+export interface Quote {
+  id: string
+  number: string
+  leadId: string
+  apartmentId: string
+  discount: number
+  finalPrice: number
+  paymentPlan: string
+  notes: string
+  validDays: number
+  validUntil: string
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'
+  createdAt: string
+  updatedAt: string
+}
+
+// In-memory fallback for quotes (Supabase is primary)
+const globalForQuotes = globalThis as unknown as {
+  quotesStore: Quote[] | undefined
+  quoteCounter: number | undefined
+}
+let fallbackQuotes: Quote[] = globalForQuotes.quotesStore ?? []
+let quoteCounter = globalForQuotes.quoteCounter ?? 0
+
+if (!globalForQuotes.quotesStore) {
+  globalForQuotes.quotesStore = fallbackQuotes
+  globalForQuotes.quoteCounter = quoteCounter
+}
+
+export function generateQuoteNumber(): string {
+  quoteCounter++
+  if (globalForQuotes.quoteCounter !== undefined) {
+    globalForQuotes.quoteCounter = quoteCounter
+  }
+  const year = new Date().getFullYear()
+  return `COT-${year}-${String(quoteCounter).padStart(4, '0')}`
+}
+
+export async function getQuotes(filters?: { status?: string }) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      let query = supabase.from('quotes').select('*').order('created_at', { ascending: false })
+      if (filters?.status) query = query.eq('status', filters.status)
+
+      const { data, error } = await query
+      if (!error && data) {
+        return data.map((row: any) => ({
+          id: row.id,
+          number: row.number,
+          leadId: row.lead_id,
+          apartmentId: row.apartment_id,
+          discount: Number(row.discount),
+          finalPrice: Number(row.final_price),
+          paymentPlan: row.payment_plan,
+          notes: row.notes || '',
+          validDays: row.valid_days || 30,
+          validUntil: row.valid_until,
+          status: row.status,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
+        })) as Quote[]
+      }
+    } catch (err) {
+      console.error('[data] Supabase quotes fetch error:', err)
+    }
+  }
+
+  // 2. Fallback: in-memory
+  let quotes = fallbackQuotes
+  if (filters?.status) quotes = quotes.filter(q => q.status === filters.status)
+  return quotes
+}
+
+export async function createQuote(data: { leadId: string; apartmentId: string; discount?: number; paymentPlan?: string; notes?: string; validDays?: number }) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase) {
+    try {
+      const adminClient = createAdminSupabaseClient()
+      if (adminClient) {
+        const insertData = {
+          number: generateQuoteNumber(),
+          lead_id: data.leadId,
+          apartment_id: data.apartmentId,
+          discount: data.discount || 0,
+          payment_plan: data.paymentPlan || 'Contado',
+          notes: data.notes || '',
+          valid_days: data.validDays || 30,
+          status: 'draft',
+        }
+        const { data: created, error } = await adminClient.from('quotes').insert(insertData).select().single()
+        if (!error && created) {
+          return { success: true, quote: created }
+        }
+        console.error('[data] Supabase quote insert error:', error?.message)
+      }
+    } catch (err) {
+      console.error('[data] Supabase quote exception:', err)
+    }
+  }
+
+  // 2. Fallback: in-memory
+  const quote: Quote = {
+    id: `quote-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    number: generateQuoteNumber(),
+    leadId: data.leadId,
+    apartmentId: data.apartmentId,
+    discount: data.discount || 0,
+    finalPrice: 0, // Will be calculated by API route
+    paymentPlan: data.paymentPlan || 'Contado',
+    notes: data.notes || '',
+    validDays: data.validDays || 30,
+    validUntil: new Date(Date.now() + (data.validDays || 30) * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'draft',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  fallbackQuotes.push(quote)
+  return { success: true, quote }
+}
+
+export async function updateQuote(id: string, data: { status?: string }) {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase) {
+    try {
+      const adminClient = createAdminSupabaseClient()
+      if (adminClient) {
+        const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+        if (data.status) {
+          const validStatuses = ['draft', 'sent', 'accepted', 'rejected', 'expired']
+          if (!validStatuses.includes(data.status)) {
+            return { success: false, error: 'Estado inválido' }
+          }
+          updateData.status = data.status
+        }
+        const { data: updated, error } = await adminClient.from('quotes').update(updateData).eq('id', id).select().single()
+        if (!error && updated) {
+          return { success: true, quote: updated }
+        }
+      }
+    } catch (err) {
+      console.error('[data] Supabase quote update error:', err)
+    }
+  }
+
+  // 2. Fallback: in-memory
+  const quote = fallbackQuotes.find(q => q.id === id)
+  if (quote) {
+    if (data.status) quote.status = data.status as Quote['status']
+    quote.updatedAt = new Date().toISOString()
+    return { success: true, quote }
+  }
+  return { success: false, error: 'Cotización no encontrada' }
+}
+
+// ==========================================
 // EXPORTED DATA FUNCTIONS
 // ==========================================
 
@@ -239,8 +426,8 @@ export async function getApartments(filters?: { status?: string; floor?: number;
       if (!error && data && data.length > 0) {
         return data.map(mapSupabaseApartment)
       }
-    } catch {
-      // Fall through to Prisma
+    } catch (err) {
+      console.error('[data] Supabase apartments error:', err)
     }
   }
 
@@ -258,12 +445,12 @@ export async function getApartments(filters?: { status?: string; floor?: number;
         orderBy: [{ floor: 'asc' }, { name: 'asc' }],
       })
       return apartments
-    } catch {
-      // Fall through to fallback
+    } catch (err) {
+      console.error('[data] Prisma apartments error:', err)
     }
   }
 
-  // 3. Fallback
+  // 3. Fallback (cached)
   let apts = generateFallbackApartments()
   if (filters?.status) apts = apts.filter(a => a.status === filters.status)
   if (filters?.floor) apts = apts.filter(a => a.floor === filters.floor)
@@ -285,8 +472,8 @@ export async function getApartmentById(id: string) {
       if (!error && data) {
         return mapSupabaseApartment(data)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase apartment by ID error:', err)
     }
   }
 
@@ -295,12 +482,12 @@ export async function getApartmentById(id: string) {
   if (hasDb) {
     try {
       return await prisma.apartment.findUnique({ where: { id } })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma apartment by ID error:', err)
     }
   }
 
-  // 3. Fallback
+  // 3. Fallback (cached)
   const apts = generateFallbackApartments()
   const apt = apts.find(a => a.id === id)
   if (apt) {
@@ -329,8 +516,8 @@ export async function updateApartment(id: string, data: { status?: string; price
       if (!error && updated) {
         return mapSupabaseApartment(updated)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase apartment update error:', err)
     }
   }
 
@@ -342,8 +529,8 @@ export async function updateApartment(id: string, data: { status?: string; price
       if (data.status) updateData.status = data.status
       if (data.price !== undefined) updateData.price = data.price
       return await prisma.apartment.update({ where: { id }, data: updateData })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma apartment update error:', err)
     }
   }
 
@@ -366,8 +553,8 @@ export async function getAmenities() {
       if (!error && data && data.length > 0) {
         return data.map(mapSupabaseAmenity)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase amenities error:', err)
     }
   }
 
@@ -376,8 +563,8 @@ export async function getAmenities() {
   if (hasDb) {
     try {
       return await prisma.amenity.findMany({ orderBy: { order: 'asc' } })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma amenities error:', err)
     }
   }
 
@@ -397,8 +584,8 @@ export async function getLeads(filters?: { status?: string }) {
       if (!error && data) {
         return data.map(mapSupabaseLead)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase leads error:', err)
     }
   }
 
@@ -412,8 +599,8 @@ export async function getLeads(filters?: { status?: string }) {
         where,
         orderBy: { createdAt: 'desc' },
       })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma leads error:', err)
     }
   }
 
@@ -447,8 +634,8 @@ export async function createLead(data: { name: string; phone: string; email: str
       if (!error && created) {
         return mapSupabaseLead(created)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase create lead error:', err)
     }
   }
 
@@ -467,8 +654,8 @@ export async function createLead(data: { name: string; phone: string; email: str
           status: 'new',
         },
       })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma create lead error:', err)
     }
   }
 
@@ -508,8 +695,8 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
       if (!error && updated) {
         return mapSupabaseLead(updated)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase update lead error:', err)
     }
   }
 
@@ -521,8 +708,8 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
       if (data.status) updateData.status = data.status
       if (data.notes !== undefined) updateData.notes = data.notes
       return await prisma.lead.update({ where: { id }, data: updateData })
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma update lead error:', err)
     }
   }
 
@@ -537,22 +724,35 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
 }
 
 export async function verifyAdmin(username: string, password: string) {
-  // 1. Try Supabase first
+  // 1. Try Supabase first (passwords should be bcrypt-hashed in admin_users table)
   const hasSupabase = await checkSupabase()
-  if (hasSupabase && supabase) {
+  if (hasSupabase) {
     try {
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('username', username)
-        .single()
+      const adminClient = createAdminSupabaseClient()
+      if (adminClient) {
+        const { data, error } = await adminClient
+          .from('admin_users')
+          .select('*')
+          .eq('username', username)
+          .single()
 
-      if (!error && data && data.password === password) {
-        return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
+        if (!error && data) {
+          // Try bcrypt comparison first (for properly hashed passwords)
+          if (data.password.startsWith('$2a$') || data.password.startsWith('$2b$')) {
+            const match = await bcrypt.compare(password, data.password)
+            if (match) {
+              return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
+            }
+          } else {
+            // Legacy: plaintext comparison (will be removed once all passwords are hashed)
+            if (data.password === password) {
+              return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
+            }
+          }
+        }
       }
-      // If Supabase query succeeded but credentials don't match, fall through to Prisma
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase admin verify error:', err)
     }
   }
 
@@ -561,19 +761,31 @@ export async function verifyAdmin(username: string, password: string) {
   if (hasDb) {
     try {
       const admin = await prisma.adminUser.findUnique({ where: { username } })
-      if (admin && admin.password === password) {
-        return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
+      if (admin) {
+        // Try bcrypt comparison first
+        if (admin.password.startsWith('$2a$') || admin.password.startsWith('$2b$')) {
+          const match = await bcrypt.compare(password, admin.password)
+          if (match) {
+            return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
+          }
+        } else if (admin.password === password) {
+          // Legacy: plaintext comparison
+          return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
+        }
       }
-      // If DB is available but admin not found, fall through to hardcoded credentials
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Prisma admin verify error:', err)
     }
   }
 
-  // 3. Fallback: check hardcoded credentials
-  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-    return { success: true, user: { id: 'admin-1', username: ADMIN_CREDENTIALS.username, name: ADMIN_CREDENTIALS.name, role: ADMIN_CREDENTIALS.role } }
+  // 3. Fallback: check env-var credentials (bcrypt hash)
+  if (ADMIN_PASSWORD_HASH && username === ADMIN_USERNAME) {
+    const match = await bcrypt.compare(password, ADMIN_PASSWORD_HASH)
+    if (match) {
+      return { success: true, user: { id: 'admin-1', username: ADMIN_USERNAME, name: 'Administrador PRAGA', role: 'admin' } }
+    }
   }
+
   return { success: false, error: 'Credenciales inválidas' }
 }
 
@@ -603,8 +815,8 @@ export async function getSiteConfig(section: string) {
       if (!error && data) {
         return parseSiteConfigValue(data.value)
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase site config get error:', err)
     }
   }
 
@@ -613,7 +825,7 @@ export async function getSiteConfig(section: string) {
   // 3. Fallback: load from JSON
   try {
     const siteConfig = await import('@/data/site-config.json')
-    return (siteConfig.default || siteConfig)[section] || null
+    return ((siteConfig.default || siteConfig) as Record<string, unknown>)[section] || null
   } catch {
     return null
   }
@@ -632,8 +844,8 @@ export async function getAllSiteConfig() {
         }
         return config
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase site config get all error:', err)
     }
   }
 
@@ -660,7 +872,7 @@ export async function updateSiteConfig(section: string, data: unknown) {
 
       if (!error) {
         // Reset the cache since we know Supabase is working
-        supabaseChecked = true
+        supabaseCheckedAt = Date.now()
         supabaseAvailable = true
         return { success: true }
       }
@@ -682,7 +894,7 @@ export async function updateSiteConfig(section: string, data: unknown) {
         )
 
       if (!error) {
-        supabaseChecked = true
+        supabaseCheckedAt = Date.now()
         supabaseAvailable = true
         return { success: true }
       }
@@ -714,13 +926,13 @@ export async function getFloorPlans() {
         .single()
 
       if (!error && data) {
-        const val = parseSiteConfigValue(data.value)
+        const val = parseSiteConfigValue(data.value) as Record<string, unknown> | null
         if (val?.floors && Array.isArray(val.floors) && val.floors.length > 0) {
           return val.floors
         }
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase floor plans error:', err)
     }
 
     // 2. Fallback: try floor_plans table (legacy, may have incomplete data)
@@ -737,8 +949,8 @@ export async function getFloorPlans() {
           apartments: row.apartments || [],
         }))
       }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase floor plans legacy error:', err)
     }
   }
 
@@ -766,8 +978,8 @@ export async function updateFloorPlan(floorNumber: number, data: { image?: strin
         .eq('floor_number', floorNumber)
 
       if (!error) return { success: true }
-    } catch {
-      // Fall through
+    } catch (err) {
+      console.error('[data] Supabase floor plan update error:', err)
     }
   }
 

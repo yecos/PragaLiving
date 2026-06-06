@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useDragControls, PanInfo } from 'framer-motion'
 
 // ═══════════════════════════════════════════════════════════════════
 // TYPES — matching floor-plans.json schema
@@ -95,37 +95,6 @@ function apartmentToUnit(apt: ApartmentZone): UnitData {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════════════════════════════
-
-function FloorplanTooltip({
-  unit,
-  x,
-  y,
-}: {
-  unit: UnitData | null
-  x: number
-  y: number
-}) {
-  if (!unit) return null
-  return (
-    <div
-      className="fixed z-50 pointer-events-none"
-      style={{ left: x + 16, top: y - 12 }}
-    >
-      <div className="bg-[#111111] border border-[#8B6B4B]/40 px-3 py-2 shadow-xl">
-        <p className="text-[10px] text-[#F5F1EA] font-[family-name:var(--font-inter)] tracking-wider">
-          {unit.name}
-        </p>
-        <p className="font-[family-name:var(--font-cormorant)] text-sm text-[#8B6B4B]">
-          {unit.area} m² · {unit.typology}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // FLOOR SELECTOR
 // ═══════════════════════════════════════════════════════════════════
 
@@ -182,48 +151,57 @@ function FloorSelector({
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// UNIT DETAIL PANEL
+// GLASSMORPHIC DETAIL PANEL — slides from right (desktop) or bottom (mobile)
 // ═══════════════════════════════════════════════════════════════════
 
-function UnitDetailPanel({
+function GlassDetailPanel({
   unit,
   floor,
+  isOpen,
+  onClose,
 }: {
   unit: UnitData | null
   floor: FloorConfig
+  isOpen: boolean
+  onClose: () => void
 }) {
-  if (!unit) {
-    return (
-      <div className="bg-[#111111]/85 backdrop-blur-xl border border-[#8B6B4B]/15 p-6 min-h-[400px] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-[1px] h-12 bg-[#8B6B4B]/30 mx-auto mb-4" />
-          <p className="text-[10px] text-[#D8D1C8]/30 tracking-[0.15em] uppercase font-[family-name:var(--font-inter)]">
-            Selecciona una unidad
-          </p>
-        </div>
-      </div>
-    )
-  }
+  const dragY = useMotionValue(0)
+  const dragControls = useDragControls()
+  const handleDragEnd = useCallback(
+    (_: unknown, info: PanInfo) => {
+      // If dragged down more than 100px or velocity is high, close the panel
+      if (info.offset.y > 100 || info.velocity.y > 500) {
+        onClose()
+      }
+    },
+    [onClose]
+  )
 
-  const statusColor = {
-    available: 'bg-[#4B5646] text-[#F5F1EA]',
-    reserved: 'bg-[#8B6B4B] text-[#F5F1EA]',
-    sold: 'bg-[#D8D1C8]/20 text-[#D8D1C8]/50',
-  }[unit.status]
+  // Status styling
+  const statusColor = unit
+    ? {
+        available: 'bg-[#4B5646] text-[#F5F1EA]',
+        reserved: 'bg-[#8B6B4B] text-[#F5F1EA]',
+        sold: 'bg-[#D8D1C8]/20 text-[#D8D1C8]/50',
+      }[unit.status]
+    : ''
 
-  return (
-    <motion.div
-      key={unit.id}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4 }}
-      className="bg-[#111111]/85 backdrop-blur-xl border border-[#8B6B4B]/15 p-6 min-h-[400px]"
-    >
-      {/* Status badge */}
-      <div className="mb-5">
+  const panelContent = unit ? (
+    <div className="p-5 md:p-6 overflow-y-auto max-h-full custom-scrollbar">
+      {/* Close button */}
+      <div className="flex items-center justify-between mb-4">
         <span className={`text-[9px] tracking-[0.15em] uppercase px-2.5 py-1 font-[family-name:var(--font-inter)] ${statusColor}`}>
           {STATUS_LABELS[unit.status]}
         </span>
+        <button
+          onClick={onClose}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F1EA]/10 transition-colors"
+          aria-label="Cerrar panel"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L13 13M1 13L13 1" stroke="#D8D1C8" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
       </div>
 
       {/* Unit name */}
@@ -299,7 +277,85 @@ function UnitDetailPanel({
           Descargar Ficha
         </button>
       </div>
-    </motion.div>
+    </div>
+  ) : null
+
+  return (
+    <>
+      {/* ═══════ DESKTOP PANEL — slides from right ═══════ */}
+      <AnimatePresence>
+        {isOpen && unit && (
+          <motion.div
+            key={`desktop-panel-${unit.id}`}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 40 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="hidden md:block absolute top-0 right-0 h-full w-[340px] z-30
+              bg-[#111111]/75 backdrop-blur-2xl border-l border-[#8B6B4B]/20
+              shadow-[-20px_0_60px_rgba(0,0,0,0.5)]"
+          >
+            {/* Decorative top accent line */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#8B6B4B]/40 to-transparent" />
+
+            {panelContent}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════ MOBILE PANEL — slides up from bottom ═══════ */}
+      <AnimatePresence>
+        {isOpen && unit && (
+          <>
+            {/* Backdrop overlay */}
+            <motion.div
+              key={`mobile-backdrop-${unit.id}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-0 z-40 bg-[#111111]/60 backdrop-blur-sm"
+              onClick={onClose}
+            />
+
+            {/* Bottom sheet */}
+            <motion.div
+              key={`mobile-panel-${unit.id}`}
+              dragControls={dragControls}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.1}
+              style={{ y: dragY }}
+              onDragEnd={handleDragEnd}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="md:hidden fixed bottom-0 left-0 right-0 z-50
+                bg-[#111111]/85 backdrop-blur-2xl border-t border-[#8B6B4B]/20
+                rounded-t-2xl shadow-[0_-10px_60px_rgba(0,0,0,0.5)]
+                max-h-[80vh] flex flex-col"
+            >
+              {/* Drag handle */}
+              <div
+                className="flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing"
+                onPointerDown={(e) => dragControls.start(e)}
+              >
+                <div className="w-10 h-1 rounded-full bg-[#D8D1C8]/30" />
+              </div>
+
+              {/* Decorative accent line */}
+              <div className="mx-5 h-[1px] bg-gradient-to-r from-transparent via-[#8B6B4B]/30 to-transparent" />
+
+              {/* Scrollable content */}
+              <div className="overflow-y-auto flex-1 custom-scrollbar">
+                {panelContent}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 
@@ -346,18 +402,12 @@ function FloorPlanDisplay({
   floor,
   units,
   selectedUnit,
-  hoveredUnit,
   onUnitClick,
-  onUnitMouseMove,
-  onUnitLeave,
 }: {
   floor: FloorConfig
   units: UnitData[]
   selectedUnit: number | null
-  hoveredUnit: number | null
   onUnitClick: (i: number) => void
-  onUnitMouseMove: (i: number, e: React.MouseEvent) => void
-  onUnitLeave: () => void
 }) {
   return (
     <div className="relative w-full" style={{ aspectRatio: '16 / 11' }}>
@@ -406,15 +456,14 @@ function FloorPlanDisplay({
                 const unit = units[i]
                 if (!unit) return null
 
-                const isHovered = hoveredUnit === i
                 const isSelected = selectedUnit === i
                 const colors = STATUS_COLORS[unit.status]
                 const fillOpacity = unit.status === 'sold'
                   ? (isSelected ? 0.3 : 0.15)
-                  : (isSelected ? 0.65 : isHovered ? 0.55 : 0.35)
+                  : (isSelected ? 0.65 : 0.35)
                 const strokeOpacity = unit.status === 'sold'
                   ? (isSelected ? 0.8 : 0.2)
-                  : (isSelected ? 1 : isHovered ? 0.9 : 0.7)
+                  : (isSelected ? 1 : 0.7)
                 const center = getPolygonCenter(apt.polygon)
 
                 return (
@@ -429,15 +478,17 @@ function FloorPlanDisplay({
                       strokeOpacity={strokeOpacity}
                       filter={isSelected ? 'url(#glow-bronce)' : undefined}
                       onClick={() => onUnitClick(i)}
-                      onMouseMove={(e) => onUnitMouseMove(i, e)}
-                      onMouseLeave={onUnitLeave}
+                      whileHover={{
+                        fillOpacity: unit.status === 'sold' ? 0.25 : 0.55,
+                        strokeOpacity: unit.status === 'sold' ? 0.4 : 0.9,
+                      }}
                       className="cursor-pointer"
                       animate={isSelected ? {
                         strokeOpacity: [1, 0.5, 1],
                       } : {}}
                       transition={isSelected ? {
                         duration: 2, repeat: Infinity, ease: 'easeInOut',
-                      } : {}}
+                      } : { duration: 0.2 }}
                     />
 
                     {/* Unit label */}
@@ -500,12 +551,6 @@ export default function PlantaInteractiva() {
   const [config, setConfig] = useState<FloorPlanConfig | null>(null)
   const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
-  const [hoveredUnit, setHoveredUnit] = useState<number | null>(null)
-  const [tooltip, setTooltip] = useState<{ unit: UnitData | null; x: number; y: number }>({
-    unit: null,
-    x: 0,
-    y: 0,
-  })
 
   // Fetch floor plan config from API
   useEffect(() => {
@@ -534,26 +579,15 @@ export default function PlantaInteractiva() {
   const handleFloorSelect = useCallback((i: number) => {
     setSelectedFloor(i)
     setSelectedUnit(null)
-    setHoveredUnit(null)
-    setTooltip({ unit: null, x: 0, y: 0 })
   }, [])
 
   const handleUnitClick = useCallback((i: number) => {
     setSelectedUnit(prev => (prev === i ? null : i))
   }, [])
 
-  const handleUnitLeave = useCallback(() => {
-    setHoveredUnit(null)
-    setTooltip(prev => ({ ...prev, unit: null }))
+  const handleClosePanel = useCallback(() => {
+    setSelectedUnit(null)
   }, [])
-
-  const handleUnitMouseMove = useCallback(
-    (i: number, e: React.MouseEvent) => {
-      setHoveredUnit(i)
-      setTooltip({ unit: units[i] ?? null, x: e.clientX, y: e.clientY })
-    },
-    [units]
-  )
 
   // Loading state
   if (!config) {
@@ -565,6 +599,9 @@ export default function PlantaInteractiva() {
       </section>
     )
   }
+
+  const selectedUnitData = selectedUnit !== null ? units[selectedUnit] ?? null : null
+  const isPanelOpen = selectedUnit !== null
 
   return (
     <section id="planta" className="relative py-24 md:py-32 bg-[#F5F1EA]">
@@ -598,7 +635,7 @@ export default function PlantaInteractiva() {
           />
         </div>
 
-        {/* Main layout — three columns */}
+        {/* Main layout — two columns: floor selector + floor plan (with overlay panel) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Floor selector — left sidebar */}
           <div className="lg:col-span-2 order-2 lg:order-1">
@@ -611,9 +648,9 @@ export default function PlantaInteractiva() {
             </div>
           </div>
 
-          {/* Floor plan — center */}
-          <div className="lg:col-span-7 order-1 lg:order-2">
-            <div className="bg-[#111111] p-4 md:p-6 h-full min-h-[400px] lg:min-h-[640px] relative">
+          {/* Floor plan — center with overlay panel */}
+          <div className="lg:col-span-10 order-1 lg:order-2">
+            <div className="bg-[#111111] p-4 md:p-6 h-full min-h-[400px] lg:min-h-[640px] relative overflow-hidden">
               {floor && (
                 <>
                   <Legend floor={floor} />
@@ -622,10 +659,7 @@ export default function PlantaInteractiva() {
                     floor={floor}
                     units={units}
                     selectedUnit={selectedUnit}
-                    hoveredUnit={hoveredUnit}
                     onUnitClick={handleUnitClick}
-                    onUnitMouseMove={handleUnitMouseMove}
-                    onUnitLeave={handleUnitLeave}
                   />
 
                   {/* Floor info strip */}
@@ -643,23 +677,33 @@ export default function PlantaInteractiva() {
                       {floor.isResidential ? `${floor.apartments.length} UNIDADES` : 'ÁREAS COMUNES'}
                     </span>
                   </div>
+
+                  {/* Glassmorphic detail panel overlay */}
+                  <GlassDetailPanel
+                    unit={selectedUnitData}
+                    floor={floor}
+                    isOpen={isPanelOpen}
+                    onClose={handleClosePanel}
+                  />
                 </>
+              )}
+
+              {/* Empty state hint when no unit is selected */}
+              {!isPanelOpen && floor?.isResidential && (
+                <div className="hidden md:flex absolute top-16 right-4 z-10 items-center gap-2 opacity-40 hover:opacity-70 transition-opacity">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 1L1 6L5 11" stroke="#8B6B4B" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M11 1L7 6L11 11" stroke="#8B6B4B" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className="text-[8px] text-[#D8D1C8]/60 tracking-wider font-[family-name:var(--font-inter)] uppercase">
+                    Selecciona una unidad
+                  </span>
+                </div>
               )}
             </div>
           </div>
-
-          {/* Unit detail panel — right sidebar */}
-          <div className="lg:col-span-3 order-3">
-            <UnitDetailPanel
-              unit={selectedUnit !== null ? units[selectedUnit] ?? null : null}
-              floor={floor}
-            />
-          </div>
         </div>
       </div>
-
-      {/* Tooltip */}
-      <FloorplanTooltip unit={tooltip.unit} x={tooltip.x} y={tooltip.y} />
 
       {/* Custom scrollbar style */}
       <style jsx global>{`
@@ -667,7 +711,7 @@ export default function PlantaInteractiva() {
           width: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #111111;
+          background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #8B6B4B33;

@@ -435,7 +435,7 @@ function EdificioEditor({ data, onChange, onSave, saving }: { data: any; onChang
           items={d.levels || []}
           onChange={v => { d.levels = v; onChange(d) }}
           addLabel="Agregar Nivel"
-          createNew={() => ({ id: `nivel-${Date.now()}`, name: '', type: '', icon: '◇', description: '', features: [], image: '' })}
+          createNew={() => ({ id: `nivel-${Date.now()}`, name: '', type: '', icon: '◇', description: '', features: [] as string[], image: '' })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -548,7 +548,7 @@ function AmenidadesEditor({ data, onChange, onSave, saving }: { data: any; onCha
           items={d.items || []}
           onChange={v => { d.items = v; onChange(d) }}
           addLabel="Agregar Amenidad"
-          createNew={() => ({ id: `amen-${Date.now()}`, name: '', description: '', image: '', benefits: [] })}
+          createNew={() => ({ id: `amen-${Date.now()}`, name: '', description: '', image: '', benefits: [] as string[] })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <TextField label="Nombre" value={item.name} onChange={v => update(i, { ...item, name: v })} />
@@ -593,7 +593,7 @@ function TipologiasEditor({ data, onChange, onSave, saving }: { data: any; onCha
           items={d.items || []}
           onChange={v => { d.items = v; onChange(d) }}
           addLabel="Agregar Tipología"
-          createNew={() => ({ id: `tipo-${Date.now()}`, name: '', area: '', bedrooms: '', bathrooms: '', image: '', description: '', features: [], status: 'Disponible' })}
+          createNew={() => ({ id: `tipo-${Date.now()}`, name: '', area: '', bedrooms: '', bathrooms: '', image: '', description: '', features: [] as string[], status: 'Disponible' })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -640,7 +640,7 @@ function RecorridosEditor({ data, onChange, onSave, saving }: { data: any; onCha
           items={d.spaces || []}
           onChange={v => { d.spaces = v; onChange(d) }}
           addLabel="Agregar Espacio"
-          createNew={() => ({ id: `space-${Date.now()}`, name: '', image: '', hotspots: [] })}
+          createNew={() => ({ id: `space-${Date.now()}`, name: '', image: '', hotspots: [] as any[] })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -654,7 +654,7 @@ function RecorridosEditor({ data, onChange, onSave, saving }: { data: any; onCha
                   items={item.hotspots || []}
                   onChange={v => update(i, { ...item, hotspots: v })}
                   addLabel="Agregar Hotspot"
-                  createNew={() => ({ id: `hs-${Date.now()}`, yaw: 0, pitch: 0, label: '', description: '' })}
+                  createNew={() => ({ id: `hs-${Date.now()}`, yaw: 0, pitch: 0, label: '', description: '', linkTo: '' })}
                   renderItem={(hs, hi, hu) => (
                     <div className="space-y-2">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -694,7 +694,7 @@ function UbicacionEditor({ data, onChange, onSave, saving }: { data: any; onChan
           items={d.layers || []}
           onChange={v => { d.layers = v; onChange(d) }}
           addLabel="Agregar Capa"
-          createNew={() => ({ id: `layer-${Date.now()}`, name: '', icon: '◇', color: '#8B6B4B', points: [] })}
+          createNew={() => ({ id: `layer-${Date.now()}`, name: '', icon: '◇', color: '#8B6B4B', points: [] as any[] })}
           renderItem={(layer, li, lu) => (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
@@ -904,7 +904,7 @@ function FooterEditor({ data, onChange, onSave, saving }: { data: any; onChange:
           items={d.linkGroups || []}
           onChange={v => { d.linkGroups = v; onChange(d) }}
           addLabel="Agregar Grupo"
-          createNew={() => ({ title: '', links: [] })}
+          createNew={() => ({ title: '', links: [] as { label: string; href: string }[] })}
           renderItem={(group, gi, gu) => (
             <div className="space-y-2">
               <TextField label="Título del Grupo" value={group.title} onChange={v => gu(gi, { ...group, title: v })} />

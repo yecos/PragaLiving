@@ -59,7 +59,7 @@ export function isNewLeadEmail(lead: { name: string; phone: string; email: strin
       ` : ''}
       
       <div style="text-align: center; margin-top: 32px;">
-        <a href="http://localhost:3000/admin" style="background: #8B6B4B; color: #F5F1EA; padding: 12px 32px; text-decoration: none; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Ver en Admin</a>
+        <a href="${process.env.NEXT_PUBLIC_URL || 'https://my-project-psi-sage.vercel.app'}/admin" style="background: #8B6B4B; color: #F5F1EA; padding: 12px 32px; text-decoration: none; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;">Ver en Admin</a>
       </div>
       
       <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #D8D1C822;">

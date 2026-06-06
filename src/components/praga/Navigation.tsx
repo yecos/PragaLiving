@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const defaultNavItems = [
+interface NavItem {
+  label: string
+  href: string
+}
+
+const defaultNavItems: NavItem[] = [
   { label: 'Inicio', href: '#hero' },
   { label: 'Arquitectura', href: '#arquitectura' },
   { label: 'Edificio', href: '#edificio' },
@@ -23,7 +28,7 @@ export default function Navigation() {
   const { config } = useSiteConfig()
   const navConfig = config?.navigation
 
-  const navItems = navConfig?.items || defaultNavItems
+  const navItems: NavItem[] = navConfig?.items || defaultNavItems
   const ctaText = navConfig?.ctaText || 'Agendar Visita'
   const ctaLink = navConfig?.ctaLink || '#contacto'
 
