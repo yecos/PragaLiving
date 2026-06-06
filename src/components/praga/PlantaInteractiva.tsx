@@ -194,7 +194,7 @@ function UnitDetailPanel({
 }) {
   if (!unit) {
     return (
-      <div className="bg-[#111111] p-6 min-h-[400px] flex items-center justify-center">
+      <div className="bg-[#111111]/85 backdrop-blur-xl border border-[#8B6B4B]/15 p-6 min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <div className="w-[1px] h-12 bg-[#8B6B4B]/30 mx-auto mb-4" />
           <p className="text-[10px] text-[#D8D1C8]/30 tracking-[0.15em] uppercase font-[family-name:var(--font-inter)]">
@@ -217,7 +217,7 @@ function UnitDetailPanel({
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-[#111111] p-6 min-h-[400px]"
+      className="bg-[#111111]/85 backdrop-blur-xl border border-[#8B6B4B]/15 p-6 min-h-[400px]"
     >
       {/* Status badge */}
       <div className="mb-5">

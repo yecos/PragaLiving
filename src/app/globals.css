@@ -169,6 +169,16 @@ html {
   background-clip: text;
 }
 
+/* PRAGA Hero Animations */
+@keyframes lightStreakMove {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes lightStreakMove2 {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
 /* Hide number input arrows */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {

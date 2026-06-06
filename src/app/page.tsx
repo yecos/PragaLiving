@@ -22,7 +22,12 @@ import WhatsAppButton from '@/components/praga/WhatsAppButton'
 import ChatIA from '@/components/praga/ChatIA'
 
 export default function Home() {
-  const [loading, setLoading] = useState(true)
+  const [minTimePassed, setMinTimePassed] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+
+  // Loader stays visible until BOTH the minimum animation time has elapsed
+  // AND the hero's first image has finished loading
+  const loading = !minTimePassed || !imageLoaded
 
   // Lenis smooth scroll initialization
   useEffect(() => {
@@ -48,9 +53,17 @@ export default function Home() {
     }
   }, [])
 
+  // Minimum display time for logo animation (2200ms)
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2200)
+    const timer = setTimeout(() => setMinTimePassed(true), 2200)
     return () => clearTimeout(timer)
+  }, [])
+
+  // Listen for hero image ready event
+  useEffect(() => {
+    const handleHeroReady = () => setImageLoaded(true)
+    window.addEventListener('hero-ready', handleHeroReady)
+    return () => window.removeEventListener('hero-ready', handleHeroReady)
   }, [])
 
   return (

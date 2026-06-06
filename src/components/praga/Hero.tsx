@@ -59,9 +59,9 @@ export default function Hero() {
     offset: ['start start', 'end start']
   })
 
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1])
+  const y = useTransform(scrollYProgress, [0, 1], [0, 150])
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -86,6 +86,7 @@ export default function Hero() {
               src={img.src}
               alt={img.alt}
               className="w-full h-full object-cover"
+              onLoad={i === 0 ? () => window.dispatchEvent(new Event('hero-ready')) : undefined}
             />
           </motion.div>
         </motion.div>
@@ -173,7 +174,7 @@ export default function Hero() {
             initial={{ clipPath: 'inset(0 50% 0 50%)', opacity: 0 }}
             animate={{ clipPath: 'inset(0 0% 0 0%)', opacity: 1 }}
             transition={{ duration: 1.4, delay: 2.8, ease: [0.76, 0, 0.24, 1] }}
-            className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl lg:text-8xl tracking-[0.15em] text-[#F5F1EA] font-light leading-[0.9]"
+            className="font-[family-name:var(--font-cormorant)] text-6xl md:text-8xl lg:text-9xl tracking-[0.15em] text-[#F5F1EA] font-light leading-[0.9] drop-shadow-2xl"
           >
             {title}
           </motion.h1>
@@ -182,9 +183,9 @@ export default function Hero() {
         {/* "Living" with letter-spacing animation */}
         <motion.p
           initial={{ opacity: 0, letterSpacing: '0.05em' }}
-          animate={{ opacity: 1, letterSpacing: '0.3em' }}
+          animate={{ opacity: 1, letterSpacing: '0.4em' }}
           transition={{ duration: 1.2, delay: 3.4, ease: [0.76, 0, 0.24, 1] }}
-          className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl tracking-[0.3em] text-[#D8D1C8] font-light mt-2"
+          className="font-[family-name:var(--font-cormorant)] text-xl md:text-3xl tracking-[0.4em] text-[#D8D1C8] font-light mt-2"
         >
           {titleAccent}
         </motion.p>
@@ -206,13 +207,14 @@ export default function Hero() {
         >
           <a
             href={ctaPrimary.link}
-            className="text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3.5 hover:bg-[#7A5C3E] transition-all duration-300"
+            className="group relative text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3.5 overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,107,75,0.4)]"
           >
-            {ctaPrimary.text}
+            <span className="relative z-10 transition-colors duration-300 group-hover:text-[#8B6B4B]">{ctaPrimary.text}</span>
+            <span className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
           </a>
           <a
             href={ctaSecondary.link}
-            className="text-[11px] tracking-[0.2em] uppercase border border-[#F5F1EA]/30 text-[#F5F1EA] px-8 py-3.5 hover:border-[#8B6B4B] hover:text-[#8B6B4B] transition-all duration-300"
+            className="text-[11px] tracking-[0.2em] uppercase backdrop-blur-md bg-white/5 border border-white/10 text-[#F5F1EA] px-8 py-3.5 hover:bg-[#8B6B4B]/10 hover:border-[#8B6B4B]/30 transition-all duration-300"
           >
             {ctaSecondary.text}
           </a>
@@ -223,7 +225,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 5, duration: 1 }}
-          className="absolute bottom-32 flex items-center gap-1"
+          className="absolute bottom-32 flex items-center gap-1 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
         >
           {heroImages.map((img: { src: string; alt: string; label: string }, i: number) => {
             const IconComponent = timeOfDayIcons[i % timeOfDayIcons.length]
@@ -231,10 +233,10 @@ export default function Hero() {
               <button
                 key={i}
                 onClick={() => setCurrentImage(i)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 transition-all duration-500 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-500 ${
                   currentImage === i
-                    ? 'text-[#8B6B4B]'
-                    : 'text-[#D8D1C8]/40 hover:text-[#D8D1C8]/70'
+                    ? 'bg-[#8B6B4B] text-[#F5F1EA] shadow-lg'
+                    : 'text-[#D8D1C8]/60 hover:text-[#D8D1C8]'
                 }`}
                 aria-label={`Ver ${img.label}`}
               >
@@ -255,25 +257,13 @@ export default function Hero() {
         transition={{ delay: 5.5, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
       >
-        <p className="text-[9px] tracking-[0.3em] uppercase text-[#D8D1C8]/50">Scroll</p>
+        <p className="text-[9px] tracking-[0.3em] uppercase text-[#D8D1C8]/50">Descubrir</p>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-[1px] h-8 bg-gradient-to-b from-[#8B6B4B] to-transparent"
+          className="w-[1px] h-10 bg-gradient-to-b from-[#8B6B4B] to-transparent"
         />
       </motion.div>
-
-      {/* CSS animations for light streaks */}
-      <style jsx>{`
-        @keyframes lightStreakMove {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-        @keyframes lightStreakMove2 {
-          0% { transform: translateY(100%); }
-          100% { transform: translateY(-100%); }
-        }
-      `}</style>
     </section>
   )
 }
