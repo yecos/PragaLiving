@@ -122,3 +122,88 @@ function loadImage(file: File): Promise<HTMLImageElement> {
     img.src = url
   })
 }
+
+// ============================================
+// IMAGE ROTATION
+// ============================================
+
+/**
+ * Rotate an image File by 90° (clockwise or counter-clockwise).
+ * Returns a new File with the rotated image.
+ * Also applies client-side resize if the result would be too large for upload.
+ *
+ * @param file     The image File to rotate
+ * @param degrees  90 (clockwise) or -90 (counter-clockwise). Other values
+ *                 will be normalized to the nearest 90° increment.
+ */
+export async function rotateImage(file: File, degrees: 90 | -90): Promise<File> {
+  // SVG cannot be rotated as a raster image — return as-is
+  if (file.type === 'image/svg+xml') {
+    console.warn('[rotateImage] SVG cannot be rotated as raster, returning original')
+    return file
+  }
+
+  try {
+    const img = await loadImage(file)
+    const originalW = img.naturalWidth
+    const originalH = img.naturalHeight
+
+    // After 90° rotation, width and height swap
+    const canvas = document.createElement('canvas')
+    canvas.width = originalH
+    canvas.height = originalW
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      console.warn('[rotateImage] Could not get canvas context, returning original')
+      return file
+    }
+
+    // Translate to center, rotate, translate back, then draw
+    ctx.translate(canvas.width / 2, canvas.height / 2)
+    ctx.rotate((degrees * Math.PI) / 180)
+    ctx.drawImage(img, -originalW / 2, -originalH / 2)
+
+    // Determine output format (preserve PNG for transparency, JPEG otherwise)
+    const isPngWithTransparency = file.type === 'image/png'
+    const outputType = isPngWithTransparency ? 'image/png' : 'image/jpeg'
+    const quality = isPngWithTransparency ? undefined : JPEG_QUALITY
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, outputType, quality)
+    })
+
+    if (!blob) {
+      console.warn('[rotateImage] canvas.toBlob returned null, returning original')
+      return file
+    }
+
+    // Build new filename with rotated suffix
+    const baseName = file.name.replace(/\.[^/.]+$/, '')
+    const newExt = outputType === 'image/png' ? 'png' : 'jpg'
+    const newName = `${baseName}-rot${degrees > 0 ? 'cw' : 'ccw'}.${newExt}`
+
+    let rotatedFile = new File([blob], newName, {
+      type: outputType,
+      lastModified: Date.now(),
+    })
+
+    console.log(
+      `[rotateImage] ${file.name} ${degrees}°: ` +
+      `${originalW}x${originalH} → ${rotatedFile.size / 1024 / 1024}MB`
+    )
+
+    // If the rotated file is still too large for upload, resize it
+    if (rotatedFile.size > MAX_UPLOAD_BYTES) {
+      console.log('[rotateImage] Result too large, applying resize...')
+      rotatedFile = await resizeImageForUpload(rotatedFile)
+    }
+
+    return rotatedFile
+  } catch (err) {
+    console.error('[rotateImage] Error rotating, returning original:', err)
+    return file
+  }
+}
+
+// Maximum upload payload size (must match /api/upload MAX_SIZE = 4MB)
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024

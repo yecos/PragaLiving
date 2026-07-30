@@ -12,6 +12,8 @@ import {
   Eye,
   X,
   HelpCircle,
+  RotateCw,
+  RotateCcw,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════════
@@ -130,6 +132,7 @@ export default function FloorPlanEditor() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [rotating, setRotating] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -231,6 +234,55 @@ export default function FloorPlanEditor() {
     }
     setUploading(false)
     if (fileInputRef.current) fileInputRef.current.value = ''
+  }, [config, currentFloor, selectedFloorIndex, saveConfig])
+
+  // ═══ IMAGE ROTATION ═══
+  // Rotates the current floor's image 90° (clockwise or counter-clockwise).
+  // Downloads the current image, rotates it client-side via Canvas, uploads
+  // the rotated version, and updates the floor config with the new URL.
+  const handleRotateImage = useCallback(async (direction: 90 | -90) => {
+    if (!currentFloor?.image) {
+      setToast('No hay imagen para rotar')
+      return
+    }
+
+    setRotating(true)
+    try {
+      // Download the current image as a File
+      const response = await fetch(currentFloor.image)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const blob = await response.blob()
+      const filename = currentFloor.image.split('/').pop() || 'image.jpg'
+      const file = new File([blob], filename, { type: blob.type })
+
+      // Rotate client-side
+      const { rotateImage } = await import('@/lib/image-resize')
+      const rotatedFile = await rotateImage(file, direction)
+
+      // Upload the rotated image
+      const formData = new FormData()
+      formData.append('file', rotatedFile)
+      formData.append('category', 'floor-plans')
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData })
+      const uploadData = await uploadRes.json().catch(() => ({}))
+
+      if (!uploadRes.ok || !uploadData.url) {
+        throw new Error(uploadData.error || `HTTP ${uploadRes.status}`)
+      }
+
+      // Update the floor with the new image URL
+      const newConfig = { ...config }
+      newConfig.floors = newConfig.floors.map((f, i) =>
+        i === selectedFloorIndex ? { ...f, image: uploadData.url } : f
+      )
+      setConfig(newConfig)
+      void saveConfig(newConfig)
+      setToast(`Imagen rotada ${direction > 0 ? '→' : '←'} 90°`)
+    } catch (err) {
+      console.error('[floor-editor] rotate error:', err)
+      setToast(`Error al rotar: ${err instanceof Error ? err.message : 'falló'}`)
+    }
+    setRotating(false)
   }, [config, currentFloor, selectedFloorIndex, saveConfig])
 
   // ═══ FLOOR MANAGEMENT ═══
@@ -811,9 +863,36 @@ export default function FloorPlanEditor() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
                   className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-3 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-50"
+                  title="Subir nueva imagen"
                 >
                   <Upload className="w-3 h-3" /> {uploading ? 'Subiendo...' : 'Subir Imagen'}
                 </button>
+                {/* Rotate buttons — only show when there's an image */}
+                {currentFloor?.image && (
+                  <>
+                    <button
+                      onClick={() => void handleRotateImage(-90)}
+                      disabled={rotating || uploading}
+                      className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-2.5 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-50"
+                      title="Rotar 90° a la izquierda"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => void handleRotateImage(90)}
+                      disabled={rotating || uploading}
+                      className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-2.5 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-50"
+                      title="Rotar 90° a la derecha"
+                    >
+                      <RotateCw className="w-3 h-3" />
+                    </button>
+                    {rotating && (
+                      <span className="text-[9px] text-[#8B6B4B]/60 tracking-wider uppercase">
+                        Rotando...
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
