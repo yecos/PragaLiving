@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
 import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
@@ -194,8 +195,12 @@ export default function AdminPanel() {
       setApartments(aptData.apartments || [])
       setLeads(leadData.leads || [])
       setAmenities(amenData.amenities || [])
-    } catch {
-      // silently fail
+      if (!aptRes.ok || !leadRes.ok || !amenRes.ok) {
+        toast.error('Algunos datos no se pudieron cargar')
+      }
+    } catch (err) {
+      console.error('[admin] fetchData error:', err)
+      toast.error('Error de conexión al cargar datos')
     }
     setLoading(false)
   }, [])
@@ -206,8 +211,9 @@ export default function AdminPanel() {
       const res = await fetch('/api/media')
       const data = await res.json()
       setMediaData(data)
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error('[admin] fetchMedia error:', err)
+      toast.error('No se pudo cargar la biblioteca de medios')
     }
     setMediaLoading(false)
   }, [])
@@ -215,10 +221,14 @@ export default function AdminPanel() {
   const fetchQuotes = useCallback(async () => {
     try {
       const res = await fetch('/api/quotes')
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
       const data = await res.json()
       setQuotes(data.quotes || [])
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error('[admin] fetchQuotes error:', err)
+      toast.error('No se pudieron cargar las cotizaciones')
     }
   }, [])
 
@@ -233,11 +243,15 @@ export default function AdminPanel() {
       })
       if (result?.error) {
         setLoginError('Credenciales inválidas')
+        toast.error('Credenciales inválidas')
       } else if (result?.ok) {
+        toast.success('Bienvenido al panel administrativo')
         void fetchData()
       }
-    } catch {
+    } catch (err) {
+      console.error('[admin] login error:', err)
       setLoginError('Error de conexión')
+      toast.error('Error de conexión al iniciar sesión')
     }
   }
 
@@ -254,19 +268,25 @@ export default function AdminPanel() {
       const body: Record<string, unknown> = { id: editingAptId }
       if (editingField === 'status') body.status = editValue
       if (editingField === 'price') body.price = editValue
-      await fetch('/api/apartments', {
+      const res = await fetch('/api/apartments', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
       setApartments(prev => prev.map(a => {
         if (a.id !== editingAptId) return a
         if (editingField === 'status') return { ...a, status: editValue }
         if (editingField === 'price') return { ...a, price: parseFloat(editValue) }
         return a
       }))
-    } catch {
-      // silently fail
+      toast.success(`Apartamento actualizado: ${editingField === 'status' ? 'estado' : 'precio'}`)
+    } catch (err) {
+      console.error('[admin] saveEdit error:', err)
+      toast.error('No se pudo actualizar el apartamento', { description: err instanceof Error ? err.message : undefined })
     }
     setEditingAptId(null)
     setEditingField(null)
@@ -275,54 +295,78 @@ export default function AdminPanel() {
 
   const updateLeadStatus = async (leadId: string, status: string) => {
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/leads', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: leadId, status }),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
       setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l))
-    } catch {
-      // silently fail
+      toast.success(`Lead marcado como: ${leadStatusLabels[status] || status}`)
+    } catch (err) {
+      console.error('[admin] updateLeadStatus error:', err)
+      toast.error('No se pudo actualizar el estado del lead')
     }
   }
 
   const saveLeadNotes = async (leadId: string) => {
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/leads', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: leadId, notes: leadNotes }),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
       setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: leadNotes } : l))
-    } catch {
-      // silently fail
+      toast.success('Notas guardadas')
+    } catch (err) {
+      console.error('[admin] saveLeadNotes error:', err)
+      toast.error('No se pudieron guardar las notas')
     }
   }
 
   const toggleAmenity = async (amenityId: string, active: boolean) => {
     try {
-      await fetch('/api/amenities', {
+      const res = await fetch('/api/amenities', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: amenityId, active }),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
       setAmenities(prev => prev.map(a => a.id === amenityId ? { ...a, active } : a))
-    } catch {
-      // silently fail
+      toast.success(`Amenidad ${active ? 'activada' : 'desactivada'}`)
+    } catch (err) {
+      console.error('[admin] toggleAmenity error:', err)
+      toast.error('No se pudo cambiar el estado de la amenidad')
     }
   }
 
   const saveAmenity = async (amenityId: string) => {
     try {
-      await fetch('/api/amenities', {
+      const res = await fetch('/api/amenities', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: amenityId, ...amenityEditData }),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `HTTP ${res.status}`)
+      }
       setAmenities(prev => prev.map(a => a.id === amenityId ? { ...a, ...amenityEditData } : a))
       setEditingAmenity(null)
-    } catch {
-      // silently fail
+      toast.success('Amenidad actualizada')
+    } catch (err) {
+      console.error('[admin] saveAmenity error:', err)
+      toast.error('No se pudo guardar la amenidad')
     }
   }
 
@@ -799,11 +843,16 @@ export default function AdminPanel() {
                               formData.append('file', file)
                               formData.append('category', uploadCategory)
                               const res = await fetch('/api/upload', { method: 'POST', body: formData })
+                              const data = await res.json().catch(() => ({}))
                               if (res.ok) {
+                                toast.success(`Imagen subida: ${file.name}`)
                                 void fetchMedia()
+                              } else {
+                                toast.error('No se pudo subir la imagen', { description: data.error || `HTTP ${res.status}` })
                               }
-                            } catch {
-                              // silently fail
+                            } catch (err) {
+                              console.error('[admin] upload error:', err)
+                              toast.error('Error de red al subir imagen')
                             }
                             setUploadingFile(false)
                             if (fileInputRef.current) fileInputRef.current.value = ''
@@ -1102,13 +1151,18 @@ export default function AdminPanel() {
                                       headers: { 'Content-Type': 'application/json' },
                                       body: JSON.stringify(newQuoteData),
                                     })
+                                    const data = await res.json().catch(() => ({}))
                                     if (res.ok) {
+                                      toast.success(`Cotización creada: ${data.quote?.number || ''}`)
                                       setShowNewQuote(false)
                                       setNewQuoteData({ leadId: '', apartmentId: '', discount: 0, paymentPlan: 'Contado', notes: '', validDays: 30 })
                                       void fetchQuotes()
+                                    } else {
+                                      toast.error('No se pudo crear la cotización', { description: data.error || `HTTP ${res.status}` })
                                     }
-                                  } catch {
-                                    // silently fail
+                                  } catch (err) {
+                                    console.error('[admin] create quote error:', err)
+                                    toast.error('Error de red al crear cotización')
                                   }
                                   setCreatingQuote(false)
                                 }
@@ -1166,14 +1220,20 @@ export default function AdminPanel() {
                                   value={quote.status}
                                   onChange={async (e) => {
                                     try {
-                                      await fetch('/api/quotes', {
+                                      const res = await fetch('/api/quotes', {
                                         method: 'PUT',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ id: quote.id, status: e.target.value }),
                                       })
-                                      void fetchQuotes()
-                                    } catch {
-                                      // silently fail
+                                      if (res.ok) {
+                                        toast.success(`Cotización ${quote.number} → ${quoteStatusLabels[e.target.value] || e.target.value}`)
+                                        void fetchQuotes()
+                                      } else {
+                                        toast.error('No se pudo actualizar el estado')
+                                      }
+                                    } catch (err) {
+                                      console.error('[admin] update quote status error:', err)
+                                      toast.error('Error de red al actualizar cotización')
                                     }
                                   }}
                                   className={`text-[8px] tracking-wider uppercase border-none focus:outline-none cursor-pointer px-1.5 py-0.5 ${quoteStatusColors[quote.status]}`}
