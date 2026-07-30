@@ -839,13 +839,17 @@ export default function AdminPanel() {
                           const handleUpload = async () => {
                             setUploadingFile(true)
                             try {
+                              // Resize image client-side to avoid Vercel 4.5MB body limit (HTTP 413)
+                              const { resizeImageForUpload } = await import('@/lib/image-resize')
+                              const resizedFile = await resizeImageForUpload(file)
+
                               const formData = new FormData()
-                              formData.append('file', file)
+                              formData.append('file', resizedFile)
                               formData.append('category', uploadCategory)
                               const res = await fetch('/api/upload', { method: 'POST', body: formData })
                               const data = await res.json().catch(() => ({}))
                               if (res.ok) {
-                                toast.success(`Imagen subida: ${file.name}`)
+                                toast.success(`Imagen subida: ${resizedFile.name}`)
                                 void fetchMedia()
                               } else {
                                 toast.error('No se pudo subir la imagen', { description: data.error || `HTTP ${res.status}` })

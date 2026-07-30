@@ -204,9 +204,13 @@ export default function FloorPlanEditor() {
 
     setUploading(true)
     try {
+      // Resize image client-side to avoid Vercel 4.5MB body limit (HTTP 413)
+      const { resizeImageForUpload } = await import('@/lib/image-resize')
+      const resizedFile = await resizeImageForUpload(file)
+
       const formData = new FormData()
-      formData.append('file', file)
-      formData.append('category', 'floor-plans') // ← FIX: was missing category
+      formData.append('file', resizedFile)
+      formData.append('category', 'floor-plans')
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
       const data = await res.json().catch(() => ({}))
 
@@ -219,9 +223,8 @@ export default function FloorPlanEditor() {
         i === selectedFloorIndex ? { ...f, image: data.url } : f
       )
       setConfig(newConfig)
-      // Save immediately (don't rely on debounce for image uploads)
       void saveConfig(newConfig)
-      setToast(`Imagen subida: ${file.name}`)
+      setToast(`Imagen subida: ${resizedFile.name}`)
     } catch (err) {
       console.error('[floor-editor] upload error:', err)
       setToast(`Error: ${err instanceof Error ? err.message : 'falló la subida'}`)

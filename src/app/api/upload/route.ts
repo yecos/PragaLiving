@@ -19,7 +19,11 @@ import path from 'path'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
 import { randomUUID } from 'crypto'
 
-const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+// Vercel serverless functions have a 4.5MB body size limit on Hobby plan.
+// We set MAX_SIZE to 4MB to leave room for FormData overhead and metadata.
+// Larger images should be resized client-side before upload (see helpers
+// in FloorPlanEditor.tsx, AdminPanel.tsx, SiteConfigEditor.tsx).
+const MAX_SIZE = 4 * 1024 * 1024 // 4MB (Vercel limit is 4.5MB)
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif']
 const CATEGORIES = ['renders', 'planos', 'galeria', 'general', 'logos', 'floor-plans']
 
@@ -50,7 +54,7 @@ export async function POST(req: NextRequest) {
     // Validate file size
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: `Archivo muy grande: ${(file.size / 1024 / 1024).toFixed(1)}MB. Máximo: 5MB` },
+        { error: `Archivo muy grande: ${(file.size / 1024 / 1024).toFixed(1)}MB. Máximo: 4MB. La imagen será redimensionada automáticamente al subirla desde el editor.` },
         { status: 400 }
       )
     }

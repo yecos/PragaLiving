@@ -46,16 +46,26 @@ const configuracionTabs: SubTab[] = [
 // ─── Helper: Image upload ───
 async function uploadImage(file: File, category?: string): Promise<string | null> {
   try {
+    // Resize image client-side to avoid Vercel 4.5MB body limit (HTTP 413)
+    const { resizeImageForUpload } = await import('@/lib/image-resize')
+    const resizedFile = await resizeImageForUpload(file)
+
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('file', resizedFile)
     if (category) formData.append('category', category)
     const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
     })
     const data = await res.json()
+    if (!res.ok) {
+      toast.error('No se pudo subir la imagen', { description: data.error || `HTTP ${res.status}` })
+      return null
+    }
     return data.url || null
-  } catch {
+  } catch (err) {
+    console.error('[site-config] upload error:', err)
+    toast.error('Error de red al subir imagen')
     return null
   }
 }
