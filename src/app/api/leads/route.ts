@@ -2,15 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getLeads, createLead, updateLead, getSiteConfig } from '@/lib/data'
 import { sendEmail, isNewLeadEmail } from '@/lib/email'
 import { leadsRateLimit, getClientId } from '@/lib/rate-limit'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
+// GET — ADMIN ONLY: list leads (contains PII: name, phone, email)
+// Public users submit leads via POST, they never list them.
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status') || undefined
 
     const leads = await getLeads({ status })
     return NextResponse.json({ leads, total: leads.length })
-  } catch {
+  } catch (err) {
+    console.error('[leads] GET error:', err)
     return NextResponse.json({ error: 'Error al obtener leads' }, { status: 500 })
   }
 }
@@ -73,6 +80,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  // ADMIN ONLY: update lead status/notes
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { id, status, notes } = body
@@ -87,7 +98,8 @@ export async function PUT(req: NextRequest) {
 
     const lead = await updateLead(id, data)
     return NextResponse.json({ success: true, lead })
-  } catch {
+  } catch (err) {
+    console.error('[leads] PUT error:', err)
     return NextResponse.json({ error: 'Error al actualizar lead' }, { status: 500 })
   }
 }

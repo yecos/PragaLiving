@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -399,12 +400,20 @@ async function main() {
   // ==========================================
   // ADMIN USER (default)
   // ==========================================
+  // SECURITY: password is bcrypt-hashed (cost factor 12) before storing.
+  // Default password is "praga2024" — CHANGE IT IMMEDIATELY in production
+  // by re-running scripts/hash-password.ts with your real password and
+  // re-seeding, or by updating the admin user via the admin panel.
 
-  // Note: In production, use bcrypt. This is a placeholder.
+  const defaultPasswordHash = bcrypt.hashSync(
+    process.env.ADMIN_SEED_PASSWORD || "praga2024",
+    12
+  );
+
   await prisma.adminUser.create({
     data: {
       username: "admin",
-      password: "praga2024", // Change in production!
+      password: defaultPasswordHash,
       name: "Administrador PRAGA",
       role: "admin",
     },

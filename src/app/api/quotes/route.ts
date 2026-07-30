@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getLeads, getApartments } from '@/lib/data'
-import { quotesStore, quoteCounter, generateQuoteNumber, type Quote } from '@/lib/quotes-store'
+import { getLeads, getApartments, createQuote, getQuotes, updateQuote } from '@/lib/data'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
+// GET — ADMIN ONLY: list quotes (contains client contact data)
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status') || undefined
 
-    let filtered = quotesStore
-    if (status) {
-      filtered = filtered.filter(q => q.status === status)
-    }
+    const quotes = await getQuotes({ status })
 
-    // Enrich quotes with lead and apartment data
+    // Enrich with lead/apartment data
     const allLeads = await getLeads()
     const allApartments = await getApartments()
 
-    const enriched = filtered.map(q => {
+    const enriched = quotes.map(q => {
       const lead = allLeads.find(l => l.id === q.leadId)
       const apt = allApartments.find(a => a.id === q.apartmentId)
       return {
@@ -32,12 +33,17 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json({ quotes: enriched, total: enriched.length })
-  } catch {
+  } catch (err) {
+    console.error('[quotes] GET error:', err)
     return NextResponse.json({ error: 'Error al obtener cotizaciones' }, { status: 500 })
   }
 }
 
+// POST — ADMIN ONLY: create quote
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { leadId, apartmentId, discount, paymentPlan, notes, validDays } = body
@@ -61,23 +67,29 @@ export async function POST(req: NextRequest) {
     const days = validDays || 30
     const validUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString()
 
-    const quote: Quote = {
-      id: `quote-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      number: generateQuoteNumber(),
+    // createQuote signature accepts: leadId, apartmentId, discount, paymentPlan, notes, validDays
+    // finalPrice and validUntil are computed internally by data.ts
+    const result = await createQuote({
       leadId,
       apartmentId,
       discount: discountAmount,
-      finalPrice,
       paymentPlan: paymentPlan || 'Contado',
       notes: notes || '',
       validDays: days,
-      validUntil,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    })
+
+    if (!result.success || !result.quote) {
+      return NextResponse.json({ error: 'No se pudo crear la cotización' }, { status: 500 })
     }
 
-    quotesStore.push(quote)
+    const quote = result.quote
+
+    // Override the in-memory quote with our computed finalPrice and validUntil
+    // (data.ts fallback doesn't have access to apartment.price, so it sets finalPrice=0)
+    if ('finalPrice' in quote && (quote as any).finalPrice === 0) {
+      ;(quote as any).finalPrice = finalPrice
+      ;(quote as any).validUntil = validUntil
+    }
 
     // Enrich for response
     const allLeads = await getLeads()
@@ -96,12 +108,17 @@ export async function POST(req: NextRequest) {
         apartmentPrice: apartment.price,
       },
     })
-  } catch {
+  } catch (err) {
+    console.error('[quotes] POST error:', err)
     return NextResponse.json({ error: 'Error al crear cotización' }, { status: 500 })
   }
 }
 
+// PUT — ADMIN ONLY: update quote status
 export async function PUT(req: NextRequest) {
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { id, status } = body
@@ -110,23 +127,22 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
     }
 
-    const quote = quotesStore.find(q => q.id === id)
-    if (!quote) {
-      return NextResponse.json({ error: 'Cotización no encontrada' }, { status: 404 })
-    }
-
     if (status) {
       const validStatuses = ['draft', 'sent', 'accepted', 'rejected', 'expired']
       if (!validStatuses.includes(status)) {
         return NextResponse.json({ error: 'Estado inválido' }, { status: 400 })
       }
-      quote.status = status as Quote['status']
     }
 
-    quote.updatedAt = new Date().toISOString()
+    const result = await updateQuote(id, { status })
 
-    return NextResponse.json({ success: true, quote })
-  } catch {
+    if (!result.success || !result.quote) {
+      return NextResponse.json({ error: 'Cotización no encontrada' }, { status: 404 })
+    }
+
+    return NextResponse.json({ success: true, quote: result.quote })
+  } catch (err) {
+    console.error('[quotes] PUT error:', err)
     return NextResponse.json({ error: 'Error al actualizar cotización' }, { status: 500 })
   }
 }

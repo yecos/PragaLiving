@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getFloorPlans, saveFloorPlansConfig } from '@/lib/data'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
 export async function GET() {
   try {
@@ -11,12 +12,17 @@ export async function GET() {
 
     // No data found anywhere
     return NextResponse.json({ floors: [] })
-  } catch {
+  } catch (err) {
+    console.error('[floor-plans] GET error:', err)
     return NextResponse.json({ floors: [] })
   }
 }
 
+// POST — ADMIN ONLY: save floor plan overlays
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminWithCsrf(request)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await request.json()
 
@@ -42,6 +48,7 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Error saving floor plans'
+    console.error('[floor-plans] POST error:', error)
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

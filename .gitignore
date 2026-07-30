@@ -30,12 +30,44 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# ============================================
+# SECRETS — never commit
+# ============================================
+# .env* matches .env, .env.local, .env.production, .env.example, etc.
+# Note: we DO commit .env.example (template with placeholders only) so it's
+# explicitly un-ignored below.
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+!.env.example
+
+# ============================================
+# DATABASES — never commit (may contain PII or hashed passwords)
+# ============================================
+db/*.db
+db/*.db-journal
+*.sqlite
+*.sqlite3
+
+# ============================================
+# LARGE BINARIES — should live in Supabase Storage / S3, not git
+# ============================================
+upload/
+download/
+*.dwg
+*.glb
+*.gltf
+*.dae
+*.obj
+*.fbx
+# Allow specific small assets that are intentionally tracked:
+!public/models/praga-building.glb
+!src/fonts/*.woff2
 
 # vercel
 .vercel
-
 
 # typescript
 *.tsbuildinfo
@@ -46,9 +78,10 @@ local-*
 *.log
 dev.log
 dev.out.log
-test
-prompt
-
 server.log
+
 # Skills directory
 /skills/
+
+# Agent context (internal dev prompts — not for public repo)
+/agent-ctx/

@@ -409,6 +409,41 @@ export async function updateQuote(id: string, data: { status?: string }) {
 }
 
 // ==========================================
+// QUOTE LOOKUP BY ID (used by PDF endpoint)
+// ==========================================
+export async function getQuoteById(id: string): Promise<Quote | null> {
+  // 1. Try Supabase first
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase && supabase) {
+    try {
+      const { data, error } = await supabase.from('quotes').select('*').eq('id', id).single()
+      if (!error && data) {
+        return {
+          id: data.id,
+          number: data.number,
+          leadId: data.lead_id,
+          apartmentId: data.apartment_id,
+          discount: Number(data.discount),
+          finalPrice: Number(data.final_price),
+          paymentPlan: data.payment_plan,
+          notes: data.notes || '',
+          validDays: data.valid_days || 30,
+          validUntil: data.valid_until,
+          status: data.status,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        }
+      }
+    } catch (err) {
+      console.error('[data] Supabase quote by id error:', err)
+    }
+  }
+
+  // 2. Fallback: in-memory
+  return fallbackQuotes.find(q => q.id === id) || null
+}
+
+// ==========================================
 // EXPORTED DATA FUNCTIONS
 // ==========================================
 
@@ -572,6 +607,53 @@ export async function getAmenities() {
   return generateFallbackAmenities()
 }
 
+// ==========================================
+// UPDATE AMENITY (used by /api/amenities PUT)
+// ==========================================
+export async function updateAmenity(id: string, data: Record<string, unknown>) {
+  // 1. Try Supabase first (with admin client for write)
+  const hasSupabase = await checkSupabase()
+  if (hasSupabase) {
+    try {
+      const adminClient = createAdminSupabaseClient()
+      if (adminClient) {
+        const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+        if (data.name !== undefined) updateData.name = data.name
+        if (data.description !== undefined) updateData.description = data.description
+        if (data.category !== undefined) updateData.category = data.category
+        if (data.active !== undefined) updateData.active = data.active
+
+        const { data: updated, error } = await adminClient
+          .from('amenities')
+          .update(updateData)
+          .eq('id', id)
+          .select()
+          .single()
+
+        if (!error && updated) {
+          return mapSupabaseAmenity(updated)
+        }
+        console.error('[data] Supabase amenity update error:', error?.message)
+      }
+    } catch (err) {
+      console.error('[data] Supabase amenity update exception:', err)
+    }
+  }
+
+  // 2. Try Prisma
+  const hasDb = await checkDb()
+  if (hasDb) {
+    try {
+      return await prisma.amenity.update({ where: { id }, data })
+    } catch (err) {
+      console.error('[data] Prisma amenity update error:', err)
+    }
+  }
+
+  // 3. Fallback: not persistable
+  return null
+}
+
 export async function getLeads(filters?: { status?: string }) {
   // 1. Try Supabase first
   const hasSupabase = await checkSupabase()
@@ -724,7 +806,7 @@ export async function updateLead(id: string, data: { status?: string; notes?: st
 }
 
 export async function verifyAdmin(username: string, password: string) {
-  // 1. Try Supabase first (passwords should be bcrypt-hashed in admin_users table)
+  // 1. Try Supabase first (passwords MUST be bcrypt-hashed in admin_users table)
   const hasSupabase = await checkSupabase()
   if (hasSupabase) {
     try {
@@ -737,17 +819,17 @@ export async function verifyAdmin(username: string, password: string) {
           .single()
 
         if (!error && data) {
-          // Try bcrypt comparison first (for properly hashed passwords)
-          if (data.password.startsWith('$2a$') || data.password.startsWith('$2b$')) {
+          // SECURITY: Only accept bcrypt-hashed passwords.
+          // Plaintext comparison is FORBIDDEN — it would let anyone who can read
+          // the admin_users table authenticate by reusing the stored hash directly.
+          if (typeof data.password === 'string' && (data.password.startsWith('$2a$') || data.password.startsWith('$2b$'))) {
             const match = await bcrypt.compare(password, data.password)
             if (match) {
               return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
             }
           } else {
-            // Legacy: plaintext comparison (will be removed once all passwords are hashed)
-            if (data.password === password) {
-              return { success: true, user: { id: data.id, username: data.username, name: data.name, role: data.role } }
-            }
+            // Reject plaintext passwords stored in DB — they are a security liability
+            console.error('[data] SECURITY: admin_users.password is not bcrypt-hashed. Refusing to authenticate. Re-hash the password immediately.')
           }
         }
       }
@@ -762,15 +844,14 @@ export async function verifyAdmin(username: string, password: string) {
     try {
       const admin = await prisma.adminUser.findUnique({ where: { username } })
       if (admin) {
-        // Try bcrypt comparison first
-        if (admin.password.startsWith('$2a$') || admin.password.startsWith('$2b$')) {
+        // SECURITY: Only accept bcrypt-hashed passwords.
+        if (typeof admin.password === 'string' && (admin.password.startsWith('$2a$') || admin.password.startsWith('$2b$'))) {
           const match = await bcrypt.compare(password, admin.password)
           if (match) {
             return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
           }
-        } else if (admin.password === password) {
-          // Legacy: plaintext comparison
-          return { success: true, user: { id: admin.id, username: admin.username, name: admin.name, role: admin.role } }
+        } else {
+          console.error('[data] SECURITY: AdminUser.password is not bcrypt-hashed. Refusing to authenticate. Re-hash the password immediately.')
         }
       }
     } catch (err) {
@@ -778,7 +859,7 @@ export async function verifyAdmin(username: string, password: string) {
     }
   }
 
-  // 3. Fallback: check env-var credentials (bcrypt hash)
+  // 3. Fallback: check env-var credentials (bcrypt hash required)
   if (ADMIN_PASSWORD_HASH && username === ADMIN_USERNAME) {
     const match = await bcrypt.compare(password, ADMIN_PASSWORD_HASH)
     if (match) {

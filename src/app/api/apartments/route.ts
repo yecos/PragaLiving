@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApartments, updateApartment } from '@/lib/data'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,12 +11,17 @@ export async function GET(req: NextRequest) {
 
     const apartments = await getApartments({ status, floor, typology })
     return NextResponse.json({ apartments, total: apartments.length })
-  } catch {
+  } catch (err) {
+    console.error('[apartments] GET error:', err)
     return NextResponse.json({ error: 'Error al obtener apartamentos' }, { status: 500 })
   }
 }
 
+// PUT — ADMIN ONLY: change apartment price/status (commercial value)
 export async function PUT(req: NextRequest) {
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { id, status, price } = body
@@ -30,7 +36,8 @@ export async function PUT(req: NextRequest) {
 
     const apartment = await updateApartment(id, data)
     return NextResponse.json({ success: true, apartment })
-  } catch {
+  } catch (err) {
+    console.error('[apartments] PUT error:', err)
     return NextResponse.json({ error: 'Error al actualizar apartamento' }, { status: 500 })
   }
 }

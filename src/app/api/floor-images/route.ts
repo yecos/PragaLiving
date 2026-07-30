@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
-// GET /api/floor-images?floor_id=piso-1
+// GET /api/floor-images?floor_id=piso-1 — public read
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -52,8 +53,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - add a floor image record
+// POST — ADMIN ONLY: add a floor image record
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { floor_id, image_url, label, order } = body
@@ -90,8 +94,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PUT - update a floor image
+// PUT — ADMIN ONLY: update a floor image
 export async function PUT(req: NextRequest) {
+  const auth = await requireAdminWithCsrf(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await req.json()
     const { id, label, order } = body
@@ -128,8 +135,11 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE - remove a floor image record
+// DELETE — ADMIN ONLY: remove a floor image record
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (!auth.authorized) return auth.error!
+
   try {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')

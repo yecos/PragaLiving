@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSiteConfig, updateSiteConfig } from '@/lib/data'
+import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
 export async function GET() {
   try {
@@ -11,12 +12,17 @@ export async function GET() {
 
     // No data found
     return NextResponse.json({})
-  } catch {
+  } catch (err) {
+    console.error('[site-config] GET error:', err)
     return NextResponse.json({ error: 'Config not found' }, { status: 404 })
   }
 }
 
+// POST — ADMIN ONLY: update site content (texts, SEO, media, contact info)
 export async function POST(request: NextRequest) {
+  const auth = await requireAdminWithCsrf(request)
+  if (!auth.authorized) return auth.error!
+
   try {
     const body = await request.json()
 
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: allSuccess, results })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to save config'
+    console.error('[site-config] POST error:', error)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

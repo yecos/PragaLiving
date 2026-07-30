@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jsPDF } from 'jspdf'
-import { getLeads, getApartments } from '@/lib/data'
+import { getLeads, getApartments, getQuoteById } from '@/lib/data'
+import { requireAdmin } from '@/lib/auth-guard'
 
 // In-memory quote store reference - must match the one in route.ts
 // We import from the parent route by re-declaring the same data source
@@ -19,14 +20,6 @@ interface Quote {
   createdAt: string
   updatedAt: string
 }
-
-// We need to access the same in-memory store from the parent route
-// Since modules are singletons in Next.js, we can import the quotes
-// But since quotes are in a different module scope, we re-fetch from the API
-// Instead, let's use a shared store approach
-
-// Shared in-memory store (imported by both route files)
-import { quotesStore } from '@/lib/quotes-store'
 
 function formatCOP(amount: number): string {
   return new Intl.NumberFormat('es-CO', {
@@ -56,11 +49,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // ADMIN ONLY: PDFs contain client contact data
+  const auth = await requireAdmin(request)
+  if (!auth.authorized) return auth.error!
+
   try {
     const { id } = await params
 
-    // Find the quote
-    const quote = quotesStore.find((q: Quote) => q.id === id)
+    // Find the quote from data layer
+    const quote = await getQuoteById(id)
     if (!quote) {
       return NextResponse.json({ error: 'Cotización no encontrada' }, { status: 404 })
     }
