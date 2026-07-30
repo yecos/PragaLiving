@@ -330,16 +330,37 @@ export async function updateSiteConfig(section: string, data: unknown): Promise<
 // ==========================================
 // FLOOR PLANS
 // ==========================================
+// Floor plans are stored as a single JSON blob in site_config.floor_plans
+// (key='floor_plans'). This matches what the FloorPlanEditor reads/writes
+// via saveFloorPlansConfig().
+// The floor_plans table is kept for legacy/queries but is not the source
+// of truth for the PlantaInteractiva component.
 
 export async function getFloorPlans() {
+  // 1. Read from site_config.floor_plans (primary — what the editor saves to)
+  const row = await prisma.siteConfig.findUnique({ where: { section: 'floor_plans' } })
+  if (row?.data) {
+    const data = row.data as { floors?: unknown[] }
+    if (Array.isArray(data.floors) && data.floors.length > 0) {
+      return data.floors as unknown[]
+    }
+  }
+
+  // 2. Fallback: read from floor_plans table and map to the expected shape
   const rows = await prisma.floorPlan.findMany({ orderBy: { floorNumber: 'asc' } })
-  return rows.map((row) => ({
-    id: `piso-${row.floorNumber}`,
-    floorNumber: row.floorNumber,
-    name: row.floorName || `Piso ${row.floorNumber}`,
-    image: row.image || '',
-    apartments: row.apartments as unknown,
-  }))
+  if (rows.length > 0) {
+    return rows.map((row) => ({
+      id: `piso-${row.floorNumber}`,
+      name: row.floorName || `Piso ${row.floorNumber}`,
+      typeLabel: row.floorNumber > 0 && row.floorNumber <= 11 ? 'Residencial' : 'Áreas Comunes',
+      isResidential: row.floorNumber > 0 && row.floorNumber <= 11,
+      image: row.image || '',
+      apartments: row.apartments as unknown,
+    }))
+  }
+
+  // 3. Last resort: empty array (component will show fallback message)
+  return []
 }
 
 export async function updateFloorPlan(
