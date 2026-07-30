@@ -206,19 +206,25 @@ export default function FloorPlanEditor() {
     try {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('category', 'floor-plans') // ← FIX: was missing category
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
-      const data = await res.json()
-      if (data.url) {
-        const newConfig = { ...config }
-        newConfig.floors = newConfig.floors.map((f, i) =>
-          i === selectedFloorIndex ? { ...f, image: data.url } : f
-        )
-        setConfig(newConfig)
-        void saveConfig(newConfig)
-        setToast('Imagen subida ✓')
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || `HTTP ${res.status}`)
       }
-    } catch {
-      setToast('Error al subir imagen')
+
+      const newConfig = { ...config }
+      newConfig.floors = newConfig.floors.map((f, i) =>
+        i === selectedFloorIndex ? { ...f, image: data.url } : f
+      )
+      setConfig(newConfig)
+      // Save immediately (don't rely on debounce for image uploads)
+      void saveConfig(newConfig)
+      setToast(`Imagen subida: ${file.name}`)
+    } catch (err) {
+      console.error('[floor-editor] upload error:', err)
+      setToast(`Error: ${err instanceof Error ? err.message : 'falló la subida'}`)
     }
     setUploading(false)
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -396,24 +402,35 @@ export default function FloorPlanEditor() {
       }
     })
     setConfig(newConfig)
-    // Auto-save with debounce via the config change effect below
+    // Auto-save with debounce is handled by the useEffect below
   }, [selectedAptId, currentFloor, config, selectedFloorIndex])
 
-  // Auto-save when config changes (debounced)
+  // Track whether config has changed from what was last saved.
+  // This prevents the auto-save effect from firing on every render due to
+  // reference changes (config is a new object on every setConfig call).
+  const lastSavedConfigRef = useRef<string>('')
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  useEffect(() => {
-    // Don't save on initial load or when loading
-    if (loading || !config.floors.length) return
 
-    // Clear any pending save
+  useEffect(() => {
+    if (loading || config.floors.length === 0) return
+
+    // Serialize config to compare; only save if it actually changed
+    const configJson = JSON.stringify(config)
+    if (configJson === lastSavedConfigRef.current) return
+    // Don't save the very first time (initial load sets config)
+    if (lastSavedConfigRef.current === '' ) {
+      lastSavedConfigRef.current = configJson
+      return
+    }
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
     }
 
-    // Debounce: save 1 second after last change
     saveTimeoutRef.current = setTimeout(() => {
       void saveConfig(config)
-    }, 1000)
+      lastSavedConfigRef.current = JSON.stringify(config)
+    }, 1500)
 
     return () => {
       if (saveTimeoutRef.current) {
@@ -439,6 +456,54 @@ export default function FloorPlanEditor() {
     setDrawingPoints([])
     setMode('select')
   }, [])
+
+  // ═══ KEYBOARD SHORTCUTS ═══
+  // ESC: cancel drawing | Delete/Backspace: delete selected apt | Arrow Up/Down: navigate apts
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input/textarea/select
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') return
+
+      if (e.key === 'Escape') {
+        if (mode === 'draw') {
+          cancelDrawing()
+          setToast('Dibujo cancelado')
+        } else if (selectedAptId) {
+          setSelectedAptId(null)
+        }
+      } else if ((e.key === 'Delete' || e.key === 'Backspace') && selectedAptId && mode === 'select') {
+        e.preventDefault()
+        deleteApartment()
+      } else if (e.key === 'd' || e.key === 'D') {
+        if (mode === 'select') {
+          setMode('draw')
+          setSelectedAptId(null)
+        }
+      } else if (e.key === 's' || e.key === 'S') {
+        if (mode === 'draw') {
+          setMode('select')
+          setDrawingPoints([])
+        }
+      } else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && currentFloor && mode === 'select') {
+        e.preventDefault()
+        const apts = currentFloor.apartments
+        if (apts.length === 0) return
+        const currentIdx = apts.findIndex(a => a.id === selectedAptId)
+        let nextIdx: number
+        if (currentIdx === -1) {
+          nextIdx = 0
+        } else if (e.key === 'ArrowDown') {
+          nextIdx = (currentIdx + 1) % apts.length
+        } else {
+          nextIdx = (currentIdx - 1 + apts.length) % apts.length
+        }
+        setSelectedAptId(apts[nextIdx].id)
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [mode, selectedAptId, currentFloor, cancelDrawing, deleteApartment])
 
   // ═══ LOADING ═══
   if (loading) {
@@ -619,12 +684,13 @@ export default function FloorPlanEditor() {
         <div className="bg-[#111111] border border-[#8B6B4B]/20 p-4 text-[11px] text-[#D8D1C8]/50 space-y-2">
           <p className="text-[#8B6B4B] text-[10px] tracking-wider uppercase font-medium mb-2">Cómo usar el editor</p>
           <p>1. Selecciona un nivel en la columna izquierda, o sube una imagen de planta</p>
-          <p>2. Activa el modo <strong className="text-[#F5F1EA]">Dibujar</strong> y haz clic sobre la imagen para definir los vértices del polígono</p>
+          <p>2. Activa el modo <strong className="text-[#F5F1EA]">Dibujar</strong> (tecla <kbd className="bg-[#0A0A0A] px-1 border border-[#D8D1C8]/10">D</kbd>) y haz clic sobre la imagen para definir los vértices</p>
           <p>3. Haz doble clic o haz clic cerca del primer punto para cerrar el polígono</p>
-          <p>4. En modo <strong className="text-[#F5F1EA]">Seleccionar</strong>, haz clic en un polígono para editar sus datos</p>
+          <p>4. En modo <strong className="text-[#F5F1EA]">Seleccionar</strong> (tecla <kbd className="bg-[#0A0A0A] px-1 border border-[#D8D1C8]/10">S</kbd>), haz clic en un polígono para editar sus datos</p>
           <p>5. Arrastra los vértices para ajustar la forma del polígono</p>
-          <p>6. Completa los datos del apartamento en el panel derecho</p>
-          <p>7. Haz clic en <strong className="text-[#F5F1EA]">Guardar</strong> para guardar todos los cambios</p>
+          <p>6. Usa <kbd className="bg-[#0A0A0A] px-1 border border-[#D8D1C8]/10">↑↓</kbd> para navegar entre apartamentos del piso actual</p>
+          <p>7. <kbd className="bg-[#0A0A0A] px-1 border border-[#D8D1C8]/10">ESC</kbd> cancela el dibujo · <kbd className="bg-[#0A0A0A] px-1 border border-[#D8D1C8]/10">Del</kbd> elimina el apartamento seleccionado</p>
+          <p>8. Los cambios se guardan automáticamente 1.5s después de editar</p>
         </div>
       )}
 
@@ -947,10 +1013,53 @@ export default function FloorPlanEditor() {
 
         {/* ═══ RIGHT COLUMN: Apartment Data Form ═══ */}
         <div className="lg:col-span-3">
-          <div className="bg-[#111111] border border-[#D8D1C8]/5 p-4 min-h-[400px]">
+          <div className="bg-[#111111] border border-[#D8D1C8]/5 p-4 min-h-[400px] max-h-[700px] overflow-y-auto custom-scrollbar">
+            {/* Apartment list (always visible when floor has apts) */}
+            {currentFloor && currentFloor.apartments.length > 0 && (
+              <div className="mb-4 pb-4 border-b border-[#D8D1C8]/10">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[9px] tracking-[0.15em] uppercase text-[#8B6B4B]">
+                    Apartamentos ({currentFloor.apartments.length})
+                  </p>
+                  <span className="text-[8px] text-[#D8D1C8]/20">↑↓ navegar</span>
+                </div>
+                <div className="space-y-0.5 max-h-32 overflow-y-auto custom-scrollbar">
+                  {currentFloor.apartments.map((apt, idx) => {
+                    const isSelected = apt.id === selectedAptId
+                    const colors = STATUS_COLORS[apt.status] || STATUS_COLORS.available
+                    return (
+                      <button
+                        key={apt.id}
+                        onClick={() => { setSelectedAptId(apt.id); setMode('select') }}
+                        className={`w-full text-left flex items-center gap-2 py-1.5 px-2 border-l-2 transition-all ${
+                          isSelected
+                            ? 'border-l-[#8B6B4B] bg-[#8B6B4B]/10'
+                            : 'border-l-transparent hover:border-l-[#8B6B4B]/30 hover:bg-[#1A1A1A]'
+                        }`}
+                      >
+                        <div
+                          className="w-2 h-2 flex-shrink-0"
+                          style={{ backgroundColor: colors.fill, opacity: 0.7 }}
+                        />
+                        <span className={`text-[10px] flex-1 truncate ${isSelected ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/50'}`}>
+                          {apt.name}
+                        </span>
+                        <span className="text-[8px] text-[#D8D1C8]/30 flex-shrink-0">
+                          {apt.area > 0 ? `${apt.area}m²` : '—'}
+                        </span>
+                        <span className="text-[8px] text-[#D8D1C8]/20 flex-shrink-0">
+                          {idx + 1}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {selectedApt ? (
               <div className="space-y-4">
-                {/* Status badge */}
+                {/* Status badge + actions */}
                 <div className="flex items-center justify-between">
                   <span className={`text-[9px] tracking-wider uppercase px-2 py-0.5 ${
                     selectedApt.status === 'available'
@@ -961,13 +1070,42 @@ export default function FloorPlanEditor() {
                   }`}>
                     {STATUS_LABELS[selectedApt.status]}
                   </span>
-                  <button
-                    onClick={deleteApartment}
-                    className="text-[#D8D1C8]/20 hover:text-red-400 transition-colors"
-                    title="Eliminar apartamento"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        // Duplicate apartment with offset polygon
+                        if (!currentFloor) return
+                        const offset = selectedApt.polygon.map(([x, y]) => [x + 2, y + 2] as number[])
+                        const newApt: ApartmentZone = {
+                          ...selectedApt,
+                          id: generateId(),
+                          name: `${selectedApt.name} (copia)`,
+                          polygon: offset,
+                        }
+                        const newConfig = { ...config }
+                        newConfig.floors = newConfig.floors.map((f, i) =>
+                          i === selectedFloorIndex
+                            ? { ...f, apartments: [...f.apartments, newApt] }
+                            : f
+                        )
+                        setConfig(newConfig)
+                        setSelectedAptId(newApt.id)
+                        void saveConfig(newConfig)
+                        setToast('Apartamento duplicado')
+                      }}
+                      className="text-[#D8D1C8]/20 hover:text-[#8B6B4B] transition-colors"
+                      title="Duplicar apartamento"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={deleteApartment}
+                      className="text-[#D8D1C8]/20 hover:text-red-400 transition-colors"
+                      title="Eliminar apartamento (Delete)"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Name */}
@@ -1110,8 +1248,13 @@ export default function FloorPlanEditor() {
                   <p className="text-[9px] text-[#D8D1C8]/15">
                     {mode === 'draw'
                       ? 'Dibuja un polígono para crear uno'
-                      : 'Haz clic en un polígono para editarlo'}
+                      : 'Haz clic en un polígono o usa ↑↓'}
                   </p>
+                  <div className="mt-4 pt-4 border-t border-[#D8D1C8]/10 text-[8px] text-[#D8D1C8]/20 space-y-1">
+                    <p><kbd className="bg-[#0A0A0A] px-1 py-0.5 border border-[#D8D1C8]/10">D</kbd> dibujar · <kbd className="bg-[#0A0A0A] px-1 py-0.5 border border-[#D8D1C8]/10">S</kbd> seleccionar</p>
+                    <p><kbd className="bg-[#0A0A0A] px-1 py-0.5 border border-[#D8D1C8]/10">ESC</kbd> cancelar · <kbd className="bg-[#0A0A0A] px-1 py-0.5 border border-[#D8D1C8]/10">Del</kbd> eliminar</p>
+                    <p><kbd className="bg-[#0A0A0A] px-1 py-0.5 border border-[#D8D1C8]/10">↑↓</kbd> navegar apartamentos</p>
+                  </div>
                 </div>
               </div>
             )}

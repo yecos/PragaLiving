@@ -99,6 +99,24 @@ export async function POST(req: NextRequest) {
         const storagePath = `${safeCategory}/${filename}`
         const arrayBuffer = await file.arrayBuffer()
 
+        // Try to get bucket info; if it doesn't exist, create it (public)
+        const { error: getBucketError } = await supabase.storage.getBucket(bucketName)
+        if (getBucketError && getBucketError.message.includes('not found')) {
+          console.log(`[upload] Bucket '${bucketName}' not found, creating it...`)
+          const { error: createBucketError } = await supabase.storage.createBucket(bucketName, {
+            public: true,
+            fileSizeLimit: '5MB',
+            allowedMimeTypes: ALLOWED_TYPES,
+          })
+          if (createBucketError) {
+            console.error('[upload] Could not create bucket:', createBucketError.message)
+            // Fall through to base64 fallback below
+          } else {
+            console.log(`[upload] Bucket '${bucketName}' created successfully`)
+          }
+        }
+
+        // Attempt the upload
         const { error: uploadError } = await supabase
           .storage
           .from(bucketName)
@@ -108,9 +126,18 @@ export async function POST(req: NextRequest) {
           })
 
         if (uploadError) {
-          console.error('[upload] Supabase Storage error:', uploadError.message)
+          console.error('[upload] Supabase Storage upload error:', uploadError.message)
+          // FALLBACK: return as base64 data URL (works for images < 5MB, no storage needed)
+          // This allows the admin to upload images even if Storage isn't fully configured.
+          // The data URL is stored directly in site_config/floor_plans.
+          if (file.size < 500_000) { // 500KB limit for base64 fallback
+            const base64 = Buffer.from(arrayBuffer).toString('base64')
+            const dataUrl = `data:${file.type};base64,${base64}`
+            console.log(`[upload] Fallback: returning base64 data URL (${file.size} bytes)`)
+            return NextResponse.json({ success: true, url: dataUrl, fallback: 'base64' })
+          }
           return NextResponse.json(
-            { error: `Error al subir a Storage: ${uploadError.message}. ¿Existe el bucket '${bucketName}'?` },
+            { error: `Error al subir a Storage: ${uploadError.message}. Bucket '${bucketName}' debe existir y ser público.` },
             { status: 500 }
           )
         }
@@ -125,17 +152,33 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, url: publicUrlData.publicUrl })
       } catch (storageErr) {
         console.error('[upload] Supabase Storage exception:', storageErr)
+        // FALLBACK: base64 data URL for small images
+        if (file.size < 500_000) {
+          const arrayBuffer = await file.arrayBuffer()
+          const base64 = Buffer.from(arrayBuffer).toString('base64')
+          const dataUrl = `data:${file.type};base64,${base64}`
+          console.log(`[upload] Exception fallback: returning base64 data URL`)
+          return NextResponse.json({ success: true, url: dataUrl, fallback: 'base64' })
+        }
         return NextResponse.json(
-          { error: 'Error al configurar almacenamiento. Verifica SUPABASE_SERVICE_ROLE_KEY.' },
+          { error: 'Error al configurar almacenamiento. Verifica SUPABASE_SERVICE_ROLE_KEY y que el bucket "praga-media" exista.' },
           { status: 500 }
         )
       }
     }
 
-    // FALLBACK: return informative error
+    // FALLBACK: no Supabase configured — use base64 data URL (small images only)
+    if (file.size < 500_000) {
+      const arrayBuffer = await file.arrayBuffer()
+      const base64 = Buffer.from(arrayBuffer).toString('base64')
+      const dataUrl = `data:${file.type};base64,${base64}`
+      console.log(`[upload] No Supabase configured, returning base64 data URL (${file.size} bytes)`)
+      return NextResponse.json({ success: true, url: dataUrl, fallback: 'base64' })
+    }
+
     return NextResponse.json({
-      error: 'Almacenamiento no configurado en producción. Opciones: (1) configura Supabase Storage bucket "praga-media" + SUPABASE_SERVICE_ROLE_KEY, o (2) developa en local para usar filesystem.',
-      hint: 'En local con `bun run dev` funciona automáticamente.',
+      error: 'Almacenamiento no configurado. Para imágenes > 500KB necesitas Supabase Storage (configura NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY).',
+      hint: 'En local con `bun run dev` funciona automáticamente con filesystem.',
     }, { status: 501 })
   } catch (err) {
     console.error('[upload] Unexpected error:', err)
