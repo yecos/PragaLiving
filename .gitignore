@@ -54,8 +54,11 @@ db/*.db-journal
 # ============================================
 # LARGE BINARIES — should live in Supabase Storage / S3, not git
 # ============================================
-upload/
-download/
+# Only ignore the TOP-LEVEL /upload directory (binary assets uploaded via DWG/PNG scans).
+# Do NOT match nested directories like src/app/api/upload/ (which is a code route).
+/upload/
+/download/
+# Specific binary extensions to ignore anywhere in the tree
 *.dwg
 *.glb
 *.gltf
