@@ -419,6 +419,65 @@ async function main() {
     },
   });
 
+  // ==========================================
+  // SITE CONFIG — load from JSON
+  // ==========================================
+  // Read the bundled site-config.json so the admin panel has defaults
+  try {
+    const siteConfig = await import("../src/data/site-config.json");
+    const config = (siteConfig.default || siteConfig) as Record<string, unknown>;
+    let sectionCount = 0;
+    for (const [section, data] of Object.entries(config)) {
+      await prisma.siteConfig.upsert({
+        where: { section },
+        create: { section, data: data as any },
+        update: { data: data as any },
+      });
+      sectionCount++;
+    }
+    console.log(`  - ${sectionCount} site config sections created`);
+  } catch (err) {
+    console.warn("  - Could not load site-config.json:", err);
+  }
+
+  // ==========================================
+  // FLOOR PLANS — empty placeholders for each residential floor
+  // ==========================================
+  for (let floor = 1; floor <= 11; floor++) {
+    await prisma.floorPlan.upsert({
+      where: { floorNumber: floor },
+      create: {
+        floorNumber: floor,
+        floorName: `Piso ${floor}`,
+        image: '/images/planos/planta-tipo.jpg',
+        apartments: [],
+      },
+      update: {},
+    });
+  }
+  // Non-residential floors
+  const nonResidential = [
+    { num: -3, name: 'Sótano 3' },
+    { num: -2, name: 'Sótano 2' },
+    { num: -1, name: 'Sótano 1' },
+    { num: 0, name: 'Acceso / Lobby' },
+    { num: 13, name: 'Zona Social' },
+    { num: 14, name: 'Cubierta' },
+  ];
+  for (const { num, name } of nonResidential) {
+    await prisma.floorPlan.upsert({
+      where: { floorNumber: num },
+      create: {
+        floorNumber: num,
+        floorName: name,
+        image: '',
+        apartments: [],
+      },
+      update: {},
+    });
+  }
+  console.log(`  - ${11 + nonResidential.length} floor plans created`);
+
   console.log("Seed completed successfully!");
   console.log(
     `  - ${apartments.length} apartments created`

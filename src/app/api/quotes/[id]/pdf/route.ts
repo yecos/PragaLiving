@@ -30,7 +30,7 @@ function formatCOP(amount: number): string {
   }).format(amount)
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso: string | Date): string {
   return new Date(iso).toLocaleDateString('es-CO', {
     day: '2-digit',
     month: 'long',

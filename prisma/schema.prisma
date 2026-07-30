@@ -1,12 +1,24 @@
+// ============================================
+// PRAGA Living — Prisma Schema (PostgreSQL / Neon)
+// ============================================
+// Provider changed from sqlite to postgresql for Neon compatibility.
+// All tables that were previously in Supabase are now Prisma models.
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Neon requires pgbouncer in production mode for serverless:
+  // directUrl is used for migrations (bypasses pgbouncer)
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
+// ==========================================
+// APARTMENTS — public catalog
+// ==========================================
 model Apartment {
   id          String   @id @default(cuid())
   name        String
@@ -19,12 +31,21 @@ model Apartment {
   status      String   @default("available") // "available", "reserved", "sold"
   price       Float
   image       String?
-  plan360Url  String?
+  plan360Url  String?  @map("plan_360_url")
   features    String?  // JSON string of features
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  quotes Quote[]
+
+  @@index([floor])
+  @@index([status])
+  @@map("apartments")
 }
 
+// ==========================================
+// AMENITIES — public catalog
+// ==========================================
 model Amenity {
   id          String   @id @default(cuid())
   name        String
@@ -34,10 +55,15 @@ model Amenity {
   image       String?
   active      Boolean  @default(true)
   order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("amenities")
 }
 
+// ==========================================
+// LEADS — form submissions (PII)
+// ==========================================
 model Lead {
   id          String   @id @default(cuid())
   name        String
@@ -48,16 +74,94 @@ model Lead {
   source      String   @default("website") // "website", "whatsapp", "referral"
   status      String   @default("new") // "new", "contacted", "qualified", "lost"
   notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  quotes Quote[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("leads")
 }
 
+// ==========================================
+// ADMIN USERS
+// ==========================================
 model AdminUser {
   id          String   @id @default(cuid())
   username    String   @unique
-  password    String   // hashed
+  password    String   // bcrypt-hashed
   name        String
   role        String   @default("admin") // "admin", "editor"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+// ==========================================
+// QUOTES — Cotizaciones (sensitive)
+// ==========================================
+model Quote {
+  id             String   @id @default(cuid())
+  number         String   @unique
+  leadId         String   @map("lead_id")
+  apartmentId    String   @map("apartment_id")
+  discount       Float    @default(0)
+  finalPrice     Float    @map("final_price")
+  paymentPlan    String   @default("Contado") @map("payment_plan")
+  notes          String   @default("")
+  validDays      Int      @default(30) @map("valid_days")
+  validUntil     DateTime @map("valid_until")
+  status         String   @default("draft") // "draft", "sent", "accepted", "rejected", "expired"
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  lead      Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("quotes")
+}
+
+// ==========================================
+// SITE CONFIG — content sections (JSONB)
+// ==========================================
+model SiteConfig {
+  section    String   @id
+  data      Json     @default("{}")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_config")
+}
+
+// ==========================================
+// FLOOR PLANS — overlays per floor
+// ==========================================
+model FloorPlan {
+  id            String   @id @default(cuid())
+  floorNumber   Int      @unique @map("floor_number")
+  floorName     String?  @map("floor_name")
+  image         String?
+  apartments    Json     @default("[]") // overlay polygons/config
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("floor_plans")
+}
+
+// ==========================================
+// FLOOR IMAGES — multiple images per floor
+// ==========================================
+model FloorImage {
+  id        String   @id @default(cuid())
+  floorId   String   @map("floor_id")
+  imageUrl  String   @map("image_url")
+  label     String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([floorId])
+  @@map("floor_images")
 }
