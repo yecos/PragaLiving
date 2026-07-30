@@ -428,6 +428,7 @@ function FloorPlanDisplay({
             className="object-contain"
             sizes="(max-width: 1024px) 100vw, 58vw"
             priority
+            unoptimized
           />
 
           {/* SVG overlay with interactive hotspots */}

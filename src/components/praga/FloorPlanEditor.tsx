@@ -570,6 +570,7 @@ export default function FloorPlanEditor() {
                   fill
                   className="object-contain"
                   sizes="100vw"
+                  unoptimized
                 />
               )}
               {currentFloor.isResidential && currentFloor.apartments.length > 0 && (
@@ -840,6 +841,7 @@ export default function FloorPlanEditor() {
                     sizes="(max-width: 1024px) 100vw, 58vw"
                     priority
                     draggable={false}
+                    unoptimized
                   />
 
                   {/* SVG overlay */}
