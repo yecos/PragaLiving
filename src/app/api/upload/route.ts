@@ -1,26 +1,23 @@
+// ============================================
+// POST /api/upload — admin-only image upload
+// ============================================
+// ARCHITECTURE: All app data lives in Neon Postgres via Prisma.
+// Supabase is used ONLY for object storage (images) — Neon doesn't have
+// blob storage. This is the only Supabase dependency in the codebase.
+//
+// Strategy:
+//   1. Local dev: write to public/images/<category>/ (filesystem)
+//   2. Production: try Supabase Storage (auto-creates bucket if missing)
+//   3. Fallback: base64 data URL for images < 500KB (no storage needed)
+//
+// To fully remove Supabase, replace this with Vercel Blob, Cloudinary, or S3.
+// See docs/SECURITY_REMEDIATION.md for migration notes.
+
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
 import { randomUUID } from 'crypto'
-
-// ============================================
-// POST /api/upload — admin-only image upload
-// ============================================
-// Saves uploaded images to public/images/<category>/
-// Returns the public URL path that can be stored in DB or config.
-//
-// On Vercel, the filesystem is read-only EXCEPT for /tmp.
-// However, images in /tmp are NOT served publicly and disappear after
-// the request. For production, set UPSTASH_S3_BUCKET (or similar) and
-// update this route to use S3/Supabase Storage instead.
-//
-// For now, this implementation works in dev (local filesystem) and
-// returns a placeholder URL in production so the UI doesn't break.
-// In production, you should:
-//   1. Create a Supabase Storage bucket "praga-media" (public)
-//   2. Set SUPABASE_SERVICE_ROLE_KEY env var (already set)
-//   3. Uncomment the Supabase Storage section below
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif']
