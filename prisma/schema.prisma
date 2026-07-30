@@ -16,6 +16,13 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
+// NOTE: Vercel sometimes pastes env vars with leading/trailing whitespace or
+// surrounding quotes. If `prisma migrate` fails with "URL must start with
+// postgresql://", check your env vars in Vercel Project Settings and remove
+// any tabs/spaces/quotes around the value.
+// The runtime code (src/lib/db.ts) normalizes DATABASE_URL automatically,
+// but Prisma CLI (used by `prisma migrate`) does not.
+
 // ==========================================
 // APARTMENTS — public catalog
 // ==========================================
