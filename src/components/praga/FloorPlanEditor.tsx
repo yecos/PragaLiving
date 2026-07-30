@@ -14,6 +14,8 @@ import {
   HelpCircle,
   RotateCw,
   RotateCcw,
+  Copy,
+  Check,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════════
@@ -136,6 +138,15 @@ export default function FloorPlanEditor() {
   const [showPreview, setShowPreview] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  // Duplicate floor config modal state
+  const [showDuplicate, setShowDuplicate] = useState(false)
+  const [dupOptions, setDupOptions] = useState({
+    copyImage: true,
+    copyApartments: true,
+    targetFloorIds: [] as string[],
+  })
+  const [duplicating, setDuplicating] = useState(false)
 
   // Refs
   const svgRef = useRef<SVGSVGElement>(null)
@@ -284,6 +295,66 @@ export default function FloorPlanEditor() {
     }
     setRotating(false)
   }, [config, currentFloor, selectedFloorIndex, saveConfig])
+
+  // ═══ DUPLICATE FLOOR CONFIG ═══
+  // Copies the current floor's image and/or apartments to other floors.
+  // Opens a modal where the user selects what to copy and target floors.
+  const handleDuplicateConfig = useCallback(async () => {
+    if (!currentFloor) return
+    if (dupOptions.targetFloorIds.length === 0) {
+      setToast('Selecciona al menos un piso destino')
+      return
+    }
+    if (!dupOptions.copyImage && !dupOptions.copyApartments) {
+      setToast('Selecciona qué copiar (imagen o apartamentos)')
+      return
+    }
+
+    setDuplicating(true)
+    try {
+      const newConfig = { ...config }
+      const sourceFloor = currentFloor
+      let updatedCount = 0
+
+      newConfig.floors = newConfig.floors.map((f) => {
+        if (!dupOptions.targetFloorIds.includes(f.id)) return f
+        if (f.id === sourceFloor.id) return f // don't copy to self
+
+        const updates: Partial<FloorConfig> = { ...f }
+        if (dupOptions.copyImage) {
+          updates.image = sourceFloor.image
+        }
+        if (dupOptions.copyApartments) {
+          // Clone apartments with new IDs and adjust names with target floor number
+          const targetFloorNum = parseInt(f.id.replace('piso-', ''))
+          updates.apartments = sourceFloor.apartments.map((apt, idx) => {
+            const newApt: ApartmentZone = {
+              ...apt,
+              id: generateId(),
+              // Rename: "Apto 101" → "Apto 201" if copying from Piso 1 to Piso 2
+              name: apt.name.replace(
+                /Apto\s+(\d+)0(\d+)/i,
+                (_, floorPart, unitPart) => `Apto ${targetFloorNum}${unitPart}`
+              ) || apt.name,
+            }
+            return newApt
+          })
+        }
+        updatedCount++
+        return updates as FloorConfig
+      })
+
+      setConfig(newConfig)
+      void saveConfig(newConfig)
+      setShowDuplicate(false)
+      setDupOptions({ copyImage: true, copyApartments: true, targetFloorIds: [] })
+      setToast(`Configuración duplicada a ${updatedCount} piso(s)`)
+    } catch (err) {
+      console.error('[floor-editor] duplicate error:', err)
+      setToast('Error al duplicar configuración')
+    }
+    setDuplicating(false)
+  }, [config, currentFloor, dupOptions, saveConfig])
 
   // ═══ FLOOR MANAGEMENT ═══
   const addFloor = useCallback(() => {
@@ -893,6 +964,17 @@ export default function FloorPlanEditor() {
                     )}
                   </>
                 )}
+                {/* Duplicate config button — only show for residential floors */}
+                {currentFloor?.isResidential && (
+                  <button
+                    onClick={() => setShowDuplicate(true)}
+                    disabled={duplicating || uploading}
+                    className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase border border-[#8B6B4B]/30 text-[#8B6B4B] px-3 py-1.5 hover:bg-[#8B6B4B]/10 transition-colors disabled:opacity-50"
+                    title="Duplicar imagen y/o apartamentos a otros pisos"
+                  >
+                    <Copy className="w-3 h-3" /> Duplicar
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1345,6 +1427,183 @@ export default function FloorPlanEditor() {
           </div>
         </div>
       </div>
+
+      {/* Duplicate config modal */}
+      {showDuplicate && currentFloor && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => !duplicating && setShowDuplicate(false)}
+        >
+          <div
+            className="bg-[#111111] border border-[#8B6B4B]/30 max-w-md w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-[#D8D1C8]/10">
+              <div className="flex items-center gap-3">
+                <Copy className="w-5 h-5 text-[#8B6B4B]" />
+                <div>
+                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA]">
+                    Duplicar Configuración
+                  </h3>
+                  <p className="text-[9px] text-[#D8D1C8]/40 tracking-wider uppercase mt-0.5">
+                    Origen: {currentFloor.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => !duplicating && setShowDuplicate(false)}
+                disabled={duplicating}
+                className="text-[#D8D1C8]/40 hover:text-[#D8D1C8] transition-colors disabled:opacity-30"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-5">
+              {/* What to copy */}
+              <div>
+                <p className="text-[9px] tracking-[0.15em] uppercase text-[#8B6B4B] mb-3">¿Qué copiar?</p>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${dupOptions.copyImage ? 'bg-[#8B6B4B] border-[#8B6B4B]' : 'border-[#D8D1C8]/20 group-hover:border-[#8B6B4B]/50'}`}>
+                      {dupOptions.copyImage && <Check className="w-3 h-3 text-[#F5F1EA]" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={dupOptions.copyImage}
+                      onChange={(e) => setDupOptions({ ...dupOptions, copyImage: e.target.checked })}
+                      className="sr-only"
+                    />
+                    <div>
+                      <p className="text-[11px] text-[#F5F1EA]">Imagen de la planta</p>
+                      <p className="text-[9px] text-[#D8D1C8]/30">Copia la imagen de fondo del piso</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${dupOptions.copyApartments ? 'bg-[#8B6B4B] border-[#8B6B4B]' : 'border-[#D8D1C8]/20 group-hover:border-[#8B6B4B]/50'}`}>
+                      {dupOptions.copyApartments && <Check className="w-3 h-3 text-[#F5F1EA]" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={dupOptions.copyApartments}
+                      onChange={(e) => setDupOptions({ ...dupOptions, copyApartments: e.target.checked })}
+                      className="sr-only"
+                    />
+                    <div>
+                      <p className="text-[11px] text-[#F5F1EA]">Apartamentos (polígonos + datos)</p>
+                      <p className="text-[9px] text-[#D8D1C8]/30">
+                        {currentFloor.apartments.length} apartamentos con polígonos, áreas, tipologías, precios
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Target floors */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[9px] tracking-[0.15em] uppercase text-[#8B6B4B]">Pisos destino</p>
+                  <button
+                    onClick={() => {
+                      const allResidential = config.floors.filter(f => f.isResidential && f.id !== currentFloor.id)
+                      const allIds = allResidential.map(f => f.id)
+                      setDupOptions({
+                        ...dupOptions,
+                        targetFloorIds: dupOptions.targetFloorIds.length === allIds.length ? [] : allIds,
+                      })
+                    }}
+                    className="text-[9px] tracking-wider uppercase text-[#D8D1C8]/40 hover:text-[#8B6B4B] transition-colors"
+                  >
+                    {(() => {
+                      const allResidential = config.floors.filter(f => f.isResidential && f.id !== currentFloor.id)
+                      return dupOptions.targetFloorIds.length === allResidential.length ? 'Quitar todos' : 'Seleccionar todos'
+                    })()}
+                  </button>
+                </div>
+                <div className="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                  {config.floors
+                    .filter(f => f.isResidential && f.id !== currentFloor.id)
+                    .map((f) => {
+                      const isSelected = dupOptions.targetFloorIds.includes(f.id)
+                      return (
+                        <label
+                          key={f.id}
+                          className="flex items-center gap-3 cursor-pointer py-2 px-2 hover:bg-[#1A1A1A] transition-colors"
+                        >
+                          <div className={`w-4 h-4 border flex items-center justify-center transition-colors ${isSelected ? 'bg-[#8B6B4B] border-[#8B6B4B]' : 'border-[#D8D1C8]/20'}`}>
+                            {isSelected && <Check className="w-2.5 h-2.5 text-[#F5F1EA]" />}
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDupOptions({ ...dupOptions, targetFloorIds: [...dupOptions.targetFloorIds, f.id] })
+                              } else {
+                                setDupOptions({ ...dupOptions, targetFloorIds: dupOptions.targetFloorIds.filter(id => id !== f.id) })
+                              }
+                            }}
+                            className="sr-only"
+                          />
+                          <span className={`text-[11px] ${isSelected ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/60'}`}>
+                            {f.name}
+                          </span>
+                          <span className="text-[9px] text-[#D8D1C8]/30 ml-auto">
+                            {f.apartments.length} aptos · {f.image ? '📷' : 'sin img'}
+                          </span>
+                        </label>
+                      )
+                    })}
+                </div>
+              </div>
+
+              {/* Warning */}
+              {dupOptions.targetFloorIds.length > 0 && (
+                <div className="bg-[#8B6B4B]/10 border border-[#8B6B4B]/20 p-3">
+                  <p className="text-[10px] text-[#D8D1C8]/60 leading-relaxed">
+                    ⚠️ <strong className="text-[#F5F1EA]">Atención:</strong> Esto reemplazará{' '}
+                    {dupOptions.copyImage && 'la imagen'}
+                    {dupOptions.copyImage && dupOptions.copyApartments && ' y '}
+                    {dupOptions.copyApartments && 'los apartamentos'} existentes en los{' '}
+                    {dupOptions.targetFloorIds.length} piso(s) seleccionado(s).
+                    {dupOptions.copyApartments && ' Los apartamentos se clonarán con nuevos IDs y nombres ajustados al piso destino (ej: "Apto 101" → "Apto 201").'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-[#D8D1C8]/10">
+              <button
+                onClick={() => setShowDuplicate(false)}
+                disabled={duplicating}
+                className="text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-4 py-2.5 hover:text-[#D8D1C8] transition-colors disabled:opacity-30"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => void handleDuplicateConfig()}
+                disabled={duplicating || dupOptions.targetFloorIds.length === 0 || (!dupOptions.copyImage && !dupOptions.copyApartments)}
+                className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase bg-[#8B6B4B] text-[#F5F1EA] px-5 py-2.5 hover:bg-[#7A5C3E] transition-colors disabled:opacity-50"
+              >
+                {duplicating ? (
+                  <>
+                    <div className="w-3 h-3 border border-[#F5F1EA] border-t-transparent rounded-full animate-spin" />
+                    Duplicando...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    Duplicar a {dupOptions.targetFloorIds.length} piso(s)
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom scrollbar style */}
       <style jsx global>{`
