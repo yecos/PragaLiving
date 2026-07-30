@@ -24,10 +24,12 @@ import ChatIA from '@/components/praga/ChatIA'
 export default function Home() {
   const [minTimePassed, setMinTimePassed] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
+  // Safety timeout: if 'hero-ready' never fires (image cached, network error,
+  // JS error, etc.), we still hide the loader after 4s so the user isn't stuck.
+  const [safetyTimeout, setSafetyTimeout] = useState(false)
 
-  // Loader stays visible until BOTH the minimum animation time has elapsed
-  // AND the hero's first image has finished loading
-  const loading = !minTimePassed || !imageLoaded
+  // Loader hides when min animation time elapsed AND (hero image ready OR safety timeout)
+  const loading = !minTimePassed || (!imageLoaded && !safetyTimeout)
 
   // Lenis smooth scroll initialization
   useEffect(() => {
@@ -59,11 +61,29 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Listen for hero image ready event
+  // Listen for hero image ready event.
+  // Also handles the race condition where the image is already complete
+  // (cached) by the time this effect runs — we check img.complete directly.
   useEffect(() => {
     const handleHeroReady = () => setImageLoaded(true)
     window.addEventListener('hero-ready', handleHeroReady)
+
+    // Race-condition check: if the hero image is already loaded (browser cache),
+    // the onLoad event in Hero.tsx may have fired before this listener was attached.
+    // Schedule the state update via microtask to avoid setState-in-effect warning.
+    const heroImg = document.querySelector<HTMLImageElement>('img[src*="hero-day"]')
+    if (heroImg && heroImg.complete && heroImg.naturalWidth > 0) {
+      Promise.resolve().then(handleHeroReady)
+    }
+
     return () => window.removeEventListener('hero-ready', handleHeroReady)
+  }, [])
+
+  // Safety timeout — never let the loader get stuck forever.
+  // After 4 seconds, force-hide it regardless of image load status.
+  useEffect(() => {
+    const timer = setTimeout(() => setSafetyTimeout(true), 4000)
+    return () => clearTimeout(timer)
   }, [])
 
   return (

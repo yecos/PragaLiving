@@ -54,6 +54,7 @@ export default function Hero() {
 
   const [currentImage, setCurrentImage] = useState(0)
   const containerRef = useRef<HTMLElement>(null)
+  const heroImgRef = useRef<HTMLImageElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start']
@@ -62,6 +63,18 @@ export default function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 150])
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
+
+  // Race-condition safety: if the hero image is already complete (cached) by
+  // the time React mounts this component, the onLoad event won't fire and the
+  // 'hero-ready' window event will never be dispatched. Check on mount and
+  // dispatch manually if needed.
+  useEffect(() => {
+    if (heroImgRef.current?.complete && heroImgRef.current.naturalWidth > 0) {
+      // Small delay to let page.tsx register its listener before we fire
+      const t = setTimeout(() => window.dispatchEvent(new Event('hero-ready')), 100)
+      return () => clearTimeout(t)
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -83,6 +96,7 @@ export default function Hero() {
         >
           <motion.div style={{ scale }} className="absolute inset-0">
             <img
+              ref={i === 0 ? heroImgRef : undefined}
               src={img.src}
               alt={img.alt}
               className="w-full h-full object-cover"
