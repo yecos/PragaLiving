@@ -66,7 +66,7 @@ const STATUS_LABELS: Record<string, string> = {
   sold: 'Vendido',
 }
 
-const TYPOLOGY_OPTIONS = ['Tipo A', 'Tipo A+', 'Tipo B', 'Tipo C']
+const TYPOLOGY_OPTIONS = ['78.51 m²', '60 m²', '104 m²', '34.28 m²', '35.6 m²', '35.8 m²', '33.75 m²', '33.05 m²']
 const BEDROOM_OPTIONS = [1, 2, 3]
 const BATHROOM_OPTIONS = [1, 2]
 const STATUS_OPTIONS = ['available', 'reserved', 'sold']
@@ -157,10 +157,10 @@ export default function FloorPlanEditor() {
   // Renders editor modal state
   const [showRenders, setShowRenders] = useState(false)
   const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
-  const [selectedTypology, setSelectedTypology] = useState<string>('Tipo A')
+  const [selectedTypology, setSelectedTypology] = useState<string>('78.51 m²')
   const [renderFileInput, setRenderFileInput] = useState<HTMLInputElement | null>(null)
   const [uploadingRender, setUploadingRender] = useState(false)
-  const TYPOLOGY_OPTIONS_LIST = ['Tipo A', 'Tipo A+', 'Tipo B', 'Tipo C']
+  const TYPOLOGY_OPTIONS_LIST = ['78.51 m²', '60 m²', '104 m²', '34.28 m²', '35.6 m²', '35.8 m²', '33.75 m²', '33.05 m²']
 
   // Confirm dialog state (replaces confirm())
   const [confirmState, setConfirmState] = useState<{
@@ -542,7 +542,7 @@ export default function FloorPlanEditor() {
             area: 0,
             bedrooms: 1,
             bathrooms: 1,
-            typology: 'Tipo C',
+            typology: '33.75 m²',
             priceRange: '',
             status: 'available',
             view: 'Interior',

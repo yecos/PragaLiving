@@ -723,10 +723,14 @@ export default function AdminPanel() {
                       </select>
                       <select value={aptTypologyFilter} onChange={e => { setAptTypologyFilter(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todas las tipologías</option>
-                        <option value="Tipo A" className="bg-[#111111]">Tipo A</option>
-                        <option value="Tipo A+" className="bg-[#111111]">Tipo A+</option>
-                        <option value="Tipo B" className="bg-[#111111]">Tipo B</option>
-                        <option value="Tipo C" className="bg-[#111111]">Tipo C</option>
+                        <option value="78.51 m²" className="bg-[#111111]">78.51 m²</option>
+                        <option value="60 m²" className="bg-[#111111]">60 m²</option>
+                        <option value="104 m²" className="bg-[#111111]">104 m²</option>
+                        <option value="34.28 m²" className="bg-[#111111]">34.28 m²</option>
+                        <option value="35.6 m²" className="bg-[#111111]">35.6 m²</option>
+                        <option value="35.8 m²" className="bg-[#111111]">35.8 m²</option>
+                        <option value="33.75 m²" className="bg-[#111111]">33.75 m²</option>
+                        <option value="33.05 m²" className="bg-[#111111]">33.05 m²</option>
                       </select>
                       <span className="text-[10px] text-[#D8D1C8]/30">{filteredApartments.length} unidades</span>
                     </div>

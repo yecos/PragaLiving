@@ -65,121 +65,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 101",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$420M – $440M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 102",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$320M – $340M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 103",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$320M – $340M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 104",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$580M – $600M",
           "status": "reserved",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 105",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$140M – $160M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 106",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$145M – $165M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 107",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$145M – $165M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 108",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$135M – $155M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 109",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$130M – $150M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 110",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$135M – $155M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -194,121 +364,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 201",
-          "area": 97.45,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "78.51 m²",
+          "priceRange": "$423M – $443M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 202",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$323M – $343M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 203",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$323M – $343M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 204",
-          "area": 74.75,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "104 m²",
+          "priceRange": "$583M – $603M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 205",
-          "area": 33.75,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$143M – $163M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 206",
-          "area": 33.05,
+          "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "35.6 m²",
+          "priceRange": "$148M – $168M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 207",
-          "area": 33.75,
+          "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "35.8 m²",
+          "priceRange": "$148M – $168M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 208",
-          "area": 35.8,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.75 m²",
+          "priceRange": "$138M – $158M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 209",
-          "area": 35.6,
+          "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.05 m²",
+          "priceRange": "$133M – $153M",
           "status": "reserved",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 210",
-          "area": 33.4,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$138M – $158M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -323,121 +663,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 301",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$426M – $446M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 302",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$326M – $346M",
           "status": "reserved",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 303",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$326M – $346M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 304",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$586M – $606M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 305",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$146M – $166M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 306",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$151M – $171M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 307",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$151M – $171M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 308",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$141M – $161M",
           "status": "sold",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 309",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$136M – $156M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 310",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$141M – $161M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -452,121 +962,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 401",
-          "area": 97.45,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "78.51 m²",
+          "priceRange": "$429M – $449M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 402",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$329M – $349M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 403",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$329M – $349M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 404",
-          "area": 74.75,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "104 m²",
+          "priceRange": "$589M – $609M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 405",
-          "area": 33.75,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$149M – $169M",
           "status": "reserved",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 406",
-          "area": 33.05,
+          "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "35.6 m²",
+          "priceRange": "$154M – $174M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 407",
-          "area": 33.75,
+          "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "35.8 m²",
+          "priceRange": "$154M – $174M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 408",
-          "area": 35.8,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.75 m²",
+          "priceRange": "$144M – $164M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 409",
-          "area": 35.6,
+          "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.05 m²",
+          "priceRange": "$139M – $159M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 410",
-          "area": 33.4,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$144M – $164M",
           "status": "sold",
           "view": "Calle 133 Sur"
         }
@@ -581,121 +1261,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 501",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$432M – $452M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 502",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$332M – $352M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 503",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$332M – $352M",
           "status": "reserved",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 504",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$592M – $612M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 505",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$152M – $172M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 506",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$157M – $177M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 507",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$157M – $177M",
           "status": "reserved",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 508",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$147M – $167M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 509",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$142M – $162M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 510",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$147M – $167M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -710,121 +1560,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 601",
-          "area": 97.45,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "78.51 m²",
+          "priceRange": "$435M – $455M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 602",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$335M – $355M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 603",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$335M – $355M",
           "status": "sold",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 604",
-          "area": 74.75,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "104 m²",
+          "priceRange": "$595M – $615M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 605",
-          "area": 33.75,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$155M – $175M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 606",
-          "area": 33.05,
+          "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "35.6 m²",
+          "priceRange": "$160M – $180M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 607",
-          "area": 33.75,
+          "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "35.8 m²",
+          "priceRange": "$160M – $180M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 608",
-          "area": 35.8,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.75 m²",
+          "priceRange": "$150M – $170M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 609",
-          "area": 35.6,
+          "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.05 m²",
+          "priceRange": "$145M – $165M",
           "status": "reserved",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 610",
-          "area": 33.4,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$150M – $170M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -839,121 +1859,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 701",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$438M – $458M",
           "status": "reserved",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 702",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$338M – $358M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 703",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$338M – $358M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 704",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$598M – $618M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 705",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$158M – $178M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 706",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$163M – $183M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 707",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$163M – $183M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 708",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$153M – $173M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 709",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$148M – $168M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 710",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$153M – $173M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -968,121 +2158,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 801",
-          "area": 97.45,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "78.51 m²",
+          "priceRange": "$441M – $461M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 802",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$341M – $361M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 803",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$341M – $361M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 804",
-          "area": 74.75,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "104 m²",
+          "priceRange": "$601M – $621M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 805",
-          "area": 33.75,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$161M – $181M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 806",
-          "area": 33.05,
+          "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "35.6 m²",
+          "priceRange": "$166M – $186M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 807",
-          "area": 33.75,
+          "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "35.8 m²",
+          "priceRange": "$166M – $186M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 808",
-          "area": 35.8,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.75 m²",
+          "priceRange": "$156M – $176M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 809",
-          "area": 35.6,
+          "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.05 m²",
+          "priceRange": "$151M – $171M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 810",
-          "area": 33.4,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$156M – $176M",
           "status": "reserved",
           "view": "Calle 133 Sur"
         }
@@ -1097,121 +2457,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 901",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$444M – $464M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 902",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$344M – $364M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 903",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$344M – $364M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 904",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$604M – $624M",
           "status": "reserved",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 905",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$164M – $184M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 906",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$169M – $189M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 907",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$169M – $189M",
           "status": "sold",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 908",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$159M – $179M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 909",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$154M – $174M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 910",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$159M – $179M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -1226,121 +2756,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 1001",
-          "area": 97.45,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "78.51 m²",
+          "priceRange": "$447M – $467M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 1002",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$347M – $367M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 1003",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$347M – $367M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 1004",
-          "area": 74.75,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "104 m²",
+          "priceRange": "$607M – $627M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 1005",
-          "area": 33.75,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$167M – $187M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 1006",
-          "area": 33.05,
+          "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "35.6 m²",
+          "priceRange": "$172M – $192M",
           "status": "reserved",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 1007",
-          "area": 33.75,
+          "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "35.8 m²",
+          "priceRange": "$172M – $192M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 1008",
-          "area": 35.8,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.75 m²",
+          "priceRange": "$162M – $182M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 1009",
-          "area": 35.6,
+          "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "33.05 m²",
+          "priceRange": "$157M – $177M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 1010",
-          "area": 33.4,
+          "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$162M – $182M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
@@ -1355,121 +3055,291 @@
       "apartments": [
         {
           "id": "apto-01",
-          "polygon": [[6,4],[28,4],[28,22],[6,22]],
+          "polygon": [
+            [
+              6,
+              4
+            ],
+            [
+              28,
+              4
+            ],
+            [
+              28,
+              22
+            ],
+            [
+              6,
+              22
+            ]
+          ],
           "name": "Apto 1101",
-          "area": 74.75,
+          "area": 78.51,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A",
-          "priceRange": "$230M – $310M",
+          "typology": "78.51 m²",
+          "priceRange": "$450M – $470M",
           "status": "sold",
           "view": "Carrera 50"
         },
         {
           "id": "apto-02",
-          "polygon": [[28,4],[45,4],[45,22],[28,22]],
+          "polygon": [
+            [
+              28,
+              4
+            ],
+            [
+              45,
+              4
+            ],
+            [
+              45,
+              22
+            ],
+            [
+              28,
+              22
+            ]
+          ],
           "name": "Apto 1102",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$350M – $370M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-03",
-          "polygon": [[55,4],[72,4],[72,22],[55,22]],
+          "polygon": [
+            [
+              55,
+              4
+            ],
+            [
+              72,
+              4
+            ],
+            [
+              72,
+              22
+            ],
+            [
+              55,
+              22
+            ]
+          ],
           "name": "Apto 1103",
-          "area": 57.0,
+          "area": 60,
           "bedrooms": 2,
           "bathrooms": 1,
-          "typology": "Tipo B",
-          "priceRange": "$160M – $210M",
+          "typology": "60 m²",
+          "priceRange": "$350M – $370M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-04",
-          "polygon": [[72,4],[94,4],[94,22],[72,22]],
+          "polygon": [
+            [
+              72,
+              4
+            ],
+            [
+              94,
+              4
+            ],
+            [
+              94,
+              22
+            ],
+            [
+              72,
+              22
+            ]
+          ],
           "name": "Apto 1104",
-          "area": 97.45,
+          "area": 104,
           "bedrooms": 3,
           "bathrooms": 2,
-          "typology": "Tipo A+",
-          "priceRange": "$310M – $390M",
+          "typology": "104 m²",
+          "priceRange": "$610M – $630M",
           "status": "available",
           "view": "Calle 133 Sur"
         },
         {
           "id": "apto-05",
-          "polygon": [[6,38],[20,38],[20,56],[6,56]],
+          "polygon": [
+            [
+              6,
+              38
+            ],
+            [
+              20,
+              38
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              6,
+              56
+            ]
+          ],
           "name": "Apto 1105",
-          "area": 33.4,
+          "area": 34.28,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "34.28 m²",
+          "priceRange": "$170M – $190M",
           "status": "available",
           "view": "Carrera 50"
         },
         {
           "id": "apto-06",
-          "polygon": [[20,38],[35,38],[35,56],[20,56]],
+          "polygon": [
+            [
+              20,
+              38
+            ],
+            [
+              35,
+              38
+            ],
+            [
+              35,
+              56
+            ],
+            [
+              20,
+              56
+            ]
+          ],
           "name": "Apto 1106",
           "area": 35.6,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.6 m²",
+          "priceRange": "$175M – $195M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-07",
-          "polygon": [[35,38],[50,38],[50,56],[35,56]],
+          "polygon": [
+            [
+              35,
+              38
+            ],
+            [
+              50,
+              38
+            ],
+            [
+              50,
+              56
+            ],
+            [
+              35,
+              56
+            ]
+          ],
           "name": "Apto 1107",
           "area": 35.8,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$125M – $155M",
+          "typology": "35.8 m²",
+          "priceRange": "$175M – $195M",
           "status": "available",
           "view": "Atrio"
         },
         {
           "id": "apto-08",
-          "polygon": [[50,38],[65,38],[65,56],[50,56]],
+          "polygon": [
+            [
+              50,
+              38
+            ],
+            [
+              65,
+              38
+            ],
+            [
+              65,
+              56
+            ],
+            [
+              50,
+              56
+            ]
+          ],
           "name": "Apto 1108",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$165M – $185M",
           "status": "reserved",
           "view": "Interior"
         },
         {
           "id": "apto-09",
-          "polygon": [[65,38],[80,38],[80,56],[65,56]],
+          "polygon": [
+            [
+              65,
+              38
+            ],
+            [
+              80,
+              38
+            ],
+            [
+              80,
+              56
+            ],
+            [
+              65,
+              56
+            ]
+          ],
           "name": "Apto 1109",
           "area": 33.05,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$118M – $148M",
+          "typology": "33.05 m²",
+          "priceRange": "$160M – $180M",
           "status": "available",
           "view": "Interior"
         },
         {
           "id": "apto-10",
-          "polygon": [[80,38],[94,38],[94,56],[80,56]],
+          "polygon": [
+            [
+              80,
+              38
+            ],
+            [
+              94,
+              38
+            ],
+            [
+              94,
+              56
+            ],
+            [
+              80,
+              56
+            ]
+          ],
           "name": "Apto 1110",
           "area": 33.75,
           "bedrooms": 1,
           "bathrooms": 1,
-          "typology": "Tipo C",
-          "priceRange": "$120M – $150M",
+          "typology": "33.75 m²",
+          "priceRange": "$165M – $185M",
           "status": "available",
           "view": "Calle 133 Sur"
         }
