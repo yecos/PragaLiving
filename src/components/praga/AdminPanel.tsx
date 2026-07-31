@@ -146,11 +146,15 @@ export default function AdminPanel() {
 
   const handleTabSwitch = (tab: Tab) => {
     setActiveTab(tab)
+    // Refresh data when switching to tabs that show real-time data
+    // This ensures the admin always shows the latest data from Neon
+    // (e.g. new leads created from the public site appear immediately)
     if (tab === 'medios') {
       void fetchMedia()
-    }
-    if (tab === 'cotizaciones') {
+    } else if (tab === 'cotizaciones') {
       void fetchQuotes()
+    } else if (tab === 'leads' || tab === 'apartments' || tab === 'amenities' || tab === 'dashboard') {
+      void fetchData()
     }
   }
   const [apartments, setApartments] = useState<Apartment[]>([])

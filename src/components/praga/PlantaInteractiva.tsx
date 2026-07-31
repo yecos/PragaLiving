@@ -619,14 +619,16 @@ export default function PlantaInteractiva() {
   const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
+  const [dbApartments, setDbApartments] = useState<Array<{ name: string; area: number; status: string; price: number; typology: string }>>([])
 
-  // Fetch floor plan config and typology renders from API
+  // Fetch floor plan config, typology renders, and apartments from DB
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const [floorRes, configRes] = await Promise.all([
+        const [floorRes, configRes, aptsRes] = await Promise.all([
           fetch('/api/floor-plans'),
           fetch('/api/site-config'),
+          fetch('/api/apartments'),
         ])
         const floorData = await floorRes.json()
         setConfig(floorData)
@@ -642,6 +644,15 @@ export default function PlantaInteractiva() {
             setTypologyRenders(renders)
           }
         }
+
+        // Load apartments from DB to merge real-time price/status
+        // This ensures changes in admin (price, availability) reflect on the public site
+        if (aptsRes.ok) {
+          const aptsData = await aptsRes.json()
+          if (aptsData.apartments) {
+            setDbApartments(aptsData.apartments)
+          }
+        }
       } catch {
         // Silently fail
       }
@@ -653,8 +664,26 @@ export default function PlantaInteractiva() {
   const floor = floors[selectedFloor] ?? null
   const units = useMemo(() => {
     if (!floor) return []
-    return floor.apartments.map(apartmentToUnit)
-  }, [floor])
+    // Merge floor plan data (polygons, layout) with DB data (real-time price, status)
+    // This ensures changes in admin (price updates, status changes) reflect on the public site
+    return floor.apartments.map((apt) => {
+      const unit = apartmentToUnit(apt)
+      // Find matching DB apartment by name (e.g. "Apto 101") or area+floor
+      const dbApt = dbApartments.find(
+        (db) => db.name === apt.name || (Math.abs(db.area - apt.area) < 0.5 && db.typology === apt.typology)
+      )
+      if (dbApt) {
+        // Override with real-time DB values
+        unit.status = (dbApt.status as UnitStatus) || unit.status
+        // Update priceRange with actual price from DB
+        if (dbApt.price > 0) {
+          const priceM = Math.round(dbApt.price / 1_000_000)
+          unit.priceRange = `$${priceM}M – $${priceM + 20}M`
+        }
+      }
+      return unit
+    })
+  }, [floor, dbApartments])
 
   const handleFloorSelect = useCallback((i: number) => {
     setSelectedFloor(i)
