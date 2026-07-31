@@ -200,10 +200,12 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
       setLoading(true)
       try {
         const res = await fetch('/api/site-config')
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         if (!cancelled) setConfig(data)
-      } catch {
-        // silently fail
+      } catch (err) {
+        console.error('[site-config-editor] load error:', err)
+        toast.error('No se pudo cargar la configuración del sitio')
       }
       if (!cancelled) setLoading(false)
     }

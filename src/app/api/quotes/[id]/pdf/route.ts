@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jsPDF } from 'jspdf'
-import { getLeads, getApartments, getQuoteById } from '@/lib/data'
+import { getLeads, getApartments, getQuoteById, getSiteConfig } from '@/lib/data'
 import { requireAdmin } from '@/lib/auth-guard'
 
 // In-memory quote store reference - must match the one in route.ts
@@ -79,6 +79,18 @@ export async function GET(
       format: 'a4',
     })
 
+    // Load contact info from site_config (single source of truth)
+    const generalConfig = await getSiteConfig('general') as {
+      phone?: string
+      email?: string
+      address?: string
+      projectName?: string
+    } | null
+    const phone = generalConfig?.phone || '+57 601 234 5678'
+    const email = generalConfig?.email || 'info@pragaliving.com'
+    const address = generalConfig?.address || 'Cl. 133 Sur #49-94, Caldas, Antioquia'
+    const projectName = generalConfig?.projectName || 'PRAGA Living'
+
     const pageW = 210
     const pageH = 297
     const marginL = 20
@@ -110,8 +122,8 @@ export async function GET(
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...GRIS)
-    doc.text('Cl. 133 Sur #49-94, Caldas, Antioquia', marginL, y + 14)
-    doc.text('info@pragaliving.com  |  +57 604 444 0000', marginL, y + 19)
+    doc.text(address, marginL, y + 14)
+    doc.text(`${email}  |  ${phone}`, marginL, y + 19)
 
     // Quote title - right side
     doc.setFont('helvetica', 'bold')
@@ -166,8 +178,8 @@ export async function GET(
     doc.setTextColor(...NEGRO)
     doc.text('Asesor Comercial PRAGA', contactX + 5, y + 14)
     doc.setTextColor(100, 100, 100)
-    doc.text('Tel: +57 604 444 0000', contactX + 5, y + 20)
-    doc.text('Email: ventas@pragaliving.com', contactX + 5, y + 26)
+    doc.text(`Tel: ${phone}`, contactX + 5, y + 20)
+    doc.text(`Email: ${email}`, contactX + 5, y + 26)
 
     y += 44
 
@@ -348,8 +360,8 @@ export async function GET(
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(6)
     doc.setTextColor(150, 150, 150)
-    doc.text('Cl. 133 Sur #49-94, Caldas, Antioquia, Colombia', marginL, footerY + 9)
-    doc.text('info@pragaliving.com  |  www.pragaliving.com  |  +57 604 444 0000', marginL, footerY + 13)
+    doc.text(`${address}, Colombia`, marginL, footerY + 9)
+    doc.text(`${email}  |  www.pragaliving.com  |  ${phone}`, marginL, footerY + 13)
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(6)

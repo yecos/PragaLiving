@@ -5,9 +5,25 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
-import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X } from 'lucide-react'
+import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
 import SiteConfigEditor from './SiteConfigEditor'
+import ConfirmDialog from './ConfirmDialog'
+
+// Format COP currency: 282000000 → "$282.000.000" or "$282M" for compact display
+function formatCOP(value: number, compact = false): string {
+  if (compact) {
+    if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(0)}M`
+    if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`
+  }
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
 
 type Tab = 'dashboard' | 'apartments' | 'leads' | 'amenities' | 'plantas' | 'contenido' | 'ubicacion' | 'configuracion' | 'medios' | 'cotizaciones'
 
@@ -146,6 +162,8 @@ export default function AdminPanel() {
   const [aptSearch, setAptSearch] = useState('')
   const [aptStatusFilter, setAptStatusFilter] = useState('')
   const [aptTypologyFilter, setAptTypologyFilter] = useState('')
+  const [aptPage, setAptPage] = useState(0)
+  const APT_PAGE_SIZE = 15
   const [editingAptId, setEditingAptId] = useState<string | null>(null)
   const [editingField, setEditingField] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
@@ -180,6 +198,32 @@ export default function AdminPanel() {
     validDays: 30,
   })
   const [creatingQuote, setCreatingQuote] = useState(false)
+
+  // Confirm dialog state for destructive actions
+  const [confirmState, setConfirmState] = useState<{
+    open: boolean
+    title: string
+    message: string
+    confirmLabel?: string
+    variant?: 'danger' | 'warning' | 'info'
+    onConfirm: () => void
+  }>({ open: false, title: '', message: '', onConfirm: () => {} })
+
+  const askConfirm = useCallback((
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    options?: { confirmLabel?: string; variant?: 'danger' | 'warning' | 'info' }
+  ) => {
+    setConfirmState({
+      open: true,
+      title,
+      message,
+      onConfirm,
+      confirmLabel: options?.confirmLabel,
+      variant: options?.variant || 'warning',
+    })
+  }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -294,6 +338,21 @@ export default function AdminPanel() {
   }
 
   const updateLeadStatus = async (leadId: string, status: string) => {
+    // Ask confirmation for destructive status changes
+    if (status === 'lost') {
+      const lead = leads.find(l => l.id === leadId)
+      askConfirm(
+        'Marcar como perdido',
+        `¿Marcar el lead "${lead?.name || ''}" como perdido? Este lead se archivará y no aparecerá en el pipeline activo.`,
+        () => void doUpdateLeadStatus(leadId, status),
+        { confirmLabel: 'Marcar perdido', variant: 'danger' }
+      )
+      return
+    }
+    void doUpdateLeadStatus(leadId, status)
+  }
+
+  const doUpdateLeadStatus = async (leadId: string, status: string) => {
     try {
       const res = await fetch('/api/leads', {
         method: 'PUT',
@@ -408,6 +467,11 @@ export default function AdminPanel() {
     return true
   })
 
+  // Reset page when filters change
+  const totalPages = Math.ceil(filteredApartments.length / APT_PAGE_SIZE) || 1
+  const safePage = Math.min(aptPage, totalPages - 1)
+  const paginatedApartments = filteredApartments.slice(safePage * APT_PAGE_SIZE, (safePage + 1) * APT_PAGE_SIZE)
+
   // Filtered leads
   const filteredLeads = leads.filter(l => {
     if (leadStatusFilter && l.status !== leadStatusFilter) return false
@@ -424,6 +488,25 @@ export default function AdminPanel() {
     if (a.status === 'sold') acc[key].sold++
     return acc
   }, {} as Record<string, { total: number; available: number; reserved: number; sold: number }>)
+
+  const doUpdateQuoteStatus = async (quoteId: string, newStatus: string, quoteNumber: string) => {
+    try {
+      const res = await fetch('/api/quotes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: quoteId, status: newStatus }),
+      })
+      if (res.ok) {
+        toast.success(`Cotización ${quoteNumber} → ${quoteStatusLabels[newStatus] || newStatus}`)
+        void fetchQuotes()
+      } else {
+        toast.error('No se pudo actualizar el estado')
+      }
+    } catch (err) {
+      console.error('[admin] update quote status error:', err)
+      toast.error('Error de red al actualizar cotización')
+    }
+  }
 
   // Loading state
   if (status === 'loading') {
@@ -487,8 +570,13 @@ export default function AdminPanel() {
             <ExternalLink className="w-3 h-3" />
             Abrir Sitio
           </a>
-          <button onClick={() => void fetchData()} className="text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
-            Actualizar
+          <button onClick={() => void fetchData()} disabled={loading} className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors disabled:opacity-50">
+            {loading ? (
+              <div className="w-3 h-3 border border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <RefreshCw className="w-3 h-3" />
+            )}
+            {loading ? 'Cargando...' : 'Actualizar'}
           </button>
           <button onClick={() => void signOut()} className="text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
             Cerrar Sesión
@@ -626,20 +714,19 @@ export default function AdminPanel() {
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                     <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Apartamentos</h2>
                     <div className="flex flex-wrap gap-3 items-center">
-                      <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => setAptSearch(e.target.value)} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#8B6B4B] focus:outline-none" />
-                      <select value={aptStatusFilter} onChange={e => setAptStatusFilter(e.target.value)} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
+                      <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => { setAptSearch(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#8B6B4B] focus:outline-none" />
+                      <select value={aptStatusFilter} onChange={e => { setAptStatusFilter(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todos los estados</option>
                         <option value="available" className="bg-[#111111]">Disponible</option>
                         <option value="reserved" className="bg-[#111111]">Reservado</option>
                         <option value="sold" className="bg-[#111111]">Vendido</option>
                       </select>
-                      <select value={aptTypologyFilter} onChange={e => setAptTypologyFilter(e.target.value)} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
+                      <select value={aptTypologyFilter} onChange={e => { setAptTypologyFilter(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todas las tipologías</option>
-                        <option value="Studio" className="bg-[#111111]">Studio</option>
-                        <option value="Studio Plus" className="bg-[#111111]">Studio Plus</option>
-                        <option value="Apartamento 2H" className="bg-[#111111]">Apartamento 2H</option>
-                        <option value="Apartamento Premium 2H" className="bg-[#111111]">Apartamento Premium 2H</option>
-                        <option value="Penthouse 3H" className="bg-[#111111]">Penthouse 3H</option>
+                        <option value="Tipo A" className="bg-[#111111]">Tipo A</option>
+                        <option value="Tipo A+" className="bg-[#111111]">Tipo A+</option>
+                        <option value="Tipo B" className="bg-[#111111]">Tipo B</option>
+                        <option value="Tipo C" className="bg-[#111111]">Tipo C</option>
                       </select>
                       <span className="text-[10px] text-[#D8D1C8]/30">{filteredApartments.length} unidades</span>
                     </div>
@@ -655,7 +742,7 @@ export default function AdminPanel() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredApartments.map((apt) => (
+                        {paginatedApartments.map((apt) => (
                           <tr key={apt.id} className="border-b border-[#D8D1C8]/5 hover:bg-[#1A1A1A] transition-colors">
                             <td className="text-[11px] text-[#F5F1EA] p-3 whitespace-nowrap">{apt.name}</td>
                             <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.area} m²</td>
@@ -668,8 +755,8 @@ export default function AdminPanel() {
                               {editingAptId === apt.id && editingField === 'price' ? (
                                 <input type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} className="bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#8B6B4B] w-28 focus:outline-none" autoFocus />
                               ) : (
-                                <span className="text-[11px] text-[#8B6B4B] cursor-pointer hover:underline" onClick={() => startEdit(apt.id, 'price', apt.price.toString())}>
-                                  ${(apt.price / 1000000).toFixed(0)}M
+                                <span className="text-[11px] text-[#8B6B4B] cursor-pointer hover:underline" onClick={() => startEdit(apt.id, 'price', apt.price.toString())} title={formatCOP(apt.price)}>
+                                  {formatCOP(apt.price, true)}
                                 </span>
                               )}
                             </td>
@@ -691,6 +778,31 @@ export default function AdminPanel() {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Pagination controls */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 px-1">
+                      <span className="text-[9px] text-[#D8D1C8]/30 tracking-wider uppercase">
+                        Página {safePage + 1} de {totalPages} · {filteredApartments.length} unidades
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setAptPage(Math.max(0, safePage - 1))}
+                          disabled={safePage === 0}
+                          className="text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-3 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          ← Anterior
+                        </button>
+                        <button
+                          onClick={() => setAptPage(Math.min(totalPages - 1, safePage + 1))}
+                          disabled={safePage >= totalPages - 1}
+                          className="text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-3 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          Siguiente →
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -1074,7 +1186,7 @@ export default function AdminPanel() {
                               >
                                 <option value="" className="bg-[#111111]">Seleccionar apartamento...</option>
                                 {apartments.filter(a => a.status === 'available').map(apt => (
-                                  <option key={apt.id} value={apt.id} className="bg-[#111111]">{apt.name} — {apt.typology} — ${(apt.price / 1000000).toFixed(0)}M</option>
+                                  <option key={apt.id} value={apt.id} className="bg-[#111111]">{apt.name} — {apt.typology} — {formatCOP(apt.price, true)}</option>
                                 ))}
                               </select>
                             </div>
@@ -1136,8 +1248,8 @@ export default function AdminPanel() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-[10px] tracking-wider uppercase text-[#D8D1C8]/40">Precio Final</span>
                                   <div className="text-right">
-                                    <span className="text-[9px] text-[#D8D1C8]/30 line-through mr-2">${(apt.price / 1000000).toFixed(0)}M</span>
-                                    <span className="font-[family-name:var(--font-cormorant)] text-xl text-[#4B5646]">${(finalPrice / 1000000).toFixed(0)}M</span>
+                                    <span className="text-[9px] text-[#D8D1C8]/30 line-through mr-2">{formatCOP(apt.price, true)}</span>
+                                    <span className="font-[family-name:var(--font-cormorant)] text-xl text-[#4B5646]">{formatCOP(finalPrice, true)}</span>
                                   </div>
                                 </div>
                               </div>
@@ -1217,28 +1329,24 @@ export default function AdminPanel() {
                               <td className="text-[11px] text-[#8B6B4B] p-3 whitespace-nowrap font-medium">{quote.number}</td>
                               <td className="text-[11px] text-[#F5F1EA] p-3">{quote.leadName || '—'}</td>
                               <td className="text-[11px] text-[#D8D1C8]/60 p-3">{quote.apartmentName || '—'}</td>
-                              <td className="text-[11px] text-[#4B5646] p-3 font-medium">${((quote.finalPrice || 0) / 1000000).toFixed(0)}M</td>
+                              <td className="text-[11px] text-[#4B5646] p-3 font-medium" title={formatCOP(quote.finalPrice || 0)}>{formatCOP(quote.finalPrice || 0, true)}</td>
                               <td className="text-[10px] text-[#D8D1C8]/40 p-3">{quote.paymentPlan}</td>
                               <td className="p-3">
                                 <select
                                   value={quote.status}
                                   onChange={async (e) => {
-                                    try {
-                                      const res = await fetch('/api/quotes', {
-                                        method: 'PUT',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ id: quote.id, status: e.target.value }),
-                                      })
-                                      if (res.ok) {
-                                        toast.success(`Cotización ${quote.number} → ${quoteStatusLabels[e.target.value] || e.target.value}`)
-                                        void fetchQuotes()
-                                      } else {
-                                        toast.error('No se pudo actualizar el estado')
-                                      }
-                                    } catch (err) {
-                                      console.error('[admin] update quote status error:', err)
-                                      toast.error('Error de red al actualizar cotización')
+                                    const newStatus = e.target.value
+                                    // Ask confirmation for destructive status changes
+                                    if (newStatus === 'rejected') {
+                                      askConfirm(
+                                        'Rechazar cotización',
+                                        `¿Rechazar la cotización ${quote.number}? Esta acción no se puede deshacer.`,
+                                        () => void doUpdateQuoteStatus(quote.id, newStatus, quote.number),
+                                        { confirmLabel: 'Rechazar', variant: 'danger' }
+                                      )
+                                      return
                                     }
+                                    void doUpdateQuoteStatus(quote.id, newStatus, quote.number)
                                   }}
                                   className={`text-[8px] tracking-wider uppercase border-none focus:outline-none cursor-pointer px-1.5 py-0.5 ${quoteStatusColors[quote.status]}`}
                                 >
@@ -1282,6 +1390,20 @@ export default function AdminPanel() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #8B6B4B33; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #8B6B4B66; }
       `}</style>
+
+      {/* Confirm dialog for destructive actions */}
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        variant={confirmState.variant}
+        onConfirm={() => {
+          confirmState.onConfirm()
+          setConfirmState({ ...confirmState, open: false })
+        }}
+        onCancel={() => setConfirmState({ ...confirmState, open: false })}
+      />
     </div>
   )
 }

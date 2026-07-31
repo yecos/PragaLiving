@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getApartmentById } from '@/lib/data'
+import { getApartmentById, getSiteConfig } from '@/lib/data'
 import jsPDF from 'jspdf'
 
 function formatCOP(value: number): string {
@@ -27,6 +27,16 @@ export async function GET(req: NextRequest) {
     const MARFIL: [number, number, number] = [245 / 255, 241 / 255, 234 / 255]
     const GRIS: [number, number, number] = [216 / 255, 209 / 255, 200 / 255]
     const VERDE: [number, number, number] = [75 / 255, 86 / 255, 70 / 255]
+
+    // Load contact info from site_config (single source of truth)
+    const generalConfig = await getSiteConfig('general') as {
+      phone?: string
+      email?: string
+      address?: string
+    } | null
+    const phone = generalConfig?.phone || '+57 601 234 5678'
+    const email = generalConfig?.email || 'info@pragaliving.com'
+    const addressShort = (generalConfig?.address || 'Cl. 133 Sur #49-94, Caldas, Antioquia').split(',')[0]
 
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
     const pageW = 210
@@ -206,11 +216,11 @@ export async function GET(req: NextRequest) {
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)
     doc.setFont('helvetica', 'normal')
-    doc.text('Caldas, Antioquia', margin, footerY + 4)
+    doc.text(addressShort, margin, footerY + 4)
 
     doc.setTextColor(...GRIS)
     doc.setFontSize(6)
-    doc.text('+57 601 234 5678  |  info@pragaliving.com  |  www.pragaliving.com', pageW - margin, footerY, { align: 'right' })
+    doc.text(`${phone}  |  ${email}  |  www.pragaliving.com`, pageW - margin, footerY, { align: 'right' })
 
     // Bottom bronce accent line
     doc.setFillColor(...BRONCE)

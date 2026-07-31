@@ -17,6 +17,7 @@ import {
   Copy,
   Check,
 } from 'lucide-react'
+import ConfirmDialog from './ConfirmDialog'
 
 // ═══════════════════════════════════════════════════════════════════
 // TYPES
@@ -147,6 +148,36 @@ export default function FloorPlanEditor() {
     targetFloorIds: [] as string[],
   })
   const [duplicating, setDuplicating] = useState(false)
+
+  // Add floor modal state (replaces prompt())
+  const [showAddFloor, setShowAddFloor] = useState(false)
+  const [newFloorData, setNewFloorData] = useState({ name: '', isResidential: false })
+
+  // Confirm dialog state (replaces confirm())
+  const [confirmState, setConfirmState] = useState<{
+    open: boolean
+    title: string
+    message: string
+    confirmLabel?: string
+    variant?: 'danger' | 'warning' | 'info'
+    onConfirm: () => void
+  }>({ open: false, title: '', message: '', onConfirm: () => {} })
+
+  const askConfirm = useCallback((
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    options?: { confirmLabel?: string; variant?: 'danger' | 'warning' | 'info' }
+  ) => {
+    setConfirmState({
+      open: true,
+      title,
+      message,
+      onConfirm,
+      confirmLabel: options?.confirmLabel,
+      variant: options?.variant || 'warning',
+    })
+  }, [])
 
   // Refs
   const svgRef = useRef<SVGSVGElement>(null)
@@ -358,15 +389,23 @@ export default function FloorPlanEditor() {
 
   // ═══ FLOOR MANAGEMENT ═══
   const addFloor = useCallback(() => {
-    const name = prompt('Nombre del nuevo nivel:')
-    if (!name) return
+    // Open modal instead of prompt()
+    setNewFloorData({ name: '', isResidential: false })
+    setShowAddFloor(true)
+  }, [])
+
+  const createFloor = useCallback(() => {
+    const name = newFloorData.name.trim()
+    if (!name) {
+      setToast('El nombre es obligatorio')
+      return
+    }
     const id = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    const isRes = confirm('¿Es residencial? (Cancelar = No)')
     const newFloor: FloorConfig = {
       id: id || generateId(),
       name,
-      typeLabel: isRes ? 'Residencial' : 'Áreas Comunes',
-      isResidential: isRes,
+      typeLabel: newFloorData.isResidential ? 'Residencial' : 'Áreas Comunes',
+      isResidential: newFloorData.isResidential,
       image: '',
       apartments: [],
     }
@@ -374,18 +413,28 @@ export default function FloorPlanEditor() {
     setConfig(newConfig)
     setSelectedFloorIndex(newConfig.floors.length - 1)
     void saveConfig(newConfig)
-  }, [config, saveConfig])
+    setShowAddFloor(false)
+    setToast(`Nivel creado: ${name}`)
+  }, [config, newFloorData, saveConfig])
 
   const deleteFloor = useCallback((index: number) => {
-    if (!confirm('¿Eliminar este nivel?')) return
-    const newConfig = { ...config, floors: config.floors.filter((_, i) => i !== index) }
-    setConfig(newConfig)
-    if (selectedFloorIndex >= newConfig.floors.length) {
-      setSelectedFloorIndex(Math.max(0, newConfig.floors.length - 1))
-    }
-    setSelectedAptId(null)
-    void saveConfig(newConfig)
-  }, [config, selectedFloorIndex, saveConfig])
+    const floorName = config.floors[index]?.name || 'este nivel'
+    askConfirm(
+      'Eliminar nivel',
+      `¿Eliminar "${floorName}"? Esta acción no se puede deshacer. Se eliminarán también ${config.floors[index]?.apartments.length || 0} apartamento(s) asociado(s).`,
+      () => {
+        const newConfig = { ...config, floors: config.floors.filter((_, i) => i !== index) }
+        setConfig(newConfig)
+        if (selectedFloorIndex >= newConfig.floors.length) {
+          setSelectedFloorIndex(Math.max(0, newConfig.floors.length - 1))
+        }
+        setSelectedAptId(null)
+        void saveConfig(newConfig)
+        setToast(`Nivel eliminado: ${floorName}`)
+      },
+      { confirmLabel: 'Eliminar', variant: 'danger' }
+    )
+  }, [config, selectedFloorIndex, saveConfig, askConfirm])
 
   // ═══ SVG INTERACTION ═══
   const handleSvgClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
@@ -566,16 +615,25 @@ export default function FloorPlanEditor() {
   }, [config, loading, saveConfig])
 
   const deleteApartment = useCallback(() => {
-    if (!selectedAptId || !confirm('¿Eliminar este apartamento?')) return
-    const newConfig = { ...config }
-    newConfig.floors = newConfig.floors.map((f, i) => {
-      if (i !== selectedFloorIndex) return f
-      return { ...f, apartments: f.apartments.filter(a => a.id !== selectedAptId) }
-    })
-    setConfig(newConfig)
-    setSelectedAptId(null)
-    void saveConfig(newConfig)
-  }, [selectedAptId, config, selectedFloorIndex, saveConfig])
+    if (!selectedAptId) return
+    const aptName = currentFloor?.apartments.find(a => a.id === selectedAptId)?.name || 'este apartamento'
+    askConfirm(
+      'Eliminar apartamento',
+      `¿Eliminar "${aptName}"? Esta acción no se puede deshacer.`,
+      () => {
+        const newConfig = { ...config }
+        newConfig.floors = newConfig.floors.map((f, i) => {
+          if (i !== selectedFloorIndex) return f
+          return { ...f, apartments: f.apartments.filter(a => a.id !== selectedAptId) }
+        })
+        setConfig(newConfig)
+        setSelectedAptId(null)
+        void saveConfig(newConfig)
+        setToast(`Apartamento eliminado: ${aptName}`)
+      },
+      { confirmLabel: 'Eliminar', variant: 'danger' }
+    )
+  }, [selectedAptId, config, selectedFloorIndex, saveConfig, askConfirm, currentFloor])
 
   // ═══ CANCEL DRAWING ═══
   const cancelDrawing = useCallback(() => {
@@ -1604,6 +1662,92 @@ export default function FloorPlanEditor() {
           </div>
         </div>
       )}
+
+      {/* Add floor modal (replaces prompt) */}
+      {showAddFloor && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setShowAddFloor(false)}
+        >
+          <div
+            className="bg-[#111111] border border-[#8B6B4B]/30 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b border-[#D8D1C8]/10">
+              <div className="flex items-center gap-3">
+                <Plus className="w-5 h-5 text-[#8B6B4B]" />
+                <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA]">
+                  Nuevo Nivel
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAddFloor(false)}
+                className="text-[#D8D1C8]/40 hover:text-[#D8D1C8] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Nombre del nivel</label>
+                <input
+                  type="text"
+                  value={newFloorData.name}
+                  onChange={(e) => setNewFloorData({ ...newFloorData, name: e.target.value })}
+                  onKeyDown={(e) => e.key === 'Enter' && createFloor()}
+                  autoFocus
+                  placeholder="Ej: Piso 12, Azotea, Mezzanine..."
+                  className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2.5 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors"
+                />
+              </div>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className={`w-5 h-5 border flex items-center justify-center transition-colors ${newFloorData.isResidential ? 'bg-[#8B6B4B] border-[#8B6B4B]' : 'border-[#D8D1C8]/20 group-hover:border-[#8B6B4B]/50'}`}>
+                  {newFloorData.isResidential && <Check className="w-3 h-3 text-[#F5F1EA]" />}
+                </div>
+                <input
+                  type="checkbox"
+                  checked={newFloorData.isResidential}
+                  onChange={(e) => setNewFloorData({ ...newFloorData, isResidential: e.target.checked })}
+                  className="sr-only"
+                />
+                <div>
+                  <p className="text-[11px] text-[#F5F1EA]">Es residencial</p>
+                  <p className="text-[9px] text-[#D8D1C8]/30">Marcar si tendrá apartamentos con polígonos</p>
+                </div>
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-[#D8D1C8]/10">
+              <button
+                onClick={() => setShowAddFloor(false)}
+                className="text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-4 py-2.5 hover:text-[#D8D1C8] transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={createFloor}
+                disabled={!newFloorData.name.trim()}
+                className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase bg-[#8B6B4B] text-[#F5F1EA] px-5 py-2.5 hover:bg-[#7A5C3E] transition-colors disabled:opacity-50"
+              >
+                <Plus className="w-3 h-3" /> Crear Nivel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm dialog (replaces confirm()) */}
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.confirmLabel}
+        variant={confirmState.variant}
+        onConfirm={() => {
+          confirmState.onConfirm()
+          setConfirmState({ ...confirmState, open: false })
+        }}
+        onCancel={() => setConfirmState({ ...confirmState, open: false })}
+      />
 
       {/* Custom scrollbar style */}
       <style jsx global>{`
