@@ -16,6 +16,7 @@ import {
   RotateCcw,
   Copy,
   Check,
+  Image as ImageIcon,
 } from 'lucide-react'
 import ConfirmDialog from './ConfirmDialog'
 
@@ -152,6 +153,14 @@ export default function FloorPlanEditor() {
   // Add floor modal state (replaces prompt())
   const [showAddFloor, setShowAddFloor] = useState(false)
   const [newFloorData, setNewFloorData] = useState({ name: '', isResidential: false })
+
+  // Renders editor modal state
+  const [showRenders, setShowRenders] = useState(false)
+  const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
+  const [selectedTypology, setSelectedTypology] = useState<string>('Tipo A')
+  const [renderFileInput, setRenderFileInput] = useState<HTMLInputElement | null>(null)
+  const [uploadingRender, setUploadingRender] = useState(false)
+  const TYPOLOGY_OPTIONS_LIST = ['Tipo A', 'Tipo A+', 'Tipo B', 'Tipo C']
 
   // Confirm dialog state (replaces confirm())
   const [confirmState, setConfirmState] = useState<{
@@ -393,6 +402,84 @@ export default function FloorPlanEditor() {
     setNewFloorData({ name: '', isResidential: false })
     setShowAddFloor(true)
   }, [])
+
+  // ═══ RENDER MANAGEMENT ═══
+  // Loads typology renders from site_config when the renders modal opens
+  const openRendersModal = useCallback(async () => {
+    try {
+      const res = await fetch('/api/site-config')
+      if (res.ok) {
+        const data = await res.json()
+        const renders = (data.typology_renders || {}) as Record<string, string[]>
+        setTypologyRenders(renders)
+      }
+    } catch (err) {
+      console.error('[floor-editor] load renders error:', err)
+      setToast('Error al cargar renders')
+    }
+    setShowRenders(true)
+  }, [])
+
+  // Upload a new render for the selected typology
+  const handleRenderUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingRender(true)
+    try {
+      const { resizeImageForUpload } = await import('@/lib/image-resize')
+      const resizedFile = await resizeImageForUpload(file)
+      const formData = new FormData()
+      formData.append('file', resizedFile)
+      formData.append('category', 'renders')
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.url) throw new Error(data.error || `HTTP ${res.status}`)
+
+      // Add to typologyRenders state
+      const updated = { ...typologyRenders }
+      if (!updated[selectedTypology]) updated[selectedTypology] = []
+      updated[selectedTypology] = [...updated[selectedTypology], data.url]
+      setTypologyRenders(updated)
+      setToast(`Render agregado a ${selectedTypology}`)
+    } catch (err) {
+      console.error('[floor-editor] render upload error:', err)
+      setToast(`Error: ${err instanceof Error ? err.message : 'falló la subida'}`)
+    }
+    setUploadingRender(false)
+    if (e.target) e.target.value = ''
+  }, [typologyRenders, selectedTypology])
+
+  // Remove a render from a typology
+  const removeRender = useCallback((typology: string, index: number) => {
+    const updated = { ...typologyRenders }
+    if (updated[typology]) {
+      updated[typology] = updated[typology].filter((_, i) => i !== index)
+      if (updated[typology].length === 0) delete updated[typology]
+      setTypologyRenders(updated)
+    }
+  }, [typologyRenders])
+
+  // Save renders to site_config
+  const saveRenders = useCallback(async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/site-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ _section: 'typology_renders', _data: typologyRenders }),
+      })
+      if (res.ok) {
+        setToast('Renders guardados ✓')
+        setShowRenders(false)
+      } else {
+        setToast('Error al guardar renders')
+      }
+    } catch (err) {
+      console.error('[floor-editor] save renders error:', err)
+      setToast('Error de conexión')
+    }
+    setSaving(false)
+  }, [typologyRenders])
 
   const createFloor = useCallback(() => {
     const name = newFloorData.name.trim()
@@ -1033,6 +1120,15 @@ export default function FloorPlanEditor() {
                     <Copy className="w-3 h-3" /> Duplicar
                   </button>
                 )}
+                {/* Renders editor button — always available */}
+                <button
+                  onClick={() => void openRendersModal()}
+                  disabled={uploading}
+                  className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-3 py-1.5 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 transition-colors disabled:opacity-50"
+                  title="Gestionar renders por tipología"
+                >
+                  <ImageIcon className="w-3 h-3" /> Renders
+                </button>
               </div>
             </div>
 
@@ -1748,6 +1844,153 @@ export default function FloorPlanEditor() {
         }}
         onCancel={() => setConfirmState({ ...confirmState, open: false })}
       />
+
+      {/* Renders editor modal */}
+      {showRenders && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => !saving && setShowRenders(false)}
+        >
+          <div
+            className="bg-[#111111] border border-[#8B6B4B]/30 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-[#D8D1C8]/10 sticky top-0 bg-[#111111] z-10">
+              <div className="flex items-center gap-3">
+                <ImageIcon className="w-5 h-5 text-[#8B6B4B]" />
+                <div>
+                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA]">
+                    Renders por Tipología
+                  </h3>
+                  <p className="text-[9px] text-[#D8D1C8]/40 tracking-wider uppercase mt-0.5">
+                    Gestiona los renders que se muestran al hacer clic en un apartamento
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => !saving && setShowRenders(false)}
+                disabled={saving}
+                className="text-[#D8D1C8]/40 hover:text-[#D8D1C8] transition-colors disabled:opacity-30"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-4">
+              {/* Typology selector tabs */}
+              <div className="flex gap-1 flex-wrap">
+                {TYPOLOGY_OPTIONS_LIST.map((typ) => {
+                  const count = typologyRenders[typ]?.length || 0
+                  return (
+                    <button
+                      key={typ}
+                      onClick={() => setSelectedTypology(typ)}
+                      className={`px-4 py-2 text-[10px] tracking-[0.1em] uppercase whitespace-nowrap transition-all ${
+                        selectedTypology === typ
+                          ? 'bg-[#8B6B4B] text-[#F5F1EA]'
+                          : 'bg-[#0A0A0A] text-[#D8D1C8]/40 border border-[#D8D1C8]/10 hover:text-[#D8D1C8]/60 hover:border-[#8B6B4B]/30'
+                      }`}
+                    >
+                      {typ} ({count})
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Upload button */}
+              <div className="flex items-center gap-3">
+                <input
+                  ref={(el) => setRenderFileInput(el)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => void handleRenderUpload(e)}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => renderFileInput?.click()}
+                  disabled={uploadingRender}
+                  className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase bg-[#8B6B4B] text-[#F5F1EA] px-4 py-2 hover:bg-[#7A5C3E] transition-colors disabled:opacity-50"
+                >
+                  {uploadingRender ? (
+                    <div className="w-3 h-3 border border-[#F5F1EA] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-3 h-3" />
+                  )}
+                  {uploadingRender ? 'Subiendo...' : `Subir render a ${selectedTypology}`}
+                </button>
+                <span className="text-[9px] text-[#D8D1C8]/30">
+                  Las imágenes se redimensionan automáticamente
+                </span>
+              </div>
+
+              {/* Current renders grid */}
+              <div>
+                {typologyRenders[selectedTypology]?.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {typologyRenders[selectedTypology].map((url, i) => (
+                      <div key={url + i} className="group relative bg-[#0A0A0A] border border-[#D8D1C8]/5 overflow-hidden">
+                        <div className="aspect-[4/3] relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={url}
+                            alt={`Render ${i + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-2 flex items-center justify-between">
+                          <span className="text-[9px] text-[#D8D1C8]/30">Render {i + 1}</span>
+                          <button
+                            onClick={() => removeRender(selectedTypology, i)}
+                            className="text-[#D8D1C8]/20 hover:text-red-400 transition-colors"
+                            title="Eliminar render"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-[#0A0A0A] border border-[#D8D1C8]/5 p-8 text-center">
+                    <ImageIcon className="w-8 h-8 text-[#D8D1C8]/15 mx-auto mb-3" />
+                    <p className="text-[11px] text-[#D8D1C8]/30">
+                      No hay renders para {selectedTypology}
+                    </p>
+                    <p className="text-[10px] text-[#D8D1C8]/15 mt-1">
+                      Sube imágenes usando el botón de arriba
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-[#D8D1C8]/10 sticky bottom-0 bg-[#111111]">
+              <button
+                onClick={() => setShowRenders(false)}
+                disabled={saving}
+                className="text-[10px] tracking-wider uppercase border border-[#D8D1C8]/15 text-[#D8D1C8]/40 px-4 py-2.5 hover:text-[#D8D1C8] transition-colors disabled:opacity-30"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => void saveRenders()}
+                disabled={saving}
+                className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase bg-[#8B6B4B] text-[#F5F1EA] px-5 py-2.5 hover:bg-[#7A5C3E] transition-colors disabled:opacity-50"
+              >
+                {saving ? (
+                  <div className="w-3 h-3 border border-[#F5F1EA] border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-3 h-3" />
+                )}
+                {saving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom scrollbar style */}
       <style jsx global>{`

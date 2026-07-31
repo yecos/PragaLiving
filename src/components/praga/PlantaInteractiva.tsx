@@ -159,14 +159,17 @@ function GlassDetailPanel({
   floor,
   isOpen,
   onClose,
+  renders = [],
 }: {
   unit: UnitData | null
   floor: FloorConfig
   isOpen: boolean
   onClose: () => void
+  renders?: string[]
 }) {
   const dragY = useMotionValue(0)
   const dragControls = useDragControls()
+  const [currentRender, setCurrentRender] = useState(0)
   const handleDragEnd = useCallback(
     (_: unknown, info: PanInfo) => {
       // If dragged down more than 100px or velocity is high, close the panel
@@ -176,6 +179,11 @@ function GlassDetailPanel({
     },
     [onClose]
   )
+
+  // Reset render index when unit changes
+  useEffect(() => {
+    Promise.resolve().then(() => setCurrentRender(0))
+  }, [unit?.id])
 
   // Status styling
   const statusColor = unit
@@ -213,9 +221,67 @@ function GlassDetailPanel({
       </p>
 
       {/* Area */}
-      <p className="font-[family-name:var(--font-cormorant)] text-3xl text-[#8B6B4B] mb-6">
+      <p className="font-[family-name:var(--font-cormorant)] text-3xl text-[#8B6B4B] mb-4">
         {unit.area} <span className="text-lg">m²</span>
       </p>
+
+      {/* Renders carousel */}
+      {renders.length > 0 && (
+        <div className="mb-6">
+          <div className="relative w-full overflow-hidden bg-[#0A0A0A] mb-2" style={{ aspectRatio: '4 / 3' }}>
+            <motion.img
+              key={currentRender}
+              src={renders[currentRender]}
+              alt={`Render ${currentRender + 1} — ${unit.typology}`}
+              className="w-full h-full object-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+            {/* Navigation arrows */}
+            {renders.length > 1 && (
+              <>
+                <button
+                  onClick={() => setCurrentRender((prev) => (prev - 1 + renders.length) % renders.length)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
+                  aria-label="Render anterior"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" strokeWidth="2">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setCurrentRender((prev) => (prev + 1) % renders.length)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
+                  aria-label="Render siguiente"
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" strokeWidth="2">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </button>
+                {/* Dots indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {renders.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentRender(i)}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        i === currentRender ? 'bg-[#8B6B4B] w-4' : 'bg-[#F5F1EA]/30'
+                      }`}
+                      aria-label={`Ir al render ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          {renders.length > 1 && (
+            <p className="text-[8px] text-[#D8D1C8]/30 text-center tracking-wider uppercase">
+              {currentRender + 1} / {renders.length} · {unit.typology}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Details */}
       <div className="space-y-3 mb-6">
@@ -552,17 +618,30 @@ export default function PlantaInteractiva() {
   const [config, setConfig] = useState<FloorPlanConfig | null>(null)
   const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
+  const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
 
-  // Fetch floor plan config from API
+  // Fetch floor plan config and typology renders from API
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const res = await fetch('/api/floor-plans')
-        const data = await res.json()
-        setConfig(data)
+        const [floorRes, configRes] = await Promise.all([
+          fetch('/api/floor-plans'),
+          fetch('/api/site-config'),
+        ])
+        const floorData = await floorRes.json()
+        setConfig(floorData)
         // Find first residential floor
-        const firstRes = data.floors?.findIndex((f: FloorConfig) => f.isResidential)
+        const firstRes = floorData.floors?.findIndex((f: FloorConfig) => f.isResidential)
         if (firstRes >= 0) setSelectedFloor(firstRes)
+
+        // Load typology renders from site_config
+        if (configRes.ok) {
+          const siteConfig = await configRes.json()
+          const renders = siteConfig.typology_renders as Record<string, string[]>
+          if (renders && typeof renders === 'object') {
+            setTypologyRenders(renders)
+          }
+        }
       } catch {
         // Silently fail
       }
@@ -685,6 +764,7 @@ export default function PlantaInteractiva() {
                     floor={floor}
                     isOpen={isPanelOpen}
                     onClose={handleClosePanel}
+                    renders={selectedUnitData ? (typologyRenders[selectedUnitData.typology] || []) : []}
                   />
                 </>
               )}
