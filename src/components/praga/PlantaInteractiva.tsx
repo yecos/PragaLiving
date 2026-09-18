@@ -94,6 +94,51 @@ function apartmentToUnit(apt: ApartmentZone): UnitData {
   }
 }
 
+const STATIC_FLOOR_IMAGES: Record<string, string> = {
+  s3: '/images/planos/planta-parqueaderos.jpg',
+  s2: '/images/planos/planta-parqueaderos.jpg',
+  s1: '/images/planos/planta-parqueaderos.jpg',
+  pv: '/images/planos/planta-parqueaderos.jpg',
+  acceso: '/images/planos/planta-primer-piso.jpg',
+  comercial: '/images/planos/planta-primer-piso.jpg',
+  social: '/images/planos/planta-social.jpg',
+  cubierta: '/images/planos/planta-techos.jpg',
+}
+
+function getFallbackFloorImage(floorId: string): string {
+  const staticImage = STATIC_FLOOR_IMAGES[floorId]
+  if (staticImage) return staticImage
+
+  const floorNumber = Number(floorId.replace('piso-', ''))
+  if (Number.isInteger(floorNumber) && floorNumber > 0) {
+    return floorNumber % 2 === 0
+      ? '/images/planos/planta-tipo-pares.jpg'
+      : '/images/planos/planta-tipo-impares.jpg'
+  }
+
+  return '/images/planos/planta-tipo.jpg'
+}
+
+function FloorPlanImage({ floor }: { floor: FloorConfig }) {
+  const fallbackImage = getFallbackFloorImage(floor.id)
+  const [imageSrc, setImageSrc] = useState(floor.image?.trim() || fallbackImage)
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={`Planta arquitectónica — ${floor.name}`}
+      fill
+      className="object-contain"
+      sizes="(max-width: 1024px) 100vw, 58vw"
+      priority
+      unoptimized
+      onError={() => {
+        if (imageSrc !== fallbackImage) setImageSrc(fallbackImage)
+      }}
+    />
+  )
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // FLOOR SELECTOR
 // ═══════════════════════════════════════════════════════════════════
@@ -487,15 +532,7 @@ function FloorPlanDisplay({
           className="absolute inset-0"
         >
           {/* Real architectural floor plan image */}
-          <Image
-            src={floor.image}
-            alt={`Planta arquitectónica — ${floor.name}`}
-            fill
-            className="object-contain"
-            sizes="(max-width: 1024px) 100vw, 58vw"
-            priority
-            unoptimized
-          />
+          <FloorPlanImage floor={floor} />
 
           {/* SVG overlay with interactive hotspots */}
           {floor.isResidential && floor.apartments.length > 0 && (
