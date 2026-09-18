@@ -243,28 +243,46 @@
     ]
   },
   "atrio": {
-    "image": "/images/renders/atrio-main.png",
+    "image": "/images/renders/atrio-2026/atrio-niveles.jpg",
+    "heroImage": "/images/renders/atrio-2026/atrio-niveles.jpg",
+    "verticalImage": "/images/renders/atrio-2026/atrio-vertical.jpg",
     "label": "El Atrio",
     "heading1": "Un espacio que",
     "heading2Accent": "conecta y trasciende",
-    "paragraph": "El atrio central de PRAGA Living es el corazón del edificio. Un vacío vertical que conecta todos los niveles, permitiendo que la luz natural descienda desde la cubierta hasta el lobby, mientras la vegetación crea un microecosistema que purifica el aire y renueva el espíritu.",
+    "paragraph": "El atrio central de PRAGA Living articula el edificio desde la recepción hasta los niveles residenciales. La luz natural, la vegetación y una materialidad cálida convierten cada recorrido en una experiencia de conexión, calma y pertenencia.",
+    "introParagraph": "El atrio central de PRAGA Living articula el edificio desde la recepción hasta los niveles residenciales. La luz natural, la vegetación y una materialidad cálida convierten cada recorrido en una experiencia de conexión, calma y pertenencia.",
     "ctaText": "Recorrer el Atrio 360°",
     "ctaLink": "#recorridos",
-    "cards": [
+    "receptionStory": {
+      "label": "La llegada",
+      "title": "Una llegada que anticipa la experiencia",
+      "description": "La recepción combina piedra, madera, iluminación cálida y formas orgánicas para crear una bienvenida serena. Cada detalle marca la transición entre el ritmo de la ciudad y la calma de llegar a casa."
+    },
+    "atriumStory": {
+      "label": "El corazón del proyecto",
+      "title": "El corazón vivo del edificio",
+      "description": "Un vacío vertical bañado por luz natural conecta visualmente cada nivel. Sus recorridos curvos, jardines interiores y materialidad honesta transforman la circulación cotidiana en una experiencia de encuentro, amplitud y conexión."
+    },
+    "gallery": [
       {
-        "image": "/images/renders/atrium-interior-1.png",
-        "title": "Luz Natural",
-        "description": "La cubierta se abre al cielo, permitiendo que la luz del sol bañe cada nivel del atrio, creando un juego de sombras que cambia con las horas del día."
+        "image": "/images/renders/atrio-2026/recepcion-bienvenida.jpg",
+        "title": "Bienvenida serena",
+        "alt": "Recepción de PRAGA Living con sala de espera, vegetación y acabados cálidos"
       },
       {
-        "image": "/images/renders/atrium-interior-2.png",
-        "title": "Vegetación Vertical",
-        "description": "Plantas seleccionadas colonizan las barandas y muros del atrio, purificando el aire y creando una conexión orgánica entre la arquitectura y la naturaleza."
+        "image": "/images/renders/atrio-2026/recepcion-corredor.jpg",
+        "title": "Recorridos luminosos",
+        "alt": "Recepción y corredor interior de PRAGA Living en madera y piedra clara"
       },
       {
-        "image": "/images/renders/lobby.png",
-        "title": "Circulación Fluida",
-        "description": "Las circulaciones curvas del atrio invitan al recorrido pausado, transformando el acto de llegar a casa en una experiencia sensorial completa."
+        "image": "/images/renders/atrio-2026/recepcion-escalera.jpg",
+        "title": "Naturaleza integrada",
+        "alt": "Lobby de PRAGA Living con escalera, jardín interior y luz natural"
+      },
+      {
+        "image": "/images/renders/atrio-2026/recepcion-ascensor.jpg",
+        "title": "Materialidad atemporal",
+        "alt": "Lobby de PRAGA Living con recepción, ascensor y mobiliario orgánico"
       }
     ]
   },
