@@ -21,6 +21,8 @@ import Footer from '@/components/praga/Footer'
 import WhatsAppButton from '@/components/praga/WhatsAppButton'
 import ChatIA from '@/components/praga/ChatIA'
 
+const SHOW_DIGITAL_TWIN = false // Activar cuando el módulo esté listo para volver a publicarse.
+
 export default function Home() {
   const [minTimePassed, setMinTimePassed] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
@@ -133,7 +135,7 @@ export default function Home() {
         <Hero />
         <Manifiesto />
         <Arquitectura />
-        <ExplorarEdificio />
+        {SHOW_DIGITAL_TWIN && <ExplorarEdificio />}
         <Atrio />
         <Amenidades />
         <Tipologias />
