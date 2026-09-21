@@ -28,7 +28,11 @@ export default function Navigation() {
   const { config } = useSiteConfig()
   const navConfig = config?.navigation
 
-  const navItems: NavItem[] = navConfig?.items || defaultNavItems
+  const allNavItems: NavItem[] = navConfig?.items || defaultNavItems
+  const SHOW_DIGITAL_TWIN = false // Mantener oculto temporalmente; cambiar a true para reactivarlo.
+  const navItems: NavItem[] = SHOW_DIGITAL_TWIN
+    ? allNavItems
+    : allNavItems.filter((item) => item.href !== '#edificio')
   const ctaText = navConfig?.ctaText || 'Agendar Visita'
   const ctaLink = navConfig?.ctaLink || '#contacto'
 
