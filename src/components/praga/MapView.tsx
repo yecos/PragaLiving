@@ -23,7 +23,7 @@ export interface LocationLayer {
 }
 
 // ─── PRAGA center (Caldas, Antioquia) ─────────────────
-const PRAGA_CENTER: [number, number] = [6.08895, -75.63514]
+export const DEFAULT_center: [number, number] = [6.08895, -75.63514]
 
 // ─── Layer definitions with real Caldas, Antioquia POIs ──────
 export const locationLayers: LocationLayer[] = [
@@ -125,9 +125,17 @@ interface MapViewProps {
   activeLayer: string
   onPoiClick?: (poi: POIPoint) => void
   flyToTarget?: POIPoint | null
+  layers?: LocationLayer[]
+  center?: [number, number]
 }
 
-export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapViewProps) {
+export default function MapView({
+  activeLayer,
+  onPoiClick,
+  flyToTarget,
+  layers = locationLayers,
+  center = DEFAULT_center,
+}: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const layerGroupsRef = useRef<Map<string, L.LayerGroup>>(new Map())
@@ -139,7 +147,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
     isInitializedRef.current = true
 
     const map = L.map(mapContainerRef.current, {
-      center: PRAGA_CENTER,
+      center: center,
       zoom: 15,
       zoomControl: false,
       attributionControl: false,
@@ -160,7 +168,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
 
     // ─── Distance circles ──────────────────────────────
     DISTANCE_CIRCLES.forEach(({ radius, label, opacity }) => {
-      const circle = L.circle(PRAGA_CENTER, {
+      const circle = L.circle(center, {
         radius,
         color: '#8B6B4B',
         weight: 1,
@@ -172,7 +180,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
       }).addTo(map)
 
       // Label at top of circle
-      const labelPoint = L.latLng(PRAGA_CENTER[0] + (radius / 111320), PRAGA_CENTER[1])
+      const labelPoint = L.latLng(center[0] + (radius / 111320), center[1])
       const labelMarker = L.marker(labelPoint, {
         icon: L.divIcon({
           className: 'praga-distance-label',
@@ -186,7 +194,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
 
     // ─── PRAGA main marker ─────────────────────────────
     const pragaIcon = createPragaIcon()
-    const pragaMarker = L.marker(PRAGA_CENTER, { icon: pragaIcon, zIndexOffset: 1000 })
+    const pragaMarker = L.marker(center, { icon: pragaIcon, zIndexOffset: 1000 })
       .addTo(map)
       .bindPopup(
         `<div class="praga-popup">
@@ -197,7 +205,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
         { className: 'praga-popup-container', closeButton: false, offset: [0, -10] }
       )
     // ─── Create POI layer groups ────────────────────────
-    locationLayers.forEach(layer => {
+    layers.forEach(layer => {
       const group = L.layerGroup()
 
       layer.points.forEach(poi => {
@@ -239,7 +247,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
       isInitializedRef.current = false
       mapRef.current = null
     }
-  }, [])
+  }, [center, layers, onPoiClick])
 
   // ─── Toggle POI layers ────────────────────────────────
   useEffect(() => {
