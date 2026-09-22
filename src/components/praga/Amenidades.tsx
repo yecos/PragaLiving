@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -23,11 +23,41 @@ const defaultAmenities: Amenity[] = [
 export default function Amenidades() {
   const { config } = useSiteConfig()
   const amenConfig = config?.amenidades
+  const amenities = useMemo<Amenity[]>(() => {
+    const configuredItems = Array.isArray(amenConfig?.items) ? amenConfig.items : []
+    if (configuredItems.length === 0) return defaultAmenities
+
+    return configuredItems.map((item: Partial<Amenity> & { image?: string }, index: number) => {
+      const fallback = defaultAmenities.find((amenity) => amenity.id === item.id) || defaultAmenities[index] || defaultAmenities[0]
+      const configuredImage = typeof item.image === 'string' && item.image.trim() ? item.image.trim() : null
+      const images = configuredImage
+        ? [{
+            src: configuredImage,
+            alt: `${item.name || fallback.name} de PRAGA Living`,
+            label: item.name || fallback.name,
+          }, ...fallback.images.slice(1)]
+        : fallback.images
+
+      return {
+        ...fallback,
+        ...item,
+        id: item.id || fallback.id,
+        name: item.name || fallback.name,
+        description: item.description || fallback.description,
+        benefits: Array.isArray(item.benefits) ? item.benefits : fallback.benefits,
+        images,
+      }
+    })
+  }, [amenConfig?.items])
   const [selected, setSelected] = useState(0)
   const [activeImage, setActiveImage] = useState(0)
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const amenity = defaultAmenities[selected]
+  const amenity = amenities[Math.min(selected, Math.max(amenities.length - 1, 0))] || defaultAmenities[0]
+  useEffect(() => {
+    if (selected >= amenities.length) setSelected(Math.max(amenities.length - 1, 0))
+    setActiveImage(0)
+  }, [amenities.length, selected])
   const padded = (n: number) => String(n + 1).padStart(2, '0')
   const selectAmenity = (n: number) => { setSelected(n); setActiveImage(0) }
   const previous = () => setActiveImage((n) => (n - 1 + amenity.images.length) % amenity.images.length)
@@ -53,14 +83,14 @@ export default function Amenidades() {
                 </AnimatePresence>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/85 via-transparent to-[#111111]/10" />
                 {amenity.images.length > 1 && <div className="absolute right-4 top-4 z-10 flex gap-2"><button type="button" onClick={previous} aria-label="Imagen anterior" className="flex h-10 w-10 items-center justify-center border border-white/30 bg-[#111111]/35 text-white backdrop-blur-sm hover:border-[#B89268]"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={next} aria-label="Imagen siguiente" className="flex h-10 w-10 items-center justify-center border border-white/30 bg-[#111111]/35 text-white backdrop-blur-sm hover:border-[#B89268]"><ChevronRight className="h-4 w-4" /></button></div>}
-                <div className="absolute inset-x-0 bottom-0 p-5 md:p-8"><span className="mb-1 block text-[10px] uppercase tracking-[0.3em] text-[#C5A47E]">{padded(selected)} / {padded(defaultAmenities.length - 1)} · Vista {activeImage + 1} de {amenity.images.length}</span><h3 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] md:text-3xl">{amenity.images[activeImage].label}</h3></div>
+                <div className="absolute inset-x-0 bottom-0 p-5 md:p-8"><span className="mb-1 block text-[10px] uppercase tracking-[0.3em] text-[#C5A47E]">{padded(selected)} / {padded(amenities.length - 1)} · Vista {activeImage + 1} de {amenity.images.length}</span><h3 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] md:text-3xl">{amenity.images[activeImage].label}</h3></div>
               </div>
               {amenity.images.length > 1 && <div className="mt-3 grid grid-flow-col auto-cols-fr gap-2" aria-label={`Galería de ${amenity.name}`}>{amenity.images.map((item, i) => <button key={item.src} type="button" onClick={() => setActiveImage(i)} aria-label={`Ver ${item.label}`} className={`relative aspect-[4/3] overflow-hidden border-2 ${activeImage === i ? 'border-[#8B6B4B]' : 'border-transparent opacity-55'}`}><Image src={item.src} alt="" fill className="object-cover" sizes="10vw" /></button>)}</div>}
             </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 30 }} animate={isInView ? { opacity: 1, x: 0 } : {}} className="lg:col-span-5">
-            {defaultAmenities.map((item, i) => { const active = selected === i; return <div key={item.id}><button type="button" onClick={() => selectAmenity(i)} aria-expanded={active} className={`w-full text-left transition-all ${active ? 'bg-[#111111] text-[#F5F1EA]' : 'border-b border-[#D8D1C8]/60 hover:bg-[#111111]/5'}`}><div className="flex items-center justify-between p-5 md:p-6"><div className="flex items-center gap-4 md:gap-5"><span className={`text-[10px] tracking-[0.15em] ${active ? 'text-[#B89268]' : 'text-[#111111]/30'}`}>{padded(i)}</span><span className={`font-[family-name:var(--font-cormorant)] text-lg md:text-xl ${active ? 'text-[#F5F1EA]' : 'text-[#111111]'}`}>{item.name}</span></div><span className={`text-lg ${active ? 'text-[#B89268]' : 'text-[#111111]/40'}`}>{active ? '×' : '+'}</span></div><AnimatePresence initial={false}>{active && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden"><div className="px-5 pb-5 md:px-6 md:pb-6"><p className="mb-4 text-sm leading-relaxed text-[#F5F1EA]/65">{item.description}</p><div className="flex flex-wrap gap-2">{item.benefits.map((benefit) => <span key={benefit} className="rounded-full border border-[#B89268]/40 bg-[#B89268]/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.1em] text-[#C5A47E]">{benefit}</span>)}</div></div></motion.div>}</AnimatePresence></button></div> })}
+            {amenities.map((item, i) => { const active = selected === i; return <div key={item.id}><button type="button" onClick={() => selectAmenity(i)} aria-expanded={active} className={`w-full text-left transition-all ${active ? 'bg-[#111111] text-[#F5F1EA]' : 'border-b border-[#D8D1C8]/60 hover:bg-[#111111]/5'}`}><div className="flex items-center justify-between p-5 md:p-6"><div className="flex items-center gap-4 md:gap-5"><span className={`text-[10px] tracking-[0.15em] ${active ? 'text-[#B89268]' : 'text-[#111111]/30'}`}>{padded(i)}</span><span className={`font-[family-name:var(--font-cormorant)] text-lg md:text-xl ${active ? 'text-[#F5F1EA]' : 'text-[#111111]'}`}>{item.name}</span></div><span className={`text-lg ${active ? 'text-[#B89268]' : 'text-[#111111]/40'}`}>{active ? '×' : '+'}</span></div><AnimatePresence initial={false}>{active && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden"><div className="px-5 pb-5 md:px-6 md:pb-6"><p className="mb-4 text-sm leading-relaxed text-[#F5F1EA]/65">{item.description}</p><div className="flex flex-wrap gap-2">{item.benefits.map((benefit) => <span key={benefit} className="rounded-full border border-[#B89268]/40 bg-[#B89268]/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.1em] text-[#C5A47E]">{benefit}</span>)}</div></div></motion.div>}</AnimatePresence></button></div> })}
           </motion.div>
         </div>
       </div>
