@@ -647,7 +647,21 @@ function TipologiasEditor({ data, onChange, onSave, saving }: { data: any; onCha
               </div>
               <TextField label="Estado" value={item.status} onChange={v => update(i, { ...item, status: v })} />
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
+              <div>
+                <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Galería de imágenes</p>
+                <ArrayEditor
+                  items={(Array.isArray(item.images) ? item.images : []).map((src: string) => ({ value: src }))}
+                  onChange={v => {
+                    const images = v.map((x: Record<string, any>) => String(x.value || ''))
+                    update(i, { ...item, images, image: images[0] || '' })
+                  }}
+                  addLabel="Agregar Imagen"
+                  createNew={() => ({ value: '' })}
+                  renderItem={(img, ii, iu) => (
+                    <ImageField label={`Imagen ${ii + 1}`} value={String(img.value || '')} onChange={v => iu(ii, { value: v })} category="renders" />
+                  )}
+                />
+              </div>
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Características</p>
                 <ArrayEditor
