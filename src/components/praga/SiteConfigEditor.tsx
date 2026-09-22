@@ -455,7 +455,21 @@ function EdificioEditor({ data, onChange, onSave, saving }: { data: any; onChang
                 <TextField label="Tipo" value={item.type} onChange={v => update(i, { ...item, type: v })} />
               </div>
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
+              <div>
+                <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Galería de imágenes</p>
+                <ArrayEditor
+                  items={(item.images || []).map((src: string) => ({ value: src }))}
+                  onChange={v => {
+                    const images = v.map((x: { value: string }) => x.value)
+                    update(i, { ...item, images, image: images[0] || '' })
+                  }}
+                  addLabel="Agregar Imagen"
+                  createNew={() => ({ value: '' })}
+                  renderItem={(img, ii, iu) => (
+                    <ImageField label={`Imagen ${ii + 1}`} value={img.value || ''} onChange={v => iu(ii, { value: v })} category="renders" />
+                  )}
+                />
+              </div>
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Características</p>
                 <ArrayEditor
@@ -560,12 +574,29 @@ function AmenidadesEditor({ data, onChange, onSave, saving }: { data: any; onCha
           items={d.items || []}
           onChange={v => { d.items = v; onChange(d) }}
           addLabel="Agregar Amenidad"
-          createNew={() => ({ id: `amen-${Date.now()}`, name: '', description: '', image: '', benefits: [] as string[] })}
+          createNew={() => ({ id: `amen-${Date.now()}`, name: '', description: '', image: '', images: [] as any[], benefits: [] as string[] })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <TextField label="Nombre" value={item.name} onChange={v => update(i, { ...item, name: v })} />
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
-              <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
+              <div>
+                <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Galería de imágenes</p>
+                <ArrayEditor
+                  items={item.images || []}
+                  onChange={v => update(i, { ...item, images: v, image: v[0]?.src || '' })}
+                  addLabel="Agregar Imagen"
+                  createNew={() => ({ src: '', alt: '', label: '' })}
+                  renderItem={(img, ii, iu) => (
+                    <div className="space-y-2">
+                      <ImageField label={`Imagen ${ii + 1}`} value={img.src || ''} onChange={v => iu(ii, { ...img, src: v })} category="renders" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <TextField label="Etiqueta" value={img.label || ''} onChange={v => iu(ii, { ...img, label: v })} />
+                        <TextField label="Texto alternativo" value={img.alt || ''} onChange={v => iu(ii, { ...img, alt: v })} />
+                      </div>
+                    </div>
+                  )}
+                />
+              </div>
               <div>
                 <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/30 mb-2">Beneficios</p>
                 <ArrayEditor
@@ -605,7 +636,7 @@ function TipologiasEditor({ data, onChange, onSave, saving }: { data: any; onCha
           items={d.items || []}
           onChange={v => { d.items = v; onChange(d) }}
           addLabel="Agregar Tipología"
-          createNew={() => ({ id: `tipo-${Date.now()}`, name: '', area: '', bedrooms: '', bathrooms: '', image: '', description: '', features: [] as string[], status: 'Disponible' })}
+          createNew={() => ({ id: `tipo-${Date.now()}`, name: '', area: '', bedrooms: '', bathrooms: '', image: '', images: [] as string[], description: '', features: [] as string[], status: 'Disponible' })}
           renderItem={(item, i, update) => (
             <div className="space-y-3">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
