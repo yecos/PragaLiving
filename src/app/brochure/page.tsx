@@ -204,7 +204,8 @@ export default function BrochurePage() {
 
         <section className={[styles.page, styles.interiorPage].join(" ")}>
           <PageNumber n="11" />
-          <div className={styles.interiorTitle}>
+
+          <div className={styles.interiorCopy}>
             <div className={styles.kicker}>INTERIORES</div>
             <h2>Interiores cálidos,<br />contemporáneos y atemporales.</h2>
             <p>
@@ -213,82 +214,142 @@ export default function BrochurePage() {
               sobria, elegante y vigente en el tiempo.
             </p>
           </div>
+
           <div className={styles.interiorMosaic}>
-            <figure className={styles.mosaicA}><img src="/images/typologies/104-02.jpg" alt="Interior PRAGA Living" /></figure>
-            <figure className={styles.mosaicB}><img src="/images/typologies/78-04.jpg" alt="Interior PRAGA Living" /></figure>
-            <figure className={styles.mosaicC}><img src="/images/typologies/60-03.jpg" alt="Interior PRAGA Living" /></figure>
-            <figure className={styles.mosaicD}><img src="/images/typologies/33-02.jpg" alt="Interior PRAGA Living" /></figure>
+            <figure className={styles.mosaicA}>
+              <img src="/images/typologies/104-02.jpg" alt="Interior PRAGA Living" />
+            </figure>
+            <figure className={styles.mosaicB}>
+              <img src="/images/typologies/78-04.jpg" alt="Interior PRAGA Living" />
+            </figure>
+            <figure className={styles.mosaicC}>
+              <img src="/images/typologies/60-03.jpg" alt="Interior PRAGA Living" />
+            </figure>
+            <figure className={styles.mosaicD}>
+              <img src="/images/typologies/33-02.jpg" alt="Interior PRAGA Living" />
+            </figure>
           </div>
         </section>
 
         <section className={[styles.page, styles.locationPage].join(" ")}>
           <PageNumber n="12" />
-          <div className={styles.locationIntro}>
+
+          <div className={styles.locationCopy}>
             <div className={styles.kicker}>UBICACIÓN</div>
             <h2>Caldas, Antioquia.<br />Todo más cerca de tu día a día.</h2>
+
             <p>
               PRAGA Living se ubica en Calle 133 Sur #49-94, en el tejido urbano consolidado de Caldas.
               Su localización conecta el proyecto con comercio, servicios, educación, salud y los principales
               recorridos del municipio.
             </p>
+
             <div className={styles.locationAddress}>
               <span>PRAGA LIVING</span>
               <strong>Cl. 133 Sur #49-94 · Caldas, Antioquia</strong>
               <small>6.08895° N · 75.63514° W</small>
             </div>
-          </div>
 
-          <div className={styles.streetMap} aria-label="Mapa esquemático de ubicación de PRAGA Living en Caldas">
-            <div className={[styles.street, styles.streetVertical, styles.cra45].join(" ")}><span>Cra. 45</span></div>
-            <div className={[styles.street, styles.streetVertical, styles.cra48].join(" ")}><span>Cra. 48</span></div>
-            <div className={[styles.street, styles.streetVertical, styles.cra49].join(" ")}><span>Cra. 49</span></div>
-            <div className={[styles.street, styles.streetVertical, styles.cra50].join(" ")}><span>Cra. 50</span></div>
-            <div className={[styles.street, styles.streetVertical, styles.cra51].join(" ")}><span>Cra. 51</span></div>
-
-            <div className={[styles.street, styles.streetHorizontal, styles.cl118].join(" ")}><span>Cl. 118 Sur</span></div>
-            <div className={[styles.street, styles.streetHorizontal, styles.cl126].join(" ")}><span>Cl. 126A Sur</span></div>
-            <div className={[styles.street, styles.streetHorizontal, styles.cl130].join(" ")}><span>Cl. 130 Sur</span></div>
-            <div className={[styles.street, styles.streetHorizontal, styles.cl133].join(" ")}><span>Cl. 133 Sur</span></div>
-            <div className={[styles.street, styles.streetHorizontal, styles.cl135].join(" ")}><span>Cl. 135 Sur</span></div>
-
-            <div className={[styles.mapPoi, styles.poiSalle].join(" ")}>
-              <i />
-              <span>La Salle</span>
-              <small>Cra. 51 · Cl. 118 Sur</small>
-            </div>
-            <div className={[styles.mapPoi, styles.poiMontpellier].join(" ")}>
-              <i />
-              <span>Montpellier Plaza</span>
-              <small>Cl. 126A Sur · Cra. 50</small>
-            </div>
-            <div className={[styles.mapPoi, styles.poiParque].join(" ")}>
-              <i />
-              <span>Parque Principal</span>
-              <small>Cra. 49 · Cl. 129–130 Sur</small>
-            </div>
-            <div className={[styles.mapPoi, styles.poiHospital].join(" ")}>
-              <i />
-              <span>Hospital San Vicente</span>
-              <small>Cra. 48 · Cl. 135 Sur</small>
-            </div>
-
-            <div className={styles.projectPin}>
-              <div className={styles.projectMarker}>P</div>
-              <div>
-                <strong>PRAGA Living</strong>
-                <span>Cl. 133 Sur #49-94</span>
-              </div>
-            </div>
-
-            <div className={styles.northArrow}><span>N</span><i /></div>
-            <div className={styles.metroConnector}>
-              <span>Conexión hacia Sabaneta</span>
-              <strong>Metro La Estrella ↑</strong>
+            <div className={styles.locationFootnote}>
+              Mapa esquemático de referencia. La ubicación del proyecto corresponde a la dirección y coordenadas
+              oficiales del proyecto.
             </div>
           </div>
 
-          <div className={styles.locationNote}>
-            Mapa esquemático de referencia. La posición del proyecto corresponde a la dirección y coordenadas oficiales usadas en el proyecto.
+          <div className={styles.locationMapCard}>
+            <svg
+              className={styles.locationSvg}
+              viewBox="0 0 720 500"
+              role="img"
+              aria-label="Mapa esquemático de ubicación de PRAGA Living en Caldas"
+            >
+              <rect x="0" y="0" width="720" height="500" fill="#efe8dc" />
+
+              <g opacity="0.18">
+                <path d="M40 50 L680 50" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 110 L680 110" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 170 L680 170" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 230 L680 230" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 290 L680 290" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 350 L680 350" stroke="#cfc5b7" strokeWidth="1" />
+                <path d="M40 410 L680 410" stroke="#cfc5b7" strokeWidth="1" />
+              </g>
+
+              <g>
+                <rect x="90" y="35" width="18" height="430" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="220" y="35" width="14" height="430" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="330" y="35" width="22" height="430" fill="#ffffff" stroke="#d9cfc2" />
+                <rect x="470" y="35" width="14" height="430" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="600" y="35" width="14" height="430" fill="#fbfaf7" stroke="#d9cfc2" />
+              </g>
+
+              <g>
+                <rect x="50" y="70" width="620" height="12" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="50" y="150" width="620" height="12" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="50" y="220" width="620" height="12" fill="#fbfaf7" stroke="#d9cfc2" />
+                <rect x="50" y="300" width="620" height="18" fill="#ffffff" stroke="#d9cfc2" />
+                <rect x="50" y="390" width="620" height="12" fill="#fbfaf7" stroke="#d9cfc2" />
+              </g>
+
+              <g fill="#8a8178" fontSize="11" fontFamily="Arial, sans-serif">
+                <text x="99" y="28" textAnchor="middle">Cra. 45</text>
+                <text x="227" y="28" textAnchor="middle">Cra. 48</text>
+                <text x="341" y="28" textAnchor="middle">Cra. 49</text>
+                <text x="477" y="28" textAnchor="middle">Cra. 50</text>
+                <text x="607" y="28" textAnchor="middle">Cra. 51</text>
+
+                <text x="56" y="66">Cl. 118 Sur</text>
+                <text x="56" y="146">Cl. 126A Sur</text>
+                <text x="56" y="216">Cl. 130 Sur</text>
+                <text x="56" y="296">Cl. 133 Sur</text>
+                <text x="56" y="386">Cl. 135 Sur</text>
+              </g>
+
+              <g fontFamily="Arial, sans-serif">
+                <circle cx="608" cy="76" r="5" fill="#b08a63" />
+                <text x="622" y="74" fontSize="16" fill="#1b1814">La Salle</text>
+                <text x="622" y="90" fontSize="10" fill="#7b736a">Cra. 51 · Cl. 118 Sur</text>
+
+                <circle cx="478" cy="156" r="5" fill="#b08a63" />
+                <text x="492" y="154" fontSize="16" fill="#1b1814">Montpellier Plaza</text>
+                <text x="492" y="170" fontSize="10" fill="#7b736a">Cl. 126A Sur · Cra. 50</text>
+
+                <circle cx="338" cy="226" r="5" fill="#b08a63" />
+                <text x="352" y="224" fontSize="16" fill="#1b1814">Parque Principal</text>
+                <text x="352" y="240" fontSize="10" fill="#7b736a">Cra. 49 · Cl. 130 Sur</text>
+
+                <circle cx="226" cy="396" r="5" fill="#b08a63" />
+                <text x="240" y="394" fontSize="16" fill="#1b1814">Hospital San Vicente</text>
+                <text x="240" y="410" fontSize="10" fill="#7b736a">Cra. 48 · Cl. 135 Sur</text>
+              </g>
+
+              <g transform="translate(315 292)">
+                <rect x="0" y="0" width="180" height="56" fill="#1e241f" />
+                <circle cx="24" cy="28" r="14" fill="#d2b190" />
+                <text x="24" y="33" textAnchor="middle" fontSize="18" fontFamily="Georgia, serif" fill="#1e241f">P</text>
+                <text x="48" y="23" fontSize="18" fontFamily="Georgia, serif" fill="#ffffff">PRAGA Living</text>
+                <text x="48" y="39" fontSize="10" fontFamily="Arial, sans-serif" fill="rgba(255,255,255,.72)">
+                  Cl. 133 Sur #49-94
+                </text>
+              </g>
+
+              <g transform="translate(655 50)">
+                <text x="0" y="0" fontSize="12" fontFamily="Arial, sans-serif" fill="#34473a" textAnchor="middle">N</text>
+                <line x1="0" y1="10" x2="0" y2="45" stroke="#34473a" strokeWidth="1.5" />
+                <path d="M0 10 L-5 18 L5 18 Z" fill="#34473a" />
+              </g>
+
+              <g transform="translate(72 32)">
+                <rect x="0" y="0" width="180" height="42" fill="rgba(255,255,255,.78)" />
+                <rect x="0" y="0" width="3" height="42" fill="#34473a" />
+                <text x="12" y="16" fontSize="10" fontFamily="Arial, sans-serif" fill="#7b736a" letterSpacing="1">
+                  CONEXIÓN HACIA SABANETA
+                </text>
+                <text x="12" y="31" fontSize="16" fontFamily="Georgia, serif" fill="#1b1814">
+                  Metro La Estrella ↑
+                </text>
+              </g>
+            </svg>
           </div>
         </section>
 
