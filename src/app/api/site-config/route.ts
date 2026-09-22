@@ -5,48 +5,52 @@ import { requireAdmin, requireAdminWithCsrf } from '@/lib/auth-guard'
 
 const staticConfig = staticSiteConfig as Record<string, any>
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * Static JSON is only the initial fallback. Once a section exists in the
+ * database, the admin panel is the source of truth for that section.
+ * Objects are merged recursively so a partial legacy row does not erase
+ * fields that were added later; arrays are intentionally replaced as a unit
+ * because the editor manages their order and membership.
+ */
 function mergePublishedConfig(dbConfig: Record<string, unknown>) {
-  const merged = { ...staticConfig, ...dbConfig } as Record<string, any>
-  const dbGeneral = (dbConfig.general || {}) as Record<string, any>
-  const dbContacto = (dbConfig.contacto || {}) as Record<string, any>
-  const dbFooter = (dbConfig.footer || {}) as Record<string, any>
+  const merge = (fallback: unknown, override: unknown): unknown => {
+    if (isPlainObject(fallback) && isPlainObject(override)) {
+      const result: Record<string, unknown> = { ...fallback }
+      for (const [key, value] of Object.entries(override)) {
+        result[key] = key in result ? merge(result[key], value) : value
+      }
+      return result
+    }
+    return override === undefined ? fallback : override
+  }
 
-  // Contact details and the public gallery are maintained in the repository.
-  // Keep these values consistent even when an older DB seed is still present.
-  merged.general = {
-    ...staticConfig.general,
-    ...dbGeneral,
-    phone: staticConfig.general.phone,
-    whatsapp: staticConfig.general.whatsapp,
-    email: staticConfig.general.email,
-  }
-  merged.contacto = {
-    ...staticConfig.contacto,
-    ...dbContacto,
-    methods: staticConfig.contacto.methods,
-    notificationEmail: staticConfig.contacto.notificationEmail,
-  }
-  merged.footer = {
-    ...staticConfig.footer,
-    ...dbFooter,
-    linkGroups: staticConfig.footer.linkGroups,
-  }
-  merged.galeria = staticConfig.galeria
-
-  return merged
+  return merge(staticConfig, dbConfig) as Record<string, any>
 }
 
 export async function GET() {
   try {
     const dbConfig = await getAllSiteConfig()
     if (dbConfig && Object.keys(dbConfig).length > 0) {
-      return NextResponse.json(mergePublishedConfig(dbConfig))
+      return NextResponse.json(mergePublishedConfig(dbConfig), {
+        headers: { 'Cache-Control': 'no-store, max-age=0' },
+      })
     }
 
-    return NextResponse.json(staticConfig)
+    return NextResponse.json(staticConfig, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
+    })
   } catch (err) {
     console.error('[site-config] GET error:', err)
-    return NextResponse.json(staticConfig)
+    return NextResponse.json(staticConfig, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
+    })
   }
 }
 
@@ -64,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // If the body has a "_section" and "_data" field, update only that section
-    if (body._section && body._data) {
+    if (typeof body._section === 'string' && Object.prototype.hasOwnProperty.call(body, '_data')) {
       const section = body._section as string
       const sectionData = body._data
 
