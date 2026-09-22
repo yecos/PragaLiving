@@ -675,7 +675,28 @@ export default function AdminPanel() {
               {/* ═══ DASHBOARD ═══ */}
               {activeTab === 'dashboard' && (
                 <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8] mb-6">Dashboard</h2>
+                  <div className="mb-7 grid grid-cols-2 gap-3 md:grid-cols-4">
+                    {[
+                      { label: 'Editar página', tab: 'contenido' as Tab, icon: PanelsTopLeft, note: 'Textos e imágenes' },
+                      { label: 'Residencias', tab: 'apartments' as Tab, icon: Building2, note: 'Inventario y precios' },
+                      { label: 'Leads', tab: 'leads' as Tab, icon: Users, note: `${leads.filter(l => l.status === 'new').length} nuevos` },
+                      { label: 'Biblioteca', tab: 'medios' as Tab, icon: Images, note: 'Recursos visuales' },
+                    ].map((action) => {
+                      const Icon = action.icon
+                      return (
+                        <button key={action.tab} onClick={() => handleTabSwitch(action.tab)} className="group rounded-2xl border border-[#E9E0D3]/7 bg-[#121210] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#B89268]/25 hover:bg-[#161613]">
+                          <div className="flex items-center justify-between">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#B89268]/15 bg-[#B89268]/5 text-[#B89268]">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[#CFC4B5]/15 transition-all group-hover:translate-x-0.5 group-hover:text-[#B89268]/70" />
+                          </div>
+                          <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E6DBCF]/75">{action.label}</p>
+                          <p className="mt-1 text-[9px] text-[#CFC4B5]/28">{action.note}</p>
+                        </button>
+                      )
+                    })}
+                  </div>
 
                   {/* KPI Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -686,9 +707,10 @@ export default function AdminPanel() {
                       { label: 'Vendidas', value: sold, color: 'text-[#D8D1C8]' },
                       { label: '% Vendido', value: `${soldPct}%`, color: 'text-[#8B6B4B]' },
                     ].map((stat) => (
-                      <div key={stat.label} className="rounded-2xl bg-gradient-to-br from-[#151513] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
-                        <p className={`font-[family-name:var(--font-cormorant)] text-3xl ${stat.color}`}>{stat.value}</p>
-                        <p className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/30 mt-1">{stat.label}</p>
+                      <div key={stat.label} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#171714] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
+                        <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full bg-[#B89268]/[0.035]" />
+                        <p className={`relative font-[family-name:var(--font-cormorant)] text-3xl md:text-4xl ${stat.color}`}>{stat.value}</p>
+                        <p className="relative mt-2 text-[8px] font-semibold tracking-[0.16em] uppercase text-[#D8D1C8]/30">{stat.label}</p>
                       </div>
                     ))}
                   </div>
@@ -705,14 +727,14 @@ export default function AdminPanel() {
                                 <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                               ))}
                             </Pie>
-                            <RTooltip contentStyle={{ background: '#111111', border: '1px solid #8B6B4B33', borderRadius: 0, fontSize: '11px', color: '#F5F1EA' }} />
+                            <RTooltip contentStyle={{ background: '#111111', border: '1px solid #8B6B4B33', borderRadius: '12px', fontSize: '11px', color: '#F5F1EA' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
                       <div className="flex justify-center gap-4 mt-2">
                         {pieData.map((d, i) => (
                           <div key={d.name} className="flex items-center gap-1.5">
-                            <div className="w-2.5 h-2.5" style={{ backgroundColor: PIE_COLORS[i] }} />
+                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: PIE_COLORS[i] }} />
                             <span className="text-[9px] text-[#D8D1C8]/50">{d.name}</span>
                           </div>
                         ))}
@@ -730,7 +752,7 @@ export default function AdminPanel() {
                         }).map(([floor, data]) => (
                           <div key={floor} className="flex items-center gap-3">
                             <span className="text-[10px] text-[#D8D1C8]/40 w-14 font-[family-name:var(--font-inter)]">{floor}</span>
-                            <div className="flex-1 h-4 bg-[#1A1A1A] flex overflow-hidden">
+                            <div className="flex h-2.5 flex-1 overflow-hidden rounded-full bg-[#1A1A18]">
                               {data.available > 0 && <div className="bg-[#4B5646]/70 h-full" style={{ width: `${(data.available / data.total) * 100}%` }} />}
                               {data.reserved > 0 && <div className="bg-[#8B6B4B]/70 h-full" style={{ width: `${(data.reserved / data.total) * 100}%` }} />}
                               {data.sold > 0 && <div className="bg-[#D8D1C8]/30 h-full" style={{ width: `${(data.sold / data.total) * 100}%` }} />}
