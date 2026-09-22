@@ -74,12 +74,43 @@ export default function Contacto() {
   const label = contactoConfig?.label || 'Contacto'
   const title = contactoConfig?.title || 'Agendar Visita'
   const intro = contactoConfig?.intro || 'Nuestro equipo de asesores está disponible para acompañarle en cada paso del proceso. Desde la primera consulta hasta la firma de su nueva residencia, le garantizamos una experiencia personalizada y discreta.'
-  const contactMethods = contactoConfig?.methods || defaultContactMethods
   const schedule = contactoConfig?.schedule || defaultSchedule
-  const interestOptionsRaw = contactoConfig?.interestOptions || defaultInterestOptions.map(o => o.value)
-  const interestOptions = interestOptionsRaw.map((opt: string) => ({ value: opt, label: opt }))
-  const whatsappNumber = generalConfig?.whatsapp || '+57 300 4203548'
   const whatsappMessage = contactoConfig?.whatsappMessage || 'Hola, me interesa conocer más sobre PRAGA Living'
+
+  // General config is the single source of truth for public contact data.
+  // contacto.methods only controls order/label/icon presentation.
+  const publicPhone = generalConfig?.phone || '+57 300 4203548'
+  const publicEmail = generalConfig?.email || 'urbanovagrupoempresarial@gmail.com'
+  const whatsappNumber = generalConfig?.whatsapp || publicPhone
+  const configuredMethods = contactoConfig?.methods || defaultContactMethods
+  const contactMethods = configuredMethods.map((method: { label: string; value: string; href: string; icon: string }) => {
+    if (method.icon === 'phone') {
+      return { ...method, value: publicPhone, href: `tel:${publicPhone.replace(/[^0-9+]/g, '')}` }
+    }
+    if (method.icon === 'email') {
+      return { ...method, value: publicEmail, href: `mailto:${publicEmail}` }
+    }
+    if (method.icon === 'whatsapp') {
+      return {
+        ...method,
+        value: whatsappNumber,
+        href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`,
+      }
+    }
+    return method
+  })
+
+  // Lead interests are derived from the typologies actually published on the site.
+  const publishedTypologies = Array.isArray(config?.tipologias?.items)
+    ? config.tipologias.items
+        .map((item: { name?: string }) => item?.name?.trim())
+        .filter((name: string | undefined): name is string => Boolean(name))
+    : []
+  const fallbackInterests = contactoConfig?.interestOptions || defaultInterestOptions.map(o => o.value)
+  const interestOptionsRaw = publishedTypologies.length > 0
+    ? [...new Set([...publishedTypologies, 'General'])]
+    : fallbackInterests
+  const interestOptions = interestOptionsRaw.map((opt: string) => ({ value: opt, label: opt }))
 
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
