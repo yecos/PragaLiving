@@ -593,8 +593,7 @@ export default function AdminPanel() {
           <button onClick={() => void signOut()} title="Cerrar sesión" className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9E0D3]/8 bg-[#121210] text-[#CFC4B5]/45 hover:text-[#D4B18A] hover:border-[#B89268]/25 transition-all">
             <LogOut className="h-4 w-4" />
           </button>
-          </div>
-        </main>
+        </div>
       </div>
 
       <div className="flex">
@@ -1466,7 +1465,8 @@ export default function AdminPanel() {
 
             </AnimatePresence>
           )}
-        </div>
+          </div>
+        </main>
       </div>
 
       <style jsx global>{`
