@@ -1,10 +1,9 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, useInView } from 'framer-motion'
-import type { LocationLayer, POIPoint } from './MapView'
-import { useSiteConfig } from '@/hooks/useSiteConfig'
+import type { POIPoint } from './MapView'
 
 // ─── Dynamic import of map (SSR disabled — Leaflet needs window) ───
 const MapView = dynamic(() => import('./MapView'), {
@@ -90,34 +89,12 @@ const locationLayers = [
 ]
 
 export default function Ubicacion() {
-  const { config } = useSiteConfig()
-  const locationConfig = config?.ubicacion
-  const generalConfig = config?.general
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const [activeLayer, setActiveLayer] = useState('movilidad')
   const [flyToTarget, setFlyToTarget] = useState<POIPoint | null>(null)
 
-  const layers = useMemo<LocationLayer[]>(() => (
-    Array.isArray(locationConfig?.layers) && locationConfig.layers.length > 0
-      ? locationConfig.layers as LocationLayer[]
-      : locationLayers
-  ), [locationConfig?.layers])
-  const mapCenter = useMemo<[number, number]>(() => {
-    const coords = generalConfig?.coordinates
-    if (Array.isArray(coords) && coords.length >= 2 && Number.isFinite(Number(coords[0])) && Number.isFinite(Number(coords[1]))) {
-      return [Number(coords[0]), Number(coords[1])]
-    }
-    return [6.08895, -75.63514]
-  }, [generalConfig?.coordinates])
-
-  useEffect(() => {
-    if (!layers.some(layer => layer.id === activeLayer)) {
-      setActiveLayer(layers[0]?.id || 'movilidad')
-    }
-  }, [activeLayer, layers])
-
-  const activeLayerData = layers.find(l => l.id === activeLayer)
+  const activeLayerData = locationLayers.find(l => l.id === activeLayer)
   const activePoints = activeLayerData?.points || []
   const activeColor = activeLayerData?.color || '#8B6B4B'
 
@@ -126,10 +103,6 @@ export default function Ubicacion() {
     // Reset fly target after animation
     setTimeout(() => setFlyToTarget(null), 1500)
   }, [])
-
-  const label = locationConfig?.label || 'Ubicación'
-  const title = locationConfig?.title || 'Vender Entorno'
-  const altitude = generalConfig?.altitude || '1,750m s.n.m.'
 
   return (
     <section id="ubicacion" ref={ref} className="relative py-24 md:py-32 bg-[#F5F1EA]">
@@ -316,7 +289,7 @@ export default function Ubicacion() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            {label}
+            Ubicación
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -324,7 +297,7 @@ export default function Ubicacion() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#111111] font-light"
           >
-            {title}
+            Vender Entorno
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
@@ -347,8 +320,6 @@ export default function Ubicacion() {
               activeLayer={activeLayer}
               flyToTarget={flyToTarget}
               onPoiClick={handlePoiClick}
-              layers={layers}
-              center={mapCenter}
             />
           </motion.div>
 
@@ -363,7 +334,7 @@ export default function Ubicacion() {
             <div className="mb-6">
               <p className="text-[9px] tracking-[0.3em] uppercase text-[#8B6B4B] mb-3">Capas</p>
               <div className="flex flex-wrap gap-2">
-                {layers.map((layer) => (
+                {locationLayers.map((layer) => (
                   <button
                     key={layer.id}
                     onClick={() => setActiveLayer(layer.id)}
@@ -445,9 +416,9 @@ export default function Ubicacion() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-[9px] text-[#F5F1EA]/40 tracking-wider">
-                  <span>{Math.abs(mapCenter[0]).toFixed(4)}° {mapCenter[0] >= 0 ? 'N' : 'S'}</span>
-                  <span>{Math.abs(mapCenter[1]).toFixed(4)}° {mapCenter[1] < 0 ? 'W' : 'E'}</span>
-                  <span>{altitude}</span>
+                  <span>6.0890° N</span>
+                  <span>75.6351° W</span>
+                  <span>1,750m s.n.m.</span>
                 </div>
               </div>
             </div>
