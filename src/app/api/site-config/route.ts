@@ -31,7 +31,32 @@ function mergePublishedConfig(dbConfig: Record<string, unknown>) {
     return override === undefined ? fallback : override
   }
 
-  return merge(staticConfig, dbConfig) as Record<string, any>
+  const merged = merge(staticConfig, dbConfig) as Record<string, any>
+
+  // Preserve the original public-site imagery for these three presentation sections.
+  // Admin/database content may still update copy and metadata without replacing the
+  // approved visual selection that was on the site before the latest integration.
+  const preserveItemImages = (section: string, imageKey: 'image' | 'src') => {
+    const staticItems = Array.isArray(staticConfig?.[section]?.items) ? staticConfig[section].items : []
+    const mergedItems = Array.isArray(merged?.[section]?.items) ? merged[section].items : []
+    const imageById = new Map(staticItems.map((item: Record<string, any>) => [String(item.id), item[imageKey]]))
+
+    if (merged?.[section]) {
+      merged[section] = {
+        ...merged[section],
+        items: mergedItems.map((item: Record<string, any>) => ({
+          ...item,
+          [imageKey]: imageById.get(String(item.id)) || item[imageKey],
+        })),
+      }
+    }
+  }
+
+  preserveItemImages('amenidades', 'image')
+  preserveItemImages('tipologias', 'image')
+  preserveItemImages('galeria', 'src')
+
+  return merged
 }
 
 export async function GET() {
