@@ -614,7 +614,10 @@ function TipologiasEditor({ data, onChange, onSave, saving }: { data: any; onCha
                 <TextField label="Habitaciones" value={item.bedrooms} onChange={v => update(i, { ...item, bedrooms: v })} />
                 <TextField label="Baños" value={item.bathrooms} onChange={v => update(i, { ...item, bathrooms: v })} />
               </div>
-              <TextField label="Estado" value={item.status} onChange={v => update(i, { ...item, status: v })} />
+              <div className="border border-[#8B6B4B]/15 bg-[#8B6B4B]/5 px-3 py-2">
+                <p className="text-[9px] uppercase tracking-[0.12em] text-[#8B6B4B]">Estado automático</p>
+                <p className="mt-1 text-[9px] leading-relaxed text-[#D8D1C8]/35">La disponibilidad se calcula desde Residencias.</p>
+              </div>
               <TextField label="Descripción" value={item.description} onChange={v => update(i, { ...item, description: v })} multiline />
               <ImageField label="Imagen" value={item.image} onChange={v => update(i, { ...item, image: v })} category="renders" />
               <div>
@@ -863,9 +866,10 @@ function ContactoEditor({ data, onChange, onSave, saving }: { data: any; onChang
           renderItem={(item, i, update) => (
             <div className="grid grid-cols-2 gap-2">
               <TextField label="Etiqueta" value={item.label} onChange={v => update(i, { ...item, label: v })} />
-              <TextField label="Valor" value={item.value} onChange={v => update(i, { ...item, value: v })} />
-              <TextField label="Href" value={item.href} onChange={v => update(i, { ...item, href: v })} />
               <TextField label="Icono" value={item.icon} onChange={v => update(i, { ...item, icon: v })} />
+              <p className="col-span-2 text-[9px] leading-relaxed text-[#D8D1C8]/30">
+                El teléfono, correo y WhatsApp se toman de Configuración → General para mantener una sola fuente de verdad.
+              </p>
             </div>
           )}
         />
@@ -885,17 +889,11 @@ function ContactoEditor({ data, onChange, onSave, saving }: { data: any; onChang
           )}
         />
       </div>
-      <div>
-        <p className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 mb-3">Opciones de Interés</p>
-        <ArrayEditor
-          items={(d.interestOptions || []).map((o: string) => ({ value: o }))}
-          onChange={v => { d.interestOptions = v.map((x: { value: string }) => x.value); onChange(d) }}
-          addLabel="Agregar Opción"
-          createNew={() => ({ value: '' })}
-          renderItem={(opt, oi, ou) => (
-            <TextField label={`Opción ${oi + 1}`} value={opt.value} onChange={v => ou(oi, { value: v })} />
-          )}
-        />
+      <div className="border border-[#8B6B4B]/20 bg-[#8B6B4B]/5 p-4">
+        <p className="text-[10px] tracking-[0.15em] uppercase text-[#8B6B4B] mb-2">Opciones de interés automáticas</p>
+        <p className="text-[10px] leading-relaxed text-[#D8D1C8]/40">
+          El formulario usa las tipologías publicadas en Contenido web → Tipologías. No es necesario mantener una segunda lista aquí.
+        </p>
       </div>
       <SaveButton onSave={onSave} saving={saving} />
     </div>
