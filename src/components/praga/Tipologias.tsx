@@ -1,19 +1,37 @@
+
 'use client'
 
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const defaultTypologies = [
+type Typology = {
+  id: string
+  name: string
+  area: string
+  bedrooms: string
+  bathrooms: string
+  images: string[]
+  description: string
+  features: string[]
+  status: string
+}
+
+const typologyImages = (prefix: string, count: number) =>
+  Array.from({ length: count }, (_, index) =>
+    '/images/typologies/' + prefix + '-' + String(index + 1).padStart(2, '0') + '.jpg',
+  )
+
+const defaultTypologies: Typology[] = [
   {
     id: 'tipo-104',
     name: '104 m²',
     area: '104',
     bedrooms: '3',
     bathrooms: '2',
-    image: '/images/renders/apto-97.png',
-    description: 'La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior con piso porcelánico, grifería de diseño y balcón amplio con jardín vertical. La altura marca la diferencia.',
-    features: ['3 Habitaciones', 'Vista Valle de Aburrá', 'Piso porcelánico', 'Balcón jardín vertical', 'Grifería premium', 'Acabados superiores'],
+    images: typologyImages('104', 11),
+    description: 'La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior y espacios amplios para vivir con calma, luz natural y privacidad.',
+    features: ['3 Habitaciones', '2 Baños', 'Vista panorámica', 'Sala y comedor', 'Cocina integrada', 'Acabados superiores'],
     status: 'Últimas unidades',
   },
   {
@@ -22,9 +40,9 @@ const defaultTypologies = [
     area: '78.51',
     bedrooms: '3',
     bathrooms: '2',
-    image: '/images/renders/apto-74.png',
-    description: 'Residencia espaciosa de tres habitaciones con dos baños completos. Suite principal con baño privado, dos habitaciones secundarias, sala-comedor abierta al balcón con vegetación, cocina semi-integrada y zona de ropas. Unidades esquineras con doble orientación y ventilación cruzada natural.',
-    features: ['3 Habitaciones', 'Suite principal', '2 Baños completos', 'Balcón con vegetación', 'Cocina semi-integrada', 'Doble orientación'],
+    images: typologyImages('78', 5),
+    description: 'Residencia de tres habitaciones con dos baños completos, cocina integrada y una distribución equilibrada que conecta la zona social con espacios privados cálidos y luminosos.',
+    features: ['3 Habitaciones', '2 Baños', 'Cocina integrada', 'Zona social', 'Habitación principal', 'Vista exterior'],
     status: 'Disponible',
   },
   {
@@ -33,20 +51,20 @@ const defaultTypologies = [
     area: '60',
     bedrooms: '2',
     bathrooms: '1',
-    image: '/images/renders/apto-57.png',
-    description: 'Diseño optimizado de dos habitaciones con máxima funcionalidad. Sala-comedor con balcón, cocina integrada y habitación principal con ventilación cruzada. La eficiencia del espacio no sacrifica la calidad de vida ni los acabados premium.',
-    features: ['2 Habitaciones', 'Balcón', 'Cocina integrada', 'Baño completo', 'Ventilación cruzada', 'Acabados premium'],
+    images: typologyImages('60', 6),
+    description: 'Una residencia compacta y sofisticada de dos habitaciones. La cocina, la sala y el comedor se integran en un ambiente fluido, con iluminación natural y acabados de alta calidad.',
+    features: ['2 Habitaciones', '1 Baño', 'Sala-comedor', 'Cocina integrada', 'Centro de TV', 'Acabados premium'],
     status: 'Disponible',
   },
   {
     id: 'tipo-studio',
-    name: '33-36 m²',
-    area: '33-36',
+    name: '33–36 m²',
+    area: '33–36',
     bedrooms: '1',
     bathrooms: '1',
-    image: '/images/renders/studio-33.png',
-    description: 'Estudios diseñados para inversores y primeros compradores. Cocina integral, baño completo y zona de ropas en un espacio eficiente con acabados premium. Ideal para renta o como punto de entrada al proyecto.',
-    features: ['1 Alcoba', 'Baño completo', 'Cocina integral', 'Zona de ropas', 'Acabados premium', 'Alta rentabilidad'],
+    images: typologyImages('33', 4),
+    description: 'Una tipología eficiente para quienes buscan diseño, confort y una inversión inteligente. Un ambiente integrado con cocina, zona social, alcoba y baño completo.',
+    features: ['1 Alcoba', '1 Baño', 'Ambiente integrado', 'Cocina', 'Diseño eficiente', 'Alta rentabilidad'],
     status: 'Disponible',
   },
 ]
@@ -57,25 +75,44 @@ export default function Tipologias() {
 
   const label = tipoConfig?.label || 'Tipologías'
   const title = tipoConfig?.title || 'Comparar Residencias'
-  const typologies = tipoConfig?.items || defaultTypologies
+  const configuredItems = (tipoConfig?.items || []) as Partial<Typology>[]
+  const typologies: Typology[] = defaultTypologies.map((base, index) => ({
+    ...base,
+    ...(configuredItems[index] || {}),
+    images: base.images,
+  }))
   const ctaText = tipoConfig?.ctaText || 'Solicitar Información'
   const ctaLink = tipoConfig?.ctaLink || '#contacto'
 
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const [selected, setSelected] = useState(0)
+  const [activeImage, setActiveImage] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'compare'>('grid')
 
+  const current = typologies[selected]
+  const selectTypology = (index: number) => {
+    setSelected(index)
+    setActiveImage(0)
+  }
+
+  const previousImage = () => {
+    setActiveImage((currentIndex) => (currentIndex - 1 + current.images.length) % current.images.length)
+  }
+
+  const nextImage = () => {
+    setActiveImage((currentIndex) => (currentIndex + 1) % current.images.length)
+  }
+
   return (
-    <section id="tipologias" ref={ref} className="relative py-24 md:py-32 bg-[#111111]">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
+    <section id="tipologias" ref={ref} className="relative bg-[#111111] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-16 text-center">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
+            className="mb-4 text-[10px] uppercase tracking-[0.5em] text-[#8B6B4B]"
           >
             {label}
           </motion.p>
@@ -83,7 +120,7 @@ export default function Tipologias() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.2 }}
-            className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#F5F1EA] font-light"
+            className="font-[family-name:var(--font-cormorant)] text-3xl font-light text-[#F5F1EA] md:text-5xl"
           >
             {title}
           </motion.h2>
@@ -91,26 +128,29 @@ export default function Tipologias() {
             initial={{ width: 0 }}
             animate={isInView ? { width: 60 } : {}}
             transition={{ duration: 1, delay: 0.5 }}
-            className="h-[1px] bg-[#8B6B4B] mx-auto mt-6"
+            className="mx-auto mt-6 h-px bg-[#8B6B4B]"
           />
         </div>
 
-        {/* View toggle */}
-        <div className="flex justify-center mb-12">
+        <div className="mb-12 flex justify-center">
           <div className="inline-flex border border-[#D8D1C8]/20">
             <button
+              type="button"
               onClick={() => setViewMode('grid')}
-              className={`px-6 py-2 text-[10px] tracking-[0.2em] uppercase transition-all duration-300 ${
-                viewMode === 'grid' ? 'bg-[#8B6B4B] text-[#F5F1EA]' : 'text-[#D8D1C8]/60 hover:text-[#F5F1EA]'
-              }`}
+              className={[
+                'px-6 py-2 text-[10px] uppercase tracking-[0.2em] transition-all duration-300',
+                viewMode === 'grid' ? 'bg-[#8B6B4B] text-[#F5F1EA]' : 'text-[#D8D1C8]/60 hover:text-[#F5F1EA]',
+              ].join(' ')}
             >
               Galería
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('compare')}
-              className={`px-6 py-2 text-[10px] tracking-[0.2em] uppercase transition-all duration-300 ${
-                viewMode === 'compare' ? 'bg-[#8B6B4B] text-[#F5F1EA]' : 'text-[#D8D1C8]/60 hover:text-[#F5F1EA]'
-              }`}
+              className={[
+                'px-6 py-2 text-[10px] uppercase tracking-[0.2em] transition-all duration-300',
+                viewMode === 'compare' ? 'bg-[#8B6B4B] text-[#F5F1EA]' : 'text-[#D8D1C8]/60 hover:text-[#F5F1EA]',
+              ].join(' ')}
             >
               Comparar
             </button>
@@ -118,77 +158,90 @@ export default function Tipologias() {
         </div>
 
         {viewMode === 'grid' ? (
-          /* Grid view */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {typologies.map((typo: typeof defaultTypologies[0], i: number) => (
-              <motion.div
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {typologies.map((typo, i) => (
+              <motion.button
+                type="button"
                 key={typo.id}
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.6 + i * 0.1 }}
-                className="group cursor-pointer"
+                className="group cursor-pointer text-left"
                 onClick={() => {
-                  setSelected(i)
+                  selectTypology(i)
                   setViewMode('compare')
                 }}
               >
-                <div className="relative overflow-hidden mb-5">
+                <div className="relative mb-5 overflow-hidden bg-[#0A0A0A]">
                   <img
-                    src={typo.image}
-                    alt={typo.name}
-                    className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-105"
+                    src={typo.images[0]}
+                    alt={typo.name + ' — vista principal'}
+                    className="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-[#111111]/30 group-hover:bg-[#111111]/10 transition-colors duration-500" />
-                  <div className="absolute top-4 right-4">
-                    <span className={`text-[9px] tracking-[0.15em] uppercase px-3 py-1 ${
-                      typo.status === 'Disponible' ? 'bg-[#4B5646] text-[#F5F1EA]' : 'bg-[#8B6B4B] text-[#F5F1EA]'
-                    }`}>
+                  <div className="absolute inset-0 bg-[#111111]/25 transition-colors duration-500 group-hover:bg-[#111111]/5" />
+                  <div className="absolute right-4 top-4">
+                    <span
+                      className={[
+                        'px-3 py-1 text-[9px] uppercase tracking-[0.15em]',
+                        typo.status === 'Disponible' ? 'bg-[#4B5646] text-[#F5F1EA]' : 'bg-[#8B6B4B] text-[#F5F1EA]',
+                      ].join(' ')}
+                    >
                       {typo.status}
                     </span>
                   </div>
+                  <div className="absolute bottom-4 left-4 bg-[#111111]/80 px-3 py-1 text-[9px] uppercase tracking-[0.15em] text-[#F5F1EA]/80">
+                    {typo.images.length} vistas
+                  </div>
                 </div>
-                <div className="flex items-baseline justify-between mb-2">
-                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] group-hover:text-[#8B6B4B] transition-colors">
+                <div className="mb-2 flex items-baseline justify-between">
+                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA] transition-colors group-hover:text-[#8B6B4B]">
                     {typo.name}
                   </h3>
                   <span className="font-[family-name:var(--font-cormorant)] text-2xl text-[#8B6B4B]">
                     {typo.area}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#D8D1C8]/50">{typo.area} m² · {typo.bedrooms} Hab · {typo.bathrooms} Baños</p>
-              </motion.div>
+                <p className="text-[11px] text-[#D8D1C8]/50">
+                  {typo.area} m² · {typo.bedrooms} Hab · {typo.bathrooms} Baños
+                </p>
+              </motion.button>
             ))}
           </div>
         ) : (
-          /* Compare view */
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Selector column */}
-            <div className="lg:col-span-1 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible">
-              {typologies.map((typo: typeof defaultTypologies[0], i: number) => (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+            <div className="flex gap-2 overflow-x-auto lg:col-span-1 lg:flex-col lg:overflow-x-visible">
+              {typologies.map((typo, i) => (
                 <button
+                  type="button"
                   key={typo.id}
-                  onClick={() => setSelected(i)}
-                  className={`text-left p-3 min-w-[120px] lg:min-w-0 transition-all duration-300 border ${
+                  onClick={() => selectTypology(i)}
+                  className={[
+                    'min-w-[120px] border p-3 text-left transition-all duration-300 lg:min-w-0',
                     selected === i
                       ? 'border-[#8B6B4B] bg-[#8B6B4B]/10'
-                      : 'border-[#D8D1C8]/10 hover:border-[#8B6B4B]/30'
-                  }`}
+                      : 'border-[#D8D1C8]/10 hover:border-[#8B6B4B]/30',
+                  ].join(' ')}
                 >
-                  <p className={`text-[10px] tracking-[0.1em] uppercase ${
-                    selected === i ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/40'
-                  }`}>
+                  <p
+                    className={[
+                      'text-[10px] uppercase tracking-[0.1em]',
+                      selected === i ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/40',
+                    ].join(' ')}
+                  >
                     {typo.name}
                   </p>
-                  <p className={`font-[family-name:var(--font-cormorant)] text-lg mt-1 ${
-                    selected === i ? 'text-[#F5F1EA]' : 'text-[#D8D1C8]/40'
-                  }`}>
-                    {typo.area} m²
+                  <p
+                    className={[
+                      'mt-1 font-[family-name:var(--font-cormorant)] text-lg',
+                      selected === i ? 'text-[#F5F1EA]' : 'text-[#D8D1C8]/40',
+                    ].join(' ')}
+                  >
+                    {typo.images.length} vistas
                   </p>
                 </button>
               ))}
             </div>
 
-            {/* Detail view */}
             <div className="lg:col-span-4">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -197,56 +250,100 @@ export default function Tipologias() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.4 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                  className="grid grid-cols-1 gap-8 md:grid-cols-2"
                 >
-                  <div className="relative overflow-hidden h-[350px] md:h-[400px]">
-                    <img
-                      src={typologies[selected].image}
-                      alt={typologies[selected].name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div>
+                    <div className="relative h-[350px] overflow-hidden bg-[#0A0A0A] md:h-[400px]">
+                      <img
+                        src={current.images[activeImage]}
+                        alt={current.name + ' — vista ' + (activeImage + 1)}
+                        className="h-full w-full object-cover"
+                      />
+                      {current.images.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={previousImage}
+                            aria-label="Imagen anterior"
+                            className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={nextImage}
+                            aria-label="Imagen siguiente"
+                            className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
+                          >
+                            ›
+                          </button>
+                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#111111]/75 px-3 py-1 text-[9px] uppercase tracking-[0.15em] text-[#F5F1EA]/80">
+                            Vista {activeImage + 1} / {current.images.length}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    {current.images.length > 1 && (
+                      <div className="mt-3 grid grid-cols-4 gap-2 md:grid-cols-6">
+                        {current.images.map((src, index) => (
+                          <button
+                            type="button"
+                            key={src}
+                            onClick={() => setActiveImage(index)}
+                            aria-label={'Ver vista ' + (index + 1) + ' de ' + current.name}
+                            className={[
+                              'relative aspect-[4/3] overflow-hidden border-2',
+                              activeImage === index ? 'border-[#8B6B4B]' : 'border-transparent opacity-55 hover:opacity-90',
+                            ].join(' ')}
+                          >
+                            <img src={src} alt="" className="h-full w-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
                   <div className="flex flex-col justify-center">
-                    <p className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-2">
-                      {typologies[selected].status}
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.5em] text-[#8B6B4B]">
+                      {current.status}
                     </p>
-                    <h3 className="font-[family-name:var(--font-cormorant)] text-3xl md:text-4xl text-[#F5F1EA] mb-2">
-                      {typologies[selected].name}
+                    <h3 className="mb-2 font-[family-name:var(--font-cormorant)] text-3xl font-light text-[#F5F1EA] md:text-4xl">
+                      {current.name}
                     </h3>
-                    <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#8B6B4B] mb-6">
-                      {typologies[selected].area} m²
+                    <p className="mb-6 font-[family-name:var(--font-cormorant)] text-2xl text-[#8B6B4B]">
+                      {current.area} m²
                     </p>
 
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="mb-6 grid grid-cols-3 gap-4">
                       <div className="border border-[#D8D1C8]/20 p-3 text-center">
-                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{typologies[selected].bedrooms}</p>
-                        <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/50 mt-1">Habitaciones</p>
+                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{current.bedrooms}</p>
+                        <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#D8D1C8]/50">Habitaciones</p>
                       </div>
                       <div className="border border-[#D8D1C8]/20 p-3 text-center">
-                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{typologies[selected].bathrooms}</p>
-                        <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/50 mt-1">Baños</p>
+                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{current.bathrooms}</p>
+                        <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#D8D1C8]/50">Baños</p>
                       </div>
                       <div className="border border-[#D8D1C8]/20 p-3 text-center">
-                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{typologies[selected].area}</p>
-                        <p className="text-[9px] tracking-[0.1em] uppercase text-[#D8D1C8]/50 mt-1">m²</p>
+                        <p className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">{current.area}</p>
+                        <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#D8D1C8]/50">m²</p>
                       </div>
                     </div>
 
-                    <p className="font-[family-name:var(--font-inter)] text-sm text-[#D8D1C8]/60 leading-relaxed mb-6">
-                      {typologies[selected].description}
+                    <p className="mb-6 font-[family-name:var(--font-inter)] text-sm leading-relaxed text-[#D8D1C8]/60">
+                      {current.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {typologies[selected].features.map((f: string, i: number) => (
-                        <span key={i} className="text-[10px] tracking-[0.1em] uppercase border border-[#8B6B4B]/30 text-[#8B6B4B] px-3 py-1.5">
-                          {f}
+                    <div className="mb-8 flex flex-wrap gap-2">
+                      {current.features.map((feature) => (
+                        <span key={feature} className="border border-[#8B6B4B]/30 px-3 py-1.5 text-[10px] uppercase tracking-[0.1em] text-[#8B6B4B]">
+                          {feature}
                         </span>
                       ))}
                     </div>
 
                     <a
                       href={ctaLink}
-                      className="inline-block text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3.5 hover:bg-[#7A5C3E] transition-all duration-300 w-fit"
+                      className="inline-block w-fit bg-[#8B6B4B] px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] text-[#F5F1EA] transition-all duration-300 hover:bg-[#7A5C3E]"
                     >
                       {ctaText}
                     </a>
