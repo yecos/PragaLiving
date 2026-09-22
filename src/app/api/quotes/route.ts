@@ -67,15 +67,15 @@ export async function POST(req: NextRequest) {
     const days = validDays || 30
     const validUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString()
 
-    // createQuote signature accepts: leadId, apartmentId, discount, paymentPlan, notes, validDays
-    // finalPrice and validUntil are computed internally by data.ts
     const result = await createQuote({
       leadId,
       apartmentId,
       discount: discountAmount,
+      finalPrice,
       paymentPlan: paymentPlan || 'Contado',
       notes: notes || '',
       validDays: days,
+      validUntil: new Date(validUntil),
     })
 
     if (!result.success || !result.quote) {
@@ -83,13 +83,6 @@ export async function POST(req: NextRequest) {
     }
 
     const quote = result.quote
-
-    // Override the in-memory quote with our computed finalPrice and validUntil
-    // (data.ts fallback doesn't have access to apartment.price, so it sets finalPrice=0)
-    if ('finalPrice' in quote && (quote as any).finalPrice === 0) {
-      ;(quote as any).finalPrice = finalPrice
-      ;(quote as any).validUntil = validUntil
-    }
 
     // Enrich for response
     const allLeads = await getLeads()
