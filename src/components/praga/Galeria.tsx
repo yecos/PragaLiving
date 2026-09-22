@@ -6,11 +6,9 @@ import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 const defaultCategories = [
   "Exteriores",
-  "Interiores",
   "Atrio",
   "Amenidades",
-  "Tipologías",
-  "Planos"
+  "Tipologías"
 ]
 
 const defaultGalleryItems = [
@@ -19,7 +17,6 @@ const defaultGalleryItems = [
   {"id":3,"category":"Exteriores","src":"/images/renders/hero-night.jpg","title":"Fachada principal · Noche"},
   {"id":4,"category":"Exteriores","src":"/images/renders/exterior-dusk.png","title":"Fachada · Hora azul"},
   {"id":5,"category":"Exteriores","src":"/images/renders/exterior-golden.png","title":"Fachada · Luz dorada"},
-  {"id":6,"category":"Interiores","src":"/images/renders/lobby.png","title":"Lobby principal"},
   {"id":7,"category":"Atrio","src":"/images/renders/atrio-2026/recepcion-bienvenida.jpg","title":"Atrio · Bienvenida"},
   {"id":8,"category":"Atrio","src":"/images/renders/atrio-2026/recepcion-corredor.jpg","title":"Atrio · Recorridos luminosos"},
   {"id":9,"category":"Atrio","src":"/images/renders/atrio-2026/recepcion-escalera.jpg","title":"Atrio · Naturaleza integrada"},
@@ -73,17 +70,6 @@ const defaultGalleryItems = [
   {"id":57,"category":"Tipologías","src":"/images/typologies/33-02.jpg","title":"33–36 m² · Vista 02"},
   {"id":58,"category":"Tipologías","src":"/images/typologies/33-03.jpg","title":"33–36 m² · Vista 03"},
   {"id":59,"category":"Tipologías","src":"/images/typologies/33-04.jpg","title":"33–36 m² · Vista 04"},
-  {"id":60,"category":"Planos","src":"/images/planos/fachadas.jpg","title":"Fachadas"},
-  {"id":61,"category":"Planos","src":"/images/planos/planta-parqueaderos.jpg","title":"Planta de parqueaderos"},
-  {"id":62,"category":"Planos","src":"/images/planos/planta-primer-piso.jpg","title":"Planta primer piso"},
-  {"id":63,"category":"Planos","src":"/images/planos/planta-social.jpg","title":"Planta zona social"},
-  {"id":64,"category":"Planos","src":"/images/planos/planta-techos.jpg","title":"Planta de techos"},
-  {"id":65,"category":"Planos","src":"/images/planos/planta-tipo-impares.jpg","title":"Planta tipo · Pisos impares"},
-  {"id":66,"category":"Planos","src":"/images/planos/planta-tipo-pares.jpg","title":"Planta tipo · Pisos pares"},
-  {"id":67,"category":"Planos","src":"/images/planos/planta-tipo-residencial.png","title":"Planta tipo · Residencial"},
-  {"id":68,"category":"Planos","src":"/images/planos/planta-tipo.jpg","title":"Planta tipo"},
-  {"id":69,"category":"Planos","src":"/images/planos/secciones.jpg","title":"Secciones del proyecto"},
-  {"id":70,"category":"Planos","src":"/images/renders/exploded-view.png","title":"Vista explotada del edificio"},
 ]
 
 export default function Galeria() {
