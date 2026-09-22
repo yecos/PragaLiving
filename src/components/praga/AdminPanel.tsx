@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
-import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw, LayoutDashboard, Building2, Layers3, Users, Sparkles, PanelsTopLeft, MapPin, Settings2, Images, ReceiptText, LogOut, ChevronRight } from 'lucide-react'
+import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw, LayoutDashboard, Building2, Layers3, Users, PanelsTopLeft, MapPin, Settings2, Images, ReceiptText, LogOut, ChevronRight } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
 import SiteConfigEditor from './SiteConfigEditor'
 import ConfirmDialog from './ConfirmDialog'
@@ -232,18 +232,15 @@ export default function AdminPanel() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [aptRes, leadRes, amenRes] = await Promise.all([
-        fetch('/api/apartments'),
-        fetch('/api/leads'),
-        fetch('/api/amenities'),
+      const [aptRes, leadRes] = await Promise.all([
+        fetch('/api/apartments', { cache: 'no-store' }),
+        fetch('/api/leads', { cache: 'no-store' }),
       ])
       const aptData = await aptRes.json()
       const leadData = await leadRes.json()
-      const amenData = await amenRes.json()
       setApartments(aptData.apartments || [])
       setLeads(leadData.leads || [])
-      setAmenities(amenData.amenities || [])
-      if (!aptRes.ok || !leadRes.ok || !amenRes.ok) {
+      if (!aptRes.ok || !leadRes.ok) {
         toast.error('Algunos datos no se pudieron cargar')
       }
     } catch (err) {
