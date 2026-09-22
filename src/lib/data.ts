@@ -9,6 +9,7 @@
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
+import { randomUUID } from 'crypto'
 
 const prisma = db
 
@@ -116,15 +117,15 @@ export interface Quote {
   updatedAt: Date | string
 }
 
-// Counter persists across hot reloads in dev
-const globalForQuotes = globalThis as unknown as { quoteCounter?: number }
-let quoteCounter = globalForQuotes.quoteCounter ?? 0
-
+// Serverless-safe quote number.
+// Never rely on an in-memory counter: Vercel can run multiple instances and
+// restart them independently, which can generate duplicate numbers.
 export function generateQuoteNumber(): string {
-  quoteCounter++
-  globalForQuotes.quoteCounter = quoteCounter
-  const year = new Date().getFullYear()
-  return `COT-${year}-${String(quoteCounter).padStart(4, '0')}`
+  const now = new Date()
+  const year = now.getFullYear()
+  const date = `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`
+  const unique = randomUUID().slice(0, 6).toUpperCase()
+  return `COT-${year}${date}-${unique}`
 }
 
 export async function getQuotes(filters?: { status?: string }): Promise<Quote[]> {
