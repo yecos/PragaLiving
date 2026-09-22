@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, type ComponentType } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
-import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw, LayoutDashboard, Building2, Layers3, Users, Sparkles, PanelsTopLeft, MapPin, Settings2, Images, ReceiptText, LogOut, ChevronRight, Menu } from 'lucide-react'
+import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw, LayoutDashboard, Building2, Layers3, Users, Sparkles, PanelsTopLeft, MapPin, Settings2, Images, ReceiptText, LogOut, ChevronRight } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
 import SiteConfigEditor from './SiteConfigEditor'
 import ConfirmDialog from './ConfirmDialog'
@@ -549,7 +549,7 @@ export default function AdminPanel() {
     )
   }
 
-  const tabs: { id: Tab; label: string; description: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  const tabs: { id: Tab; label: string; description: string; icon: ComponentType<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Resumen', description: 'Pulso comercial del proyecto', icon: LayoutDashboard },
     { id: 'apartments', label: 'Residencias', description: 'Inventario, precio y estado', icon: Building2 },
     { id: 'plantas', label: 'Plantas', description: 'Disponibilidad interactiva', icon: Layers3 },
