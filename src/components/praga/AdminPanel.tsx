@@ -555,7 +555,6 @@ export default function AdminPanel() {
     { id: 'plantas', label: 'Plantas', description: 'Disponibilidad interactiva', icon: Layers3 },
     { id: 'leads', label: 'Leads', description: 'Prospectos y seguimiento', icon: Users },
     { id: 'cotizaciones', label: 'Cotizaciones', description: 'Propuestas comerciales', icon: ReceiptText },
-    { id: 'amenities', label: 'Amenidades', description: 'Operación de amenidades', icon: Sparkles },
     { id: 'contenido', label: 'Contenido web', description: 'Textos, imágenes y secciones', icon: PanelsTopLeft },
     { id: 'ubicacion', label: 'Ubicación', description: 'Mapa y puntos de interés', icon: MapPin },
     { id: 'medios', label: 'Biblioteca', description: 'Archivos e imágenes', icon: Images },
