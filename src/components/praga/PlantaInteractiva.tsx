@@ -352,12 +352,12 @@ function GlassDetailPanel({
       {/* Price range */}
       <div className="mb-6 p-3 border border-[#8B6B4B]/20 bg-[#8B6B4B]/5">
         <p className="text-[9px] text-[#D8D1C8]/40 uppercase tracking-wider font-[family-name:var(--font-inter)] mb-1">
-          Rango de precio
+          Precio
         </p>
         <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#8B6B4B]">
           {unit.priceRange}
         </p>
-        <p className="text-[8px] text-[#D8D1C8]/25 font-[family-name:var(--font-inter)] mt-1">COP · Aprox.</p>
+        <p className="text-[8px] text-[#D8D1C8]/25 font-[family-name:var(--font-inter)] mt-1">COP</p>
       </div>
 
       {/* Action buttons */}
