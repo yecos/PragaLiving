@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RTooltip } from 'recharts'
-import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw } from 'lucide-react'
+import { Download, Upload, Copy, Check, ImageIcon, ExternalLink, FileText, Plus, X, RefreshCw, LayoutDashboard, Building2, Layers3, Users, Sparkles, PanelsTopLeft, MapPin, Settings2, Images, ReceiptText, LogOut, ChevronRight, Menu } from 'lucide-react'
 import FloorPlanEditor from './FloorPlanEditor'
 import SiteConfigEditor from './SiteConfigEditor'
 import ConfirmDialog from './ConfirmDialog'
@@ -548,33 +548,40 @@ export default function AdminPanel() {
     )
   }
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'apartments', label: 'Apartamentos' },
-    { id: 'plantas', label: 'Plantas' },
-    { id: 'leads', label: 'Leads' },
-    { id: 'amenities', label: 'Amenidades' },
-    { id: 'contenido', label: 'Contenido' },
-    { id: 'ubicacion', label: 'Ubicación' },
-    { id: 'configuracion', label: 'Configuración' },
-    { id: 'medios', label: 'Medios' },
-    { id: 'cotizaciones', label: 'Cotizaciones' },
+  const tabs: { id: Tab; label: string; description: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'dashboard', label: 'Resumen', description: 'Pulso comercial del proyecto', icon: LayoutDashboard },
+    { id: 'apartments', label: 'Residencias', description: 'Inventario, precio y estado', icon: Building2 },
+    { id: 'plantas', label: 'Plantas', description: 'Disponibilidad interactiva', icon: Layers3 },
+    { id: 'leads', label: 'Leads', description: 'Prospectos y seguimiento', icon: Users },
+    { id: 'cotizaciones', label: 'Cotizaciones', description: 'Propuestas comerciales', icon: ReceiptText },
+    { id: 'amenities', label: 'Amenidades', description: 'Operación de amenidades', icon: Sparkles },
+    { id: 'contenido', label: 'Contenido web', description: 'Textos, imágenes y secciones', icon: PanelsTopLeft },
+    { id: 'ubicacion', label: 'Ubicación', description: 'Mapa y puntos de interés', icon: MapPin },
+    { id: 'medios', label: 'Biblioteca', description: 'Archivos e imágenes', icon: Images },
+    { id: 'configuracion', label: 'Configuración', description: 'Contacto, SEO y sistema', icon: Settings2 },
   ]
+  const activeTabMeta = tabs.find(tab => tab.id === activeTab) || tabs[0]
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-[#0A0A09] text-[#F6F0E7]">
+      <div className="pointer-events-none fixed inset-0 opacity-60" style={{ background: 'radial-gradient(circle at 72% 0%, rgba(184,146,104,0.08), transparent 30%), radial-gradient(circle at 10% 90%, rgba(184,146,104,0.035), transparent 28%)' }} />
       {/* Top bar */}
-      <div className="bg-[#111111] border-b border-[#D8D1C8]/5 px-6 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[#0D0D0C]/90 backdrop-blur-xl border-b border-[#E9E0D3]/7 px-4 md:px-7 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <img src="/images/logo.png" alt="PRAGA" className="h-8 w-auto brightness-0 invert opacity-70" />
-          <span className="text-[10px] tracking-[0.3em] uppercase text-[#8B6B4B]">Admin</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#B89268]/20 bg-[#B89268]/5">
+            <img src="/images/logo.png" alt="PRAGA" className="h-6 w-auto brightness-0 invert opacity-85" />
+          </div>
+          <div className="hidden sm:block">
+            <p className="font-[family-name:var(--font-cormorant)] text-lg leading-none text-[#F7F1E8]">PRAGA Living</p>
+            <span className="mt-1 block text-[8px] tracking-[0.28em] uppercase text-[#B89268]">Private Management Suite</span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="hidden sm:flex items-center gap-2 rounded-xl border border-[#E9E0D3]/8 bg-[#121210] px-3.5 py-2.5 text-[9px] font-medium tracking-[0.12em] uppercase text-[#CFC4B5]/55 hover:text-[#E8D8C5] hover:border-[#B89268]/25 transition-all">
             <ExternalLink className="w-3 h-3" />
             Abrir Sitio
           </a>
-          <button onClick={() => void fetchData()} disabled={loading} className="flex items-center gap-1.5 text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors disabled:opacity-50">
+          <button onClick={() => void fetchData()} disabled={loading} className="flex items-center gap-2 rounded-xl border border-[#E9E0D3]/8 bg-[#121210] px-3.5 py-2.5 text-[9px] font-medium tracking-[0.12em] uppercase text-[#CFC4B5]/55 hover:text-[#E8D8C5] hover:border-[#B89268]/25 transition-all disabled:opacity-50">
             {loading ? (
               <div className="w-3 h-3 border border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
             ) : (
@@ -582,35 +589,82 @@ export default function AdminPanel() {
             )}
             {loading ? 'Cargando...' : 'Actualizar'}
           </button>
-          <button onClick={() => void signOut()} className="text-[10px] tracking-wider uppercase text-[#D8D1C8]/30 hover:text-[#8B6B4B] transition-colors">
-            Cerrar Sesión
+          <button onClick={() => void signOut()} title="Cerrar sesión" className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E9E0D3]/8 bg-[#121210] text-[#CFC4B5]/45 hover:text-[#D4B18A] hover:border-[#B89268]/25 transition-all">
+            <LogOut className="h-4 w-4" />
           </button>
-        </div>
+          </div>
+        </main>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-56 bg-[#111111] border-r border-[#D8D1C8]/5 min-h-[calc(100vh-56px)] p-4 hidden md:block">
-          <nav className="space-y-1">
+        <aside className="relative z-10 w-[280px] bg-[#0D0D0C]/75 border-r border-[#E9E0D3]/7 min-h-[calc(100vh-68px)] p-4 hidden lg:block">
+          <div className="sticky top-[84px]">
+            <div className="mb-5 px-3">
+              <p className="text-[8px] font-semibold tracking-[0.22em] uppercase text-[#B89268]/75">Workspace</p>
+              <p className="mt-2 text-xs leading-relaxed text-[#CFC4B5]/35">Gestiona ventas, contenido y operación desde un solo lugar.</p>
+            </div>
+          <nav className="space-y-1.5">
             {tabs.map((tab) => (
-              <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`w-full text-left px-4 py-2.5 text-[11px] tracking-[0.1em] uppercase transition-all duration-300 ${activeTab === tab.id ? 'bg-[#8B6B4B]/10 text-[#8B6B4B] border-l-2 border-[#8B6B4B]' : 'text-[#D8D1C8]/30 hover:text-[#D8D1C8]/50 border-l-2 border-transparent'}`}>
-                {tab.label}
-              </button>
+              (() => {
+                const Icon = tab.icon
+                const active = activeTab === tab.id
+                return (
+                  <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`group w-full rounded-xl border px-3.5 py-3 text-left transition-all duration-300 ${active ? 'border-[#B89268]/25 bg-[#B89268]/10 shadow-[0_12px_28px_rgba(0,0,0,0.12)]' : 'border-transparent text-[#CFC4B5]/45 hover:bg-[#151513] hover:border-[#E9E0D3]/7'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${active ? 'border-[#B89268]/25 bg-[#B89268]/10 text-[#D0AE86]' : 'border-[#E9E0D3]/7 bg-[#121210] text-[#CFC4B5]/35 group-hover:text-[#D0AE86]'}`}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-[10px] font-semibold tracking-[0.08em] uppercase ${active ? 'text-[#EEDDC9]' : 'text-[#D9CFC2]/55 group-hover:text-[#E7D8C6]/80'}`}>{tab.label}</p>
+                        <p className="mt-1 truncate text-[9px] text-[#CFC4B5]/25">{tab.description}</p>
+                      </div>
+                      <ChevronRight className={`h-3.5 w-3.5 transition-all ${active ? 'translate-x-0 text-[#B89268]' : '-translate-x-1 text-transparent group-hover:translate-x-0 group-hover:text-[#B89268]/50'}`} />
+                    </div>
+                  </button>
+                )
+              })()
             ))}
           </nav>
-        </div>
+          <div className="mt-6 rounded-2xl border border-[#B89268]/12 bg-gradient-to-br from-[#B89268]/8 to-transparent p-4">
+            <p className="text-[8px] font-semibold tracking-[0.18em] uppercase text-[#B89268]/70">Estado del sitio</p>
+            <div className="mt-3 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.45)]" />
+              <span className="text-[10px] text-[#D9CFC2]/60">Contenido sincronizado</span>
+            </div>
+          </div>
+          </div>
+        </aside>
 
         {/* Mobile tabs */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111111] border-t border-[#D8D1C8]/5 z-50 flex">
-          {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`flex-1 py-3 text-[9px] tracking-wider uppercase ${activeTab === tab.id ? 'text-[#8B6B4B]' : 'text-[#D8D1C8]/30'}`}>
-              {tab.label}
-            </button>
-          ))}
+        <div className="lg:hidden fixed bottom-3 left-3 right-3 z-50 overflow-x-auto rounded-2xl border border-[#E9E0D3]/10 bg-[#10100F]/95 p-2 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          <div className="flex min-w-max gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button key={tab.id} onClick={() => handleTabSwitch(tab.id)} className={`flex min-w-[82px] flex-col items-center gap-1.5 rounded-xl px-3 py-2 text-[8px] font-medium tracking-[0.08em] uppercase transition-all ${activeTab === tab.id ? 'bg-[#B89268]/12 text-[#D4B18A]' : 'text-[#CFC4B5]/35'}`}>
+                  <Icon className="h-4 w-4" />
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Main content */}
-        <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
+        <main className="relative z-10 min-w-0 flex-1 p-4 pb-28 md:p-7 lg:pb-8">
+          <div className="mx-auto max-w-[1540px]">
+            <div className="mb-7 flex flex-col gap-4 rounded-[24px] border border-[#E9E0D3]/7 bg-gradient-to-r from-[#151513] to-[#10100F] p-5 md:flex-row md:items-end md:justify-between md:p-6 shadow-[0_18px_60px_rgba(0,0,0,0.16)]">
+              <div>
+                <p className="text-[8px] font-semibold tracking-[0.22em] uppercase text-[#B89268]/75">PRAGA Management Suite</p>
+                <h1 className="mt-2 font-[family-name:var(--font-cormorant)] text-3xl font-light text-[#F7F1E8] md:text-4xl">{activeTabMeta.label}</h1>
+                <p className="mt-1 text-xs text-[#CFC4B5]/38">{activeTabMeta.description}</p>
+              </div>
+              <div className="flex items-center gap-2 text-[9px] text-[#CFC4B5]/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                Datos en vivo
+              </div>
+            </div>
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="w-8 h-8 border-2 border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
