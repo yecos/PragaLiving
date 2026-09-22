@@ -155,9 +155,11 @@ export async function createQuote(data: {
   leadId: string
   apartmentId: string
   discount?: number
+  finalPrice: number
   paymentPlan?: string
   notes?: string
   validDays?: number
+  validUntil?: Date
 }): Promise<{ success: boolean; quote?: Quote; error?: string }> {
   try {
     const created = await prisma.quote.create({
@@ -166,11 +168,11 @@ export async function createQuote(data: {
         leadId: data.leadId,
         apartmentId: data.apartmentId,
         discount: data.discount || 0,
-        finalPrice: 0, // API route computes and overrides
+        finalPrice: data.finalPrice,
         paymentPlan: data.paymentPlan || 'Contado',
         notes: data.notes || '',
         validDays: data.validDays || 30,
-        validUntil: new Date(Date.now() + (data.validDays || 30) * 24 * 60 * 60 * 1000),
+        validUntil: data.validUntil || new Date(Date.now() + (data.validDays || 30) * 24 * 60 * 60 * 1000),
         status: 'draft',
       },
     })
