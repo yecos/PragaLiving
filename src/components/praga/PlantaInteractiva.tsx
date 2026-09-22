@@ -12,6 +12,7 @@ type UnitStatus = 'available' | 'reserved' | 'sold'
 
 interface ApartmentZone {
   id: string
+  apartmentId?: string
   polygon: number[][]
   name: string
   area: number
@@ -39,6 +40,7 @@ interface FloorPlanConfig {
 // UnitData for the detail panel (derived from ApartmentZone)
 interface UnitData {
   id: string
+  apartmentId?: string
   name: string
   area: number
   bedrooms: number
@@ -83,6 +85,7 @@ function getPolygonCenter(polygon: number[][]): [number, number] {
 function apartmentToUnit(apt: ApartmentZone): UnitData {
   return {
     id: apt.id,
+    apartmentId: apt.apartmentId,
     name: apt.name,
     area: apt.area,
     bedrooms: apt.bedrooms,
@@ -370,17 +373,18 @@ function GlassDetailPanel({
         </button>
         <button
           onClick={async () => {
+            if (unit.apartmentId) {
+              window.open(`/api/ficha?id=${unit.apartmentId}`, '_blank')
+              return
+            }
+
             try {
-              const res = await fetch(`/api/apartments?floor=${encodeURIComponent(floor.name.replace('Piso ', ''))}`)
+              const res = await fetch(`/api/apartments?floor=${encodeURIComponent(floor.name.replace('Piso ', ''))}`, { cache: 'no-store' })
               const data = await res.json()
-              const dbApt = data.apartments?.find((a: { name: string; area: number }) => a.name === unit.name || Math.abs(a.area - unit.area) < 1)
-              if (dbApt) {
-                window.open(`/api/ficha?id=${dbApt.id}`, '_blank')
-              } else if (data.apartments?.length > 0) {
-                window.open(`/api/ficha?id=${data.apartments[0].id}`, '_blank')
-              }
+              const dbApt = data.apartments?.find((a: { name: string; area: number }) => a.name === unit.name || Math.abs(a.area - unit.area) < 0.25)
+              if (dbApt) window.open(`/api/ficha?id=${dbApt.id}`, '_blank')
             } catch {
-              // Silently fail
+              // The unit remains usable even if the downloadable sheet lookup fails.
             }
           }}
           className="block w-full text-center text-[10px] tracking-[0.2em] uppercase border border-[#D8D1C8]/20 text-[#D8D1C8]/50 py-3 hover:border-[#D8D1C8]/40 transition-colors font-[family-name:var(--font-inter)]"
@@ -656,16 +660,14 @@ export default function PlantaInteractiva() {
   const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
-  const [dbApartments, setDbApartments] = useState<Array<{ name: string; area: number; status: string; price: number; typology: string }>>([])
 
   // Fetch floor plan config, typology renders, and apartments from DB
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const [floorRes, configRes, aptsRes] = await Promise.all([
-          fetch('/api/floor-plans'),
-          fetch('/api/site-config'),
-          fetch('/api/apartments'),
+        const [floorRes, configRes] = await Promise.all([
+          fetch('/api/floor-plans', { cache: 'no-store' }),
+          fetch('/api/site-config', { cache: 'no-store' }),
         ])
         const floorData = await floorRes.json()
         setConfig(floorData)
@@ -682,14 +684,6 @@ export default function PlantaInteractiva() {
           }
         }
 
-        // Load apartments from DB to merge real-time price/status
-        // This ensures changes in admin (price, availability) reflect on the public site
-        if (aptsRes.ok) {
-          const aptsData = await aptsRes.json()
-          if (aptsData.apartments) {
-            setDbApartments(aptsData.apartments)
-          }
-        }
       } catch {
         // Silently fail
       }
@@ -701,26 +695,8 @@ export default function PlantaInteractiva() {
   const floor = floors[selectedFloor] ?? null
   const units = useMemo(() => {
     if (!floor) return []
-    // Merge floor plan data (polygons, layout) with DB data (real-time price, status)
-    // This ensures changes in admin (price updates, status changes) reflect on the public site
-    return floor.apartments.map((apt) => {
-      const unit = apartmentToUnit(apt)
-      // Find matching DB apartment by name (e.g. "Apto 101") or area+floor
-      const dbApt = dbApartments.find(
-        (db) => db.name === apt.name || (Math.abs(db.area - apt.area) < 0.5 && db.typology === apt.typology)
-      )
-      if (dbApt) {
-        // Override with real-time DB values
-        unit.status = (dbApt.status as UnitStatus) || unit.status
-        // Update priceRange with actual price from DB
-        if (dbApt.price > 0) {
-          const priceM = Math.round(dbApt.price / 1_000_000)
-          unit.priceRange = `$${priceM}M – $${priceM + 20}M`
-        }
-      }
-      return unit
-    })
-  }, [floor, dbApartments])
+    return floor.apartments.map(apartmentToUnit)
+  }, [floor])
 
   const handleFloorSelect = useCallback((i: number) => {
     setSelectedFloor(i)
