@@ -293,73 +293,73 @@
       {
         "id": "coworking",
         "name": "Coworking",
-        "description": "Un entorno sereno para concentrarse, crear y conectar. La luz natural, las salas de reunión y las zonas de trabajo flexible hacen que cada jornada fluya sin salir de casa.",
+        "description": "Espacio de trabajo colaborativo diseñado para profesionales que buscan inspiración y productividad sin salir de casa. Conectividad de alta velocidad, zonas de concentración y áreas de reunión en un entorno que estimula la creatividad.",
         "image": "/images/renders/coworking.png",
         "benefits": [
-          "Trabajo flexible",
+          "Fibra óptica",
           "Salas de reunión",
-          "Luz natural",
-          "Conectividad"
+          "Zonas silenciosas",
+          "Café incluido"
         ]
       },
       {
         "id": "gimnasio",
         "name": "Gimnasio",
-        "description": "Entrenar se convierte en parte del paisaje. Un gimnasio completo, bañado por luz natural y equipado para combinar cardio, fuerza y movimiento funcional.",
+        "description": "Equipamiento de última generación en un espacio diseñado para entrenar con vista al exterior. Máquinas cardiovasculares, zona de pesos libres y área funcional para rutinas personalizadas en un entorno que motiva el bienestar físico.",
         "image": "/images/renders/gimnasio.png",
         "benefits": [
-          "Cardio",
-          "Fuerza",
+          "Equipamiento premium",
+          "Vista exterior",
           "Zona funcional",
-          "Vista panorámica"
+          "Pesos libres"
         ]
       },
       {
         "id": "salon-social",
         "name": "Salón Social",
-        "description": "Un escenario cálido y sofisticado para celebrar, recibir y compartir. Sus ambientes integrados se adaptan con naturalidad a encuentros íntimos y ocasiones memorables.",
+        "description": "Un espacio versátil para celebraciones, reuniones y eventos íntimos. Diseñado con acabados de lujo, iluminación ambiental y capacidad para adaptarse a cualquier ocasión especial que requiera un marco excepcional.",
         "image": "/images/renders/salon-social.png",
         "benefits": [
-          "Sala y comedor",
-          "Vista panorámica",
-          "Ambientes integrados",
-          "Diseño versátil"
+          "Cocina integrada",
+          "Terraza",
+          "Sistema audio",
+          "Capacidad 40 personas"
         ]
       },
       {
         "id": "vitality-pool",
         "name": "Vitality Pool",
-        "description": "Agua, luz y horizonte en un refugio pensado para bajar el ritmo. La hidroterapia y las zonas de descanso crean una experiencia de renovación cotidiana.",
+        "description": "Piscina de hidroterapia con vista panorámica a la ciudad. Chorros dirigidos, cascadas y temperatura controlada para la recuperación física y el relajamiento profundo en un ambiente que fusiona agua, cielo y arquitectura.",
         "image": "/images/renders/vitality-pool.png",
         "benefits": [
-          "Hidroterapia",
+          "Hidromasaje",
+          "Vista panorámica",
           "Temperatura controlada",
-          "Zona de descanso",
-          "Vista exterior"
+          "Cascadas"
         ]
       },
       {
         "id": "sauna",
         "name": "Sauna & Turco",
-        "description": "Un circuito privado de bienestar para recuperar el cuerpo y despejar la mente. Sauna, duchas de experiencia y vestieres se conectan en una atmósfera íntima y envolvente.",
+        "description": "Circuito de bienestar que alterna entre el calor seco de la sauna finlandesa y la humedad del baño turco, diseñado para la desintoxicación, relajación muscular y renovación completa del cuerpo y la mente.",
         "image": "/images/renders/vitality-pool.png",
         "benefits": [
-          "Sauna",
+          "Sauna seca",
           "Baño turco",
-          "Duchas de experiencia",
+          "Zona descanso",
           "Vestieres"
         ]
       },
       {
         "id": "ludoteca",
         "name": "Ludoteca",
-        "description": "Un universo seguro para imaginar, jugar y descubrir. La ludoteca integra ambientes interiores y una zona al aire libre donde los más pequeños pueden vivir sus propias aventuras.",
+        "description": "Espacio seguro y estimulante para los más pequeños, con áreas de juego creativo, zona de lectura y actividades supervisadas. Diseñado para que los niños exploren y crezcan mientras los padres disfrutan tranquilidad.",
         "image": "/images/renders/coworking.png",
         "benefits": [
-          "Juego interior",
-          "Zona exterior",
-          "Área creativa",
-          "Entorno seguro"
+          "Zona juegos",
+          "Área lectura",
+          "Supervisión",
+          "Materiales didácticos"
         ]
       }
     ]
@@ -375,13 +375,13 @@
         "bedrooms": "3",
         "bathrooms": "2",
         "image": "/images/renders/apto-97.png",
-        "description": "La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior y espacios amplios para vivir con calma, luz natural y privacidad.",
+        "description": "La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior con piso porcelánico, grifería de diseño y balcón amplio con jardín vertical. La altura marca la diferencia.",
         "features": [
           "3 Habitaciones",
-          "2 Baños",
-          "Vista panorámica",
-          "Sala y comedor",
-          "Cocina integrada",
+          "Vista Valle de Aburrá",
+          "Piso porcelánico",
+          "Balcón jardín vertical",
+          "Grifería premium",
           "Acabados superiores"
         ],
         "status": "Últimas unidades"
@@ -393,14 +393,14 @@
         "bedrooms": "3",
         "bathrooms": "2",
         "image": "/images/renders/apto-74.png",
-        "description": "Residencia de tres habitaciones con dos baños completos, cocina integrada y una distribución equilibrada que conecta la zona social con espacios privados cálidos y luminosos.",
+        "description": "Residencia espaciosa de tres habitaciones con dos baños completos. Suite principal con baño privado, dos habitaciones secundarias, sala-comedor abierta al balcón con vegetación, cocina semi-integrada y zona de ropas. Unidades esquineras con doble orientación y ventilación cruzada natural.",
         "features": [
           "3 Habitaciones",
-          "2 Baños",
-          "Cocina integrada",
-          "Zona social",
-          "Habitación principal",
-          "Vista exterior"
+          "Suite principal",
+          "2 Baños completos",
+          "Balcón con vegetación",
+          "Cocina semi-integrada",
+          "Doble orientación"
         ],
         "status": "Disponible"
       },
@@ -411,31 +411,31 @@
         "bedrooms": "2",
         "bathrooms": "1",
         "image": "/images/renders/apto-57.png",
-        "description": "Una residencia compacta y sofisticada de dos habitaciones. La cocina, la sala y el comedor se integran en un ambiente fluido, con iluminación natural y acabados de alta calidad.",
+        "description": "Diseño optimizado de dos habitaciones con máxima funcionalidad. Sala-comedor con balcón, cocina integrada y habitación principal con ventilación cruzada. La eficiencia del espacio no sacrifica la calidad de vida ni los acabados premium.",
         "features": [
           "2 Habitaciones",
-          "1 Baño",
-          "Sala-comedor",
+          "Balcón",
           "Cocina integrada",
-          "Centro de TV",
+          "Baño completo",
+          "Ventilación cruzada",
           "Acabados premium"
         ],
         "status": "Disponible"
       },
       {
         "id": "tipo-studio",
-        "name": "33–36 m²",
+        "name": "33-36 m²",
         "area": "33-36",
         "bedrooms": "1",
         "bathrooms": "1",
         "image": "/images/renders/studio-33.png",
-        "description": "Una tipología eficiente para quienes buscan diseño, confort y una inversión inteligente. Un ambiente integrado con cocina, zona social, alcoba y baño completo.",
+        "description": "Estudios diseñados para inversores y primeros compradores. Cocina integral, baño completo y zona de ropas en un espacio eficiente con acabados premium. Ideal para renta o como punto de entrada al proyecto.",
         "features": [
           "1 Alcoba",
-          "1 Baño",
-          "Ambiente integrado",
-          "Cocina",
-          "Diseño eficiente",
+          "Baño completo",
+          "Cocina integral",
+          "Zona de ropas",
+          "Acabados premium",
           "Alta rentabilidad"
         ],
         "status": "Disponible"
