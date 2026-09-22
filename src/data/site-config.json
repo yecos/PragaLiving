@@ -973,110 +973,428 @@
       "Atrio",
       "Amenidades",
       "Tipologías",
-      "Videos"
+      "Planos"
     ],
     "items": [
       {
         "id": 1,
         "category": "Exteriores",
         "src": "/images/renders/hero-day.jpg",
-        "title": "Fachada Principal - Día"
+        "title": "Fachada principal · Día"
       },
       {
         "id": 2,
         "category": "Exteriores",
         "src": "/images/renders/hero-sunset.jpg",
-        "title": "Vista Atardecer"
+        "title": "Fachada principal · Atardecer"
       },
       {
         "id": 3,
         "category": "Exteriores",
         "src": "/images/renders/hero-night.jpg",
-        "title": "Vista Nocturna"
+        "title": "Fachada principal · Noche"
       },
       {
         "id": 4,
         "category": "Exteriores",
         "src": "/images/renders/exterior-dusk.png",
-        "title": "Fachada - Atardecer"
+        "title": "Fachada · Hora azul"
       },
       {
         "id": 5,
         "category": "Exteriores",
         "src": "/images/renders/exterior-golden.png",
-        "title": "Fachada - Golden Hour"
+        "title": "Fachada · Luz dorada"
       },
       {
         "id": 6,
         "category": "Interiores",
         "src": "/images/renders/lobby.png",
-        "title": "Lobby Principal"
+        "title": "Lobby principal"
       },
       {
         "id": 7,
         "category": "Atrio",
-        "src": "/images/renders/atrio-main.png",
-        "title": "Atrio Central"
+        "src": "/images/renders/atrio-2026/recepcion-bienvenida.jpg",
+        "title": "Atrio · Bienvenida"
       },
       {
         "id": 8,
         "category": "Atrio",
-        "src": "/images/renders/atrium-interior-1.png",
-        "title": "Atrio - Vista Inferior"
+        "src": "/images/renders/atrio-2026/recepcion-corredor.jpg",
+        "title": "Atrio · Recorridos luminosos"
       },
       {
         "id": 9,
         "category": "Atrio",
-        "src": "/images/renders/atrium-interior-2.png",
-        "title": "Atrio - Vista Superior"
+        "src": "/images/renders/atrio-2026/recepcion-escalera.jpg",
+        "title": "Atrio · Naturaleza integrada"
       },
       {
         "id": 10,
-        "category": "Amenidades",
-        "src": "/images/renders/coworking.png",
-        "title": "Coworking"
+        "category": "Atrio",
+        "src": "/images/renders/atrio-2026/recepcion-ascensor.jpg",
+        "title": "Atrio · Materialidad atemporal"
       },
       {
         "id": 11,
-        "category": "Amenidades",
-        "src": "/images/renders/gimnasio.png",
-        "title": "Gimnasio"
+        "category": "Atrio",
+        "src": "/images/renders/atrio-2026/atrio-niveles.jpg",
+        "title": "Atrio · Niveles residenciales"
       },
       {
         "id": 12,
-        "category": "Amenidades",
-        "src": "/images/renders/salon-social.png",
-        "title": "Salón Social"
+        "category": "Atrio",
+        "src": "/images/renders/atrio-2026/atrio-vertical.jpg",
+        "title": "Atrio · Vista vertical"
       },
       {
         "id": 13,
-        "category": "Amenidades",
-        "src": "/images/renders/vitality-pool.png",
-        "title": "Vitality Pool"
+        "category": "Atrio",
+        "src": "/images/renders/atrio-main.png",
+        "title": "Atrio central"
       },
       {
         "id": 14,
-        "category": "Tipologías",
-        "src": "/images/typologies/104-01.jpg",
-        "title": "Apartamento 104 m²"
+        "category": "Atrio",
+        "src": "/images/renders/atrium-interior-1.png",
+        "title": "Atrio · Vista inferior"
       },
       {
         "id": 15,
-        "category": "Tipologías",
-        "src": "/images/typologies/78-03.jpg",
-        "title": "Apartamento 78.51 m²"
+        "category": "Atrio",
+        "src": "/images/renders/atrium-interior-2.png",
+        "title": "Atrio · Vista superior"
       },
       {
         "id": 16,
-        "category": "Tipologías",
-        "src": "/images/typologies/60-01.jpg",
-        "title": "Apartamento 60 m²"
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/coworking-01.jpg",
+        "title": "Coworking · Zona de trabajo"
       },
       {
         "id": 17,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/coworking-02.jpg",
+        "title": "Coworking · Sala colaborativa"
+      },
+      {
+        "id": 18,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/gimnasio-01.jpg",
+        "title": "Gimnasio · Entrenamiento"
+      },
+      {
+        "id": 19,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/gimnasio-02.jpg",
+        "title": "Gimnasio · Zona funcional"
+      },
+      {
+        "id": 20,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/ludoteca-01.jpg",
+        "title": "Ludoteca · Zona infantil"
+      },
+      {
+        "id": 21,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/ludoteca-02.jpg",
+        "title": "Ludoteca · Área creativa"
+      },
+      {
+        "id": 22,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/salon-social-01.jpg",
+        "title": "Salón social · Vista principal"
+      },
+      {
+        "id": 23,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/salon-social-02.jpg",
+        "title": "Salón social · Reuniones"
+      },
+      {
+        "id": 24,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/salon-social-03.jpg",
+        "title": "Salón social · Terraza"
+      },
+      {
+        "id": 25,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/sauna-01.jpg",
+        "title": "Sauna · Calor seco"
+      },
+      {
+        "id": 26,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/sauna-02.jpg",
+        "title": "Sauna · Zona de descanso"
+      },
+      {
+        "id": 27,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/vitality-pool-01.jpg",
+        "title": "Vitality Pool · Hidroterapia"
+      },
+      {
+        "id": 28,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/vitality-pool-02.jpg",
+        "title": "Vitality Pool · Área de relajación"
+      },
+      {
+        "id": 29,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/wellness-ducha-01.jpg",
+        "title": "Wellness · Duchas"
+      },
+      {
+        "id": 30,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/wellness-ducha-02.jpg",
+        "title": "Wellness · Duchas privadas"
+      },
+      {
+        "id": 31,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/wellness-vestieres-01.jpg",
+        "title": "Wellness · Vestieres"
+      },
+      {
+        "id": 32,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/zona-infantil-01.jpg",
+        "title": "Zona infantil · Juego"
+      },
+      {
+        "id": 33,
+        "category": "Amenidades",
+        "src": "/images/amenities-2026/zona-infantil-02.jpg",
+        "title": "Zona infantil · Lectura"
+      },
+      {
+        "id": 34,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-01.jpg",
+        "title": "104 m² · Vista 01"
+      },
+      {
+        "id": 35,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-02.jpg",
+        "title": "104 m² · Vista 02"
+      },
+      {
+        "id": 36,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-03.jpg",
+        "title": "104 m² · Vista 03"
+      },
+      {
+        "id": 37,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-04.jpg",
+        "title": "104 m² · Vista 04"
+      },
+      {
+        "id": 38,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-05.jpg",
+        "title": "104 m² · Vista 05"
+      },
+      {
+        "id": 39,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-06.jpg",
+        "title": "104 m² · Vista 06"
+      },
+      {
+        "id": 40,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-07.jpg",
+        "title": "104 m² · Vista 07"
+      },
+      {
+        "id": 41,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-08.jpg",
+        "title": "104 m² · Vista 08"
+      },
+      {
+        "id": 42,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-09.jpg",
+        "title": "104 m² · Vista 09"
+      },
+      {
+        "id": 43,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-10.jpg",
+        "title": "104 m² · Vista 10"
+      },
+      {
+        "id": 44,
+        "category": "Tipologías",
+        "src": "/images/typologies/104-11.jpg",
+        "title": "104 m² · Vista 11"
+      },
+      {
+        "id": 45,
+        "category": "Tipologías",
+        "src": "/images/typologies/78-01.jpg",
+        "title": "78.51 m² · Vista 01"
+      },
+      {
+        "id": 46,
+        "category": "Tipologías",
+        "src": "/images/typologies/78-02.jpg",
+        "title": "78.51 m² · Vista 02"
+      },
+      {
+        "id": 47,
+        "category": "Tipologías",
+        "src": "/images/typologies/78-03.jpg",
+        "title": "78.51 m² · Vista 03"
+      },
+      {
+        "id": 48,
+        "category": "Tipologías",
+        "src": "/images/typologies/78-04.jpg",
+        "title": "78.51 m² · Vista 04"
+      },
+      {
+        "id": 49,
+        "category": "Tipologías",
+        "src": "/images/typologies/78-05.jpg",
+        "title": "78.51 m² · Vista 05"
+      },
+      {
+        "id": 50,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-01.jpg",
+        "title": "60 m² · Vista 01"
+      },
+      {
+        "id": 51,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-02.jpg",
+        "title": "60 m² · Vista 02"
+      },
+      {
+        "id": 52,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-03.jpg",
+        "title": "60 m² · Vista 03"
+      },
+      {
+        "id": 53,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-04.jpg",
+        "title": "60 m² · Vista 04"
+      },
+      {
+        "id": 54,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-05.jpg",
+        "title": "60 m² · Vista 05"
+      },
+      {
+        "id": 55,
+        "category": "Tipologías",
+        "src": "/images/typologies/60-06.jpg",
+        "title": "60 m² · Vista 06"
+      },
+      {
+        "id": 56,
         "category": "Tipologías",
         "src": "/images/typologies/33-01.jpg",
-        "title": "Apartamento 33–36 m²"
+        "title": "33–36 m² · Vista 01"
+      },
+      {
+        "id": 57,
+        "category": "Tipologías",
+        "src": "/images/typologies/33-02.jpg",
+        "title": "33–36 m² · Vista 02"
+      },
+      {
+        "id": 58,
+        "category": "Tipologías",
+        "src": "/images/typologies/33-03.jpg",
+        "title": "33–36 m² · Vista 03"
+      },
+      {
+        "id": 59,
+        "category": "Tipologías",
+        "src": "/images/typologies/33-04.jpg",
+        "title": "33–36 m² · Vista 04"
+      },
+      {
+        "id": 60,
+        "category": "Planos",
+        "src": "/images/planos/fachadas.jpg",
+        "title": "Fachadas"
+      },
+      {
+        "id": 61,
+        "category": "Planos",
+        "src": "/images/planos/planta-parqueaderos.jpg",
+        "title": "Planta de parqueaderos"
+      },
+      {
+        "id": 62,
+        "category": "Planos",
+        "src": "/images/planos/planta-primer-piso.jpg",
+        "title": "Planta primer piso"
+      },
+      {
+        "id": 63,
+        "category": "Planos",
+        "src": "/images/planos/planta-social.jpg",
+        "title": "Planta zona social"
+      },
+      {
+        "id": 64,
+        "category": "Planos",
+        "src": "/images/planos/planta-techos.jpg",
+        "title": "Planta de techos"
+      },
+      {
+        "id": 65,
+        "category": "Planos",
+        "src": "/images/planos/planta-tipo-impares.jpg",
+        "title": "Planta tipo · Pisos impares"
+      },
+      {
+        "id": 66,
+        "category": "Planos",
+        "src": "/images/planos/planta-tipo-pares.jpg",
+        "title": "Planta tipo · Pisos pares"
+      },
+      {
+        "id": 67,
+        "category": "Planos",
+        "src": "/images/planos/planta-tipo-residencial.png",
+        "title": "Planta tipo · Residencial"
+      },
+      {
+        "id": 68,
+        "category": "Planos",
+        "src": "/images/planos/planta-tipo.jpg",
+        "title": "Planta tipo"
+      },
+      {
+        "id": 69,
+        "category": "Planos",
+        "src": "/images/planos/secciones.jpg",
+        "title": "Secciones del proyecto"
+      },
+      {
+        "id": 70,
+        "category": "Planos",
+        "src": "/images/renders/exploded-view.png",
+        "title": "Vista explotada del edificio"
       }
     ]
   },
