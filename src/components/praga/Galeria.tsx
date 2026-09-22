@@ -27,10 +27,10 @@ const defaultGalleryItems = [
   { id: 11, category: 'Amenidades', src: '/images/renders/gimnasio.png', title: 'Gimnasio' },
   { id: 12, category: 'Amenidades', src: '/images/renders/salon-social.png', title: 'Salón Social' },
   { id: 13, category: 'Amenidades', src: '/images/renders/vitality-pool.png', title: 'Vitality Pool' },
-  { id: 14, category: 'Tipologías', src: '/images/renders/studio-33.png', title: 'Studio 33 m²' },
-  { id: 15, category: 'Tipologías', src: '/images/renders/apto-57.png', title: 'Apartamento 57 m²' },
-  { id: 16, category: 'Tipologías', src: '/images/renders/apto-74.png', title: 'Apartamento 74 m²' },
-  { id: 17, category: 'Tipologías', src: '/images/renders/apto-97.png', title: 'Penthouse 97 m²' },
+  { id: 14, category: 'Tipologías', src: '/images/typologies/104-01.jpg', title: 'Apartamento 104 m²' },
+  { id: 15, category: 'Tipologías', src: '/images/typologies/78-03.jpg', title: 'Apartamento 78.51 m²' },
+  { id: 16, category: 'Tipologías', src: '/images/typologies/60-01.jpg', title: 'Apartamento 60 m²' },
+  { id: 17, category: 'Tipologías', src: '/images/typologies/33-01.jpg', title: 'Apartamento 33–36 m²' },
 ]
 
 export default function Galeria() {
