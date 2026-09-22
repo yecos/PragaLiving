@@ -294,72 +294,174 @@
         "id": "coworking",
         "name": "Coworking",
         "description": "Espacio de trabajo colaborativo diseñado para profesionales que buscan inspiración y productividad sin salir de casa. Conectividad de alta velocidad, zonas de concentración y áreas de reunión en un entorno que estimula la creatividad.",
-        "image": "/images/renders/coworking.png",
+        "image": "/images/amenities-2026/coworking-01.jpg",
         "benefits": [
           "Fibra óptica",
           "Salas de reunión",
           "Zonas silenciosas",
           "Café incluido"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/coworking-01.jpg",
+            "alt": "Coworking de PRAGA Living con mesas de trabajo, vegetación y vista a la montaña",
+            "label": "Trabajo con perspectiva"
+          },
+          {
+            "src": "/images/amenities-2026/coworking-02.jpg",
+            "alt": "Zona colaborativa del coworking de PRAGA Living",
+            "label": "Conectar y crear"
+          }
         ]
       },
       {
         "id": "gimnasio",
         "name": "Gimnasio",
         "description": "Equipamiento de última generación en un espacio diseñado para entrenar con vista al exterior. Máquinas cardiovasculares, zona de pesos libres y área funcional para rutinas personalizadas en un entorno que motiva el bienestar físico.",
-        "image": "/images/renders/gimnasio.png",
+        "image": "/images/amenities-2026/gimnasio-01.jpg",
         "benefits": [
           "Equipamiento premium",
           "Vista exterior",
           "Zona funcional",
           "Pesos libres"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/gimnasio-01.jpg",
+            "alt": "Gimnasio de PRAGA Living con equipos de cardio y fuerza",
+            "label": "Energía en movimiento"
+          },
+          {
+            "src": "/images/amenities-2026/gimnasio-02.jpg",
+            "alt": "Gimnasio panorámico de PRAGA Living con vista a la ciudad y la montaña",
+            "label": "Entrenar con vista"
+          }
         ]
       },
       {
         "id": "salon-social",
         "name": "Salón Social",
         "description": "Un espacio versátil para celebraciones, reuniones y eventos íntimos. Diseñado con acabados de lujo, iluminación ambiental y capacidad para adaptarse a cualquier ocasión especial que requiera un marco excepcional.",
-        "image": "/images/renders/salon-social.png",
+        "image": "/images/amenities-2026/salon-social-01.jpg",
         "benefits": [
           "Cocina integrada",
           "Terraza",
           "Sistema audio",
           "Capacidad 40 personas"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/salon-social-01.jpg",
+            "alt": "Salón social de PRAGA Living con mobiliario contemporáneo",
+            "label": "Momentos para compartir"
+          },
+          {
+            "src": "/images/amenities-2026/salon-social-02.jpg",
+            "alt": "Sala principal del salón social de PRAGA Living",
+            "label": "Encuentros memorables"
+          },
+          {
+            "src": "/images/amenities-2026/salon-social-03.jpg",
+            "alt": "Salón social de PRAGA Living con comedor y vista panorámica",
+            "label": "Celebrar con estilo"
+          }
         ]
       },
       {
         "id": "vitality-pool",
         "name": "Vitality Pool",
         "description": "Piscina de hidroterapia con vista panorámica a la ciudad. Chorros dirigidos, cascadas y temperatura controlada para la recuperación física y el relajamiento profundo en un ambiente que fusiona agua, cielo y arquitectura.",
-        "image": "/images/renders/vitality-pool.png",
+        "image": "/images/amenities-2026/vitality-pool-01.jpg",
         "benefits": [
           "Hidromasaje",
           "Vista panorámica",
           "Temperatura controlada",
           "Cascadas"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/vitality-pool-01.jpg",
+            "alt": "Vitality Pool de PRAGA Living con iluminación cálida y vista exterior",
+            "label": "Bienestar en el agua"
+          },
+          {
+            "src": "/images/amenities-2026/vitality-pool-02.jpg",
+            "alt": "Zona de descanso junto al Vitality Pool de PRAGA Living",
+            "label": "Pausa y contemplación"
+          }
         ]
       },
       {
         "id": "sauna",
         "name": "Sauna & Turco",
         "description": "Circuito de bienestar que alterna entre el calor seco de la sauna finlandesa y la humedad del baño turco, diseñado para la desintoxicación, relajación muscular y renovación completa del cuerpo y la mente.",
-        "image": "/images/renders/vitality-pool.png",
+        "image": "/images/amenities-2026/sauna-01.jpg",
         "benefits": [
           "Sauna seca",
           "Baño turco",
           "Zona descanso",
           "Vestieres"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/sauna-01.jpg",
+            "alt": "Sauna en madera de PRAGA Living con vista a la montaña",
+            "label": "Calor que renueva"
+          },
+          {
+            "src": "/images/amenities-2026/sauna-02.jpg",
+            "alt": "Segunda vista del sauna panorámico de PRAGA Living",
+            "label": "Silencio y contemplación"
+          },
+          {
+            "src": "/images/amenities-2026/wellness-ducha-01.jpg",
+            "alt": "Ducha de experiencia del circuito de bienestar de PRAGA Living",
+            "label": "Ritual de agua"
+          },
+          {
+            "src": "/images/amenities-2026/wellness-ducha-02.jpg",
+            "alt": "Zona de duchas y descanso de PRAGA Living",
+            "label": "Pausa sensorial"
+          },
+          {
+            "src": "/images/amenities-2026/wellness-vestieres-01.jpg",
+            "alt": "Vestieres del área de bienestar de PRAGA Living",
+            "label": "Bienestar en cada detalle"
+          }
         ]
       },
       {
         "id": "ludoteca",
         "name": "Ludoteca",
         "description": "Espacio seguro y estimulante para los más pequeños, con áreas de juego creativo, zona de lectura y actividades supervisadas. Diseñado para que los niños exploren y crezcan mientras los padres disfrutan tranquilidad.",
-        "image": "/images/renders/coworking.png",
+        "image": "/images/amenities-2026/ludoteca-01.jpg",
         "benefits": [
           "Zona juegos",
           "Área lectura",
           "Supervisión",
           "Materiales didácticos"
+        ],
+        "images": [
+          {
+            "src": "/images/amenities-2026/ludoteca-01.jpg",
+            "alt": "Ludoteca interior de PRAGA Living con juegos y mobiliario infantil",
+            "label": "Imaginar sin límites"
+          },
+          {
+            "src": "/images/amenities-2026/ludoteca-02.jpg",
+            "alt": "Salón infantil de PRAGA Living con mesas de actividades",
+            "label": "Aprender jugando"
+          },
+          {
+            "src": "/images/amenities-2026/zona-infantil-01.jpg",
+            "alt": "Zona infantil exterior de PRAGA Living con juegos y vegetación",
+            "label": "Aventuras al aire libre"
+          },
+          {
+            "src": "/images/amenities-2026/zona-infantil-02.jpg",
+            "alt": "Parque infantil exterior de PRAGA Living con columpios",
+            "label": "Un lugar para crecer"
+          }
         ]
       }
     ]
@@ -374,7 +476,7 @@
         "area": "104",
         "bedrooms": "3",
         "bathrooms": "2",
-        "image": "/images/renders/apto-97.png",
+        "image": "/images/typologies/104-01.jpg",
         "description": "La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior con piso porcelánico, grifería de diseño y balcón amplio con jardín vertical. La altura marca la diferencia.",
         "features": [
           "3 Habitaciones",
@@ -384,7 +486,20 @@
           "Grifería premium",
           "Acabados superiores"
         ],
-        "status": "Últimas unidades"
+        "status": "Últimas unidades",
+        "images": [
+          "/images/typologies/104-01.jpg",
+          "/images/typologies/104-02.jpg",
+          "/images/typologies/104-03.jpg",
+          "/images/typologies/104-04.jpg",
+          "/images/typologies/104-05.jpg",
+          "/images/typologies/104-06.jpg",
+          "/images/typologies/104-07.jpg",
+          "/images/typologies/104-08.jpg",
+          "/images/typologies/104-09.jpg",
+          "/images/typologies/104-10.jpg",
+          "/images/typologies/104-11.jpg"
+        ]
       },
       {
         "id": "tipo-78",
@@ -392,7 +507,7 @@
         "area": "78.51",
         "bedrooms": "3",
         "bathrooms": "2",
-        "image": "/images/renders/apto-74.png",
+        "image": "/images/typologies/78-01.jpg",
         "description": "Residencia espaciosa de tres habitaciones con dos baños completos. Suite principal con baño privado, dos habitaciones secundarias, sala-comedor abierta al balcón con vegetación, cocina semi-integrada y zona de ropas. Unidades esquineras con doble orientación y ventilación cruzada natural.",
         "features": [
           "3 Habitaciones",
@@ -402,7 +517,14 @@
           "Cocina semi-integrada",
           "Doble orientación"
         ],
-        "status": "Disponible"
+        "status": "Disponible",
+        "images": [
+          "/images/typologies/78-01.jpg",
+          "/images/typologies/78-02.jpg",
+          "/images/typologies/78-03.jpg",
+          "/images/typologies/78-04.jpg",
+          "/images/typologies/78-05.jpg"
+        ]
       },
       {
         "id": "tipo-60",
@@ -410,7 +532,7 @@
         "area": "60",
         "bedrooms": "2",
         "bathrooms": "1",
-        "image": "/images/renders/apto-57.png",
+        "image": "/images/typologies/60-01.jpg",
         "description": "Diseño optimizado de dos habitaciones con máxima funcionalidad. Sala-comedor con balcón, cocina integrada y habitación principal con ventilación cruzada. La eficiencia del espacio no sacrifica la calidad de vida ni los acabados premium.",
         "features": [
           "2 Habitaciones",
@@ -420,7 +542,15 @@
           "Ventilación cruzada",
           "Acabados premium"
         ],
-        "status": "Disponible"
+        "status": "Disponible",
+        "images": [
+          "/images/typologies/60-01.jpg",
+          "/images/typologies/60-02.jpg",
+          "/images/typologies/60-03.jpg",
+          "/images/typologies/60-04.jpg",
+          "/images/typologies/60-05.jpg",
+          "/images/typologies/60-06.jpg"
+        ]
       },
       {
         "id": "tipo-studio",
@@ -428,7 +558,7 @@
         "area": "33-36",
         "bedrooms": "1",
         "bathrooms": "1",
-        "image": "/images/renders/studio-33.png",
+        "image": "/images/typologies/33-01.jpg",
         "description": "Estudios diseñados para inversores y primeros compradores. Cocina integral, baño completo y zona de ropas en un espacio eficiente con acabados premium. Ideal para renta o como punto de entrada al proyecto.",
         "features": [
           "1 Alcoba",
@@ -438,7 +568,13 @@
           "Acabados premium",
           "Alta rentabilidad"
         ],
-        "status": "Disponible"
+        "status": "Disponible",
+        "images": [
+          "/images/typologies/33-01.jpg",
+          "/images/typologies/33-02.jpg",
+          "/images/typologies/33-03.jpg",
+          "/images/typologies/33-04.jpg"
+        ]
       }
     ],
     "ctaText": "Solicitar Información",
