@@ -13,6 +13,7 @@ type FloorApartment = {
   bathrooms: number
   typology: string
   priceRange: string
+  price?: number
   status: string
   view: string
   polygon: number[][]
@@ -95,6 +96,7 @@ export async function GET() {
           typology: apartment.typology,
           status: apartment.status,
           view: apartment.view,
+          price: apartment.price,
           priceRange: apartment.price > 0 ? formatPrice(apartment.price) : zone.priceRange,
         }
       }),
