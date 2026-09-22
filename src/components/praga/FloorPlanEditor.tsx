@@ -373,6 +373,7 @@ export default function FloorPlanEditor() {
             const newApt: ApartmentZone = {
               ...apt,
               id: generateId(),
+              apartmentId: undefined,
               // Rename: "Apto 101" → "Apto 201" if copying from Piso 1 to Piso 2
               name: apt.name.replace(
                 /Apto\s+(\d+)0(\d+)/i,
@@ -1401,6 +1402,7 @@ export default function FloorPlanEditor() {
                         const newApt: ApartmentZone = {
                           ...selectedApt,
                           id: generateId(),
+                          apartmentId: undefined,
                           name: `${selectedApt.name} (copia)`,
                           polygon: offset,
                         }
@@ -1436,8 +1438,9 @@ export default function FloorPlanEditor() {
                   <input
                     type="text"
                     value={selectedApt.name}
+                    disabled={Boolean(selectedApt.apartmentId)}
                     onChange={(e) => updateApartment('name', e.target.value)}
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors"
+                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
                   />
                 </div>
 
@@ -1448,8 +1451,9 @@ export default function FloorPlanEditor() {
                     type="number"
                     step="0.01"
                     value={selectedApt.area || ''}
+                    disabled={Boolean(selectedApt.apartmentId)}
                     onChange={(e) => updateApartment('area', parseFloat(e.target.value) || 0)}
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors"
+                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
                   />
                 </div>
 
@@ -1459,8 +1463,9 @@ export default function FloorPlanEditor() {
                     <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Alcobas</label>
                     <select
                       value={selectedApt.bedrooms}
+                      disabled={Boolean(selectedApt.apartmentId)}
                       onChange={(e) => updateApartment('bedrooms', parseInt(e.target.value))}
-                      className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                      className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                     >
                       {BEDROOM_OPTIONS.map(n => (
                         <option key={n} value={n} className="bg-[#111111]">{n}</option>
@@ -1471,8 +1476,9 @@ export default function FloorPlanEditor() {
                     <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Baños</label>
                     <select
                       value={selectedApt.bathrooms}
+                      disabled={Boolean(selectedApt.apartmentId)}
                       onChange={(e) => updateApartment('bathrooms', parseInt(e.target.value))}
-                      className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                      className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                     >
                       {BATHROOM_OPTIONS.map(n => (
                         <option key={n} value={n} className="bg-[#111111]">{n}</option>
@@ -1486,8 +1492,9 @@ export default function FloorPlanEditor() {
                   <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Tipología</label>
                   <select
                     value={selectedApt.typology}
+                    disabled={Boolean(selectedApt.apartmentId)}
                     onChange={(e) => updateApartment('typology', e.target.value)}
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                   >
                     {TYPOLOGY_OPTIONS.map(t => (
                       <option key={t} value={t} className="bg-[#111111]">{t}</option>
@@ -1519,8 +1526,9 @@ export default function FloorPlanEditor() {
                   <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Vista</label>
                   <select
                     value={selectedApt.view}
+                    disabled={Boolean(selectedApt.apartmentId)}
                     onChange={(e) => updateApartment('view', e.target.value)}
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                   >
                     {VIEW_OPTIONS.map(v => (
                       <option key={v} value={v} className="bg-[#111111]">{v}</option>
