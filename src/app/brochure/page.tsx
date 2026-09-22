@@ -206,7 +206,12 @@ export default function BrochurePage() {
           <PageNumber n="11" />
           <div className={styles.interiorTitle}>
             <div className={styles.kicker}>INTERIORES</div>
-            <h2>Una paleta cálida,<br />contemporánea y atemporal.</h2>
+            <h2>Interiores cálidos,<br />contemporáneos y atemporales.</h2>
+            <p>
+              Cada espacio ha sido pensado para ofrecer amplitud visual, luz natural y una atmósfera serena.
+              Tonos neutros, texturas cálidas y una materialidad coherente construyen una experiencia residencial
+              sobria, elegante y vigente en el tiempo.
+            </p>
           </div>
           <div className={styles.interiorMosaic}>
             <figure className={styles.mosaicA}><img src="/images/typologies/104-02.jpg" alt="Interior PRAGA Living" /></figure>
@@ -219,19 +224,72 @@ export default function BrochurePage() {
         <section className={[styles.page, styles.locationPage].join(" ")}>
           <PageNumber n="12" />
           <div className={styles.locationIntro}>
-            <div className={styles.kicker}>EL ENTORNO</div>
-            <h2>Caldas, Antioquia.<br />Conexión con el sur del Valle de Aburrá.</h2>
-            <p>PRAGA Living se integra a un entorno urbano en transformación, con acceso a movilidad, comercio, servicios y naturaleza.</p>
+            <div className={styles.kicker}>UBICACIÓN</div>
+            <h2>Caldas, Antioquia.<br />Todo más cerca de tu día a día.</h2>
+            <p>
+              PRAGA Living se ubica en Calle 133 Sur #49-94, en el tejido urbano consolidado de Caldas.
+              Su localización conecta el proyecto con comercio, servicios, educación, salud y los principales
+              recorridos del municipio.
+            </p>
+            <div className={styles.locationAddress}>
+              <span>PRAGA LIVING</span>
+              <strong>Cl. 133 Sur #49-94 · Caldas, Antioquia</strong>
+              <small>6.08895° N · 75.63514° W</small>
+            </div>
           </div>
-          <div className={styles.mapGraphic}>
-            <div className={styles.ringOne} />
-            <div className={styles.ringTwo} />
-            <div className={styles.mapCenter}><strong>P</strong><span>PRAGA Living</span><small>6.0890° N · 75.6351° W</small></div>
-            <div className={[styles.mapNode, styles.nodeA].join(" ")}><strong>1 min</strong><span>Bus urbano</span></div>
-            <div className={[styles.mapNode, styles.nodeB].join(" ")}><strong>2 min</strong><span>Rutas veredales</span></div>
-            <div className={[styles.mapNode, styles.nodeC].join(" ")}><strong>25 min</strong><span>Metro La Estrella*</span></div>
+
+          <div className={styles.streetMap} aria-label="Mapa esquemático de ubicación de PRAGA Living en Caldas">
+            <div className={[styles.street, styles.streetVertical, styles.cra45].join(" ")}><span>Cra. 45</span></div>
+            <div className={[styles.street, styles.streetVertical, styles.cra48].join(" ")}><span>Cra. 48</span></div>
+            <div className={[styles.street, styles.streetVertical, styles.cra49].join(" ")}><span>Cra. 49</span></div>
+            <div className={[styles.street, styles.streetVertical, styles.cra50].join(" ")}><span>Cra. 50</span></div>
+            <div className={[styles.street, styles.streetVertical, styles.cra51].join(" ")}><span>Cra. 51</span></div>
+
+            <div className={[styles.street, styles.streetHorizontal, styles.cl118].join(" ")}><span>Cl. 118 Sur</span></div>
+            <div className={[styles.street, styles.streetHorizontal, styles.cl126].join(" ")}><span>Cl. 126A Sur</span></div>
+            <div className={[styles.street, styles.streetHorizontal, styles.cl130].join(" ")}><span>Cl. 130 Sur</span></div>
+            <div className={[styles.street, styles.streetHorizontal, styles.cl133].join(" ")}><span>Cl. 133 Sur</span></div>
+            <div className={[styles.street, styles.streetHorizontal, styles.cl135].join(" ")}><span>Cl. 135 Sur</span></div>
+
+            <div className={[styles.mapPoi, styles.poiSalle].join(" ")}>
+              <i />
+              <span>La Salle</span>
+              <small>Cra. 51 · Cl. 118 Sur</small>
+            </div>
+            <div className={[styles.mapPoi, styles.poiMontpellier].join(" ")}>
+              <i />
+              <span>Montpellier Plaza</span>
+              <small>Cl. 126A Sur · Cra. 50</small>
+            </div>
+            <div className={[styles.mapPoi, styles.poiParque].join(" ")}>
+              <i />
+              <span>Parque Principal</span>
+              <small>Cra. 49 · Cl. 129–130 Sur</small>
+            </div>
+            <div className={[styles.mapPoi, styles.poiHospital].join(" ")}>
+              <i />
+              <span>Hospital San Vicente</span>
+              <small>Cra. 48 · Cl. 135 Sur</small>
+            </div>
+
+            <div className={styles.projectPin}>
+              <div className={styles.projectMarker}>P</div>
+              <div>
+                <strong>PRAGA Living</strong>
+                <span>Cl. 133 Sur #49-94</span>
+              </div>
+            </div>
+
+            <div className={styles.northArrow}><span>N</span><i /></div>
+            <div className={styles.metroConnector}>
+              <span>Conexión hacia Sabaneta</span>
+              <strong>Metro La Estrella ↑</strong>
+            </div>
           </div>
-          <div className={styles.locationNote}>*Tiempo de referencia publicado en el proyecto. Sujeto a condiciones de movilidad.</div>
+
+          <div className={styles.locationNote}>
+            Mapa esquemático de referencia. La posición del proyecto corresponde a la dirección y coordenadas oficiales usadas en el proyecto.
+          </div>
         </section>
 
         <section className={[styles.page, styles.contactPage].join(" ")}>
