@@ -294,7 +294,7 @@
         "id": "coworking",
         "name": "Coworking",
         "description": "Un entorno sereno para concentrarse, crear y conectar. La luz natural, las salas de reunión y las zonas de trabajo flexible hacen que cada jornada fluya sin salir de casa.",
-        "image": "/images/amenities-2026/coworking-01.jpg",
+        "image": "/images/renders/coworking.png",
         "benefits": [
           "Trabajo flexible",
           "Salas de reunión",
@@ -306,7 +306,7 @@
         "id": "gimnasio",
         "name": "Gimnasio",
         "description": "Entrenar se convierte en parte del paisaje. Un gimnasio completo, bañado por luz natural y equipado para combinar cardio, fuerza y movimiento funcional.",
-        "image": "/images/amenities-2026/gimnasio-01.jpg",
+        "image": "/images/renders/gimnasio.png",
         "benefits": [
           "Cardio",
           "Fuerza",
@@ -318,7 +318,7 @@
         "id": "salon-social",
         "name": "Salón Social",
         "description": "Un escenario cálido y sofisticado para celebrar, recibir y compartir. Sus ambientes integrados se adaptan con naturalidad a encuentros íntimos y ocasiones memorables.",
-        "image": "/images/amenities-2026/salon-social-01.jpg",
+        "image": "/images/renders/salon-social.png",
         "benefits": [
           "Sala y comedor",
           "Vista panorámica",
@@ -330,7 +330,7 @@
         "id": "vitality-pool",
         "name": "Vitality Pool",
         "description": "Agua, luz y horizonte en un refugio pensado para bajar el ritmo. La hidroterapia y las zonas de descanso crean una experiencia de renovación cotidiana.",
-        "image": "/images/amenities-2026/vitality-pool-01.jpg",
+        "image": "/images/renders/vitality-pool.png",
         "benefits": [
           "Hidroterapia",
           "Temperatura controlada",
@@ -342,7 +342,7 @@
         "id": "sauna",
         "name": "Sauna & Turco",
         "description": "Un circuito privado de bienestar para recuperar el cuerpo y despejar la mente. Sauna, duchas de experiencia y vestieres se conectan en una atmósfera íntima y envolvente.",
-        "image": "/images/amenities-2026/sauna-01.jpg",
+        "image": "/images/renders/vitality-pool.png",
         "benefits": [
           "Sauna",
           "Baño turco",
@@ -354,7 +354,7 @@
         "id": "ludoteca",
         "name": "Ludoteca",
         "description": "Un universo seguro para imaginar, jugar y descubrir. La ludoteca integra ambientes interiores y una zona al aire libre donde los más pequeños pueden vivir sus propias aventuras.",
-        "image": "/images/amenities-2026/ludoteca-01.jpg",
+        "image": "/images/renders/coworking.png",
         "benefits": [
           "Juego interior",
           "Zona exterior",
@@ -374,7 +374,7 @@
         "area": "104",
         "bedrooms": "3",
         "bathrooms": "2",
-        "image": "/images/typologies/104-01.jpg",
+        "image": "/images/renders/apto-97.png",
         "description": "La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior y espacios amplios para vivir con calma, luz natural y privacidad.",
         "features": [
           "3 Habitaciones",
@@ -392,7 +392,7 @@
         "area": "78.51",
         "bedrooms": "3",
         "bathrooms": "2",
-        "image": "/images/typologies/78-01.jpg",
+        "image": "/images/renders/apto-74.png",
         "description": "Residencia de tres habitaciones con dos baños completos, cocina integrada y una distribución equilibrada que conecta la zona social con espacios privados cálidos y luminosos.",
         "features": [
           "3 Habitaciones",
@@ -410,7 +410,7 @@
         "area": "60",
         "bedrooms": "2",
         "bathrooms": "1",
-        "image": "/images/typologies/60-01.jpg",
+        "image": "/images/renders/apto-57.png",
         "description": "Una residencia compacta y sofisticada de dos habitaciones. La cocina, la sala y el comedor se integran en un ambiente fluido, con iluminación natural y acabados de alta calidad.",
         "features": [
           "2 Habitaciones",
@@ -428,7 +428,7 @@
         "area": "33-36",
         "bedrooms": "1",
         "bathrooms": "1",
-        "image": "/images/typologies/33-01.jpg",
+        "image": "/images/renders/studio-33.png",
         "description": "Una tipología eficiente para quienes buscan diseño, confort y una inversión inteligente. Un ambiente integrado con cocina, zona social, alcoba y baño completo.",
         "features": [
           "1 Alcoba",
