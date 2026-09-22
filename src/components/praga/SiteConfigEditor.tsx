@@ -199,7 +199,7 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
     const load = async () => {
       setLoading(true)
       try {
-        const res = await fetch('/api/site-config')
+        const res = await fetch('/api/site-config', { cache: 'no-store' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         if (!cancelled) setConfig(data)
