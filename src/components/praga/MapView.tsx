@@ -23,7 +23,7 @@ export interface LocationLayer {
 }
 
 // ─── PRAGA center (Caldas, Antioquia) ─────────────────
-export const DEFAULT_center: [number, number] = [6.08895, -75.63514]
+export const DEFAULT_PRAGA_CENTER: [number, number] = [6.08895, -75.63514]
 
 // ─── Layer definitions with real Caldas, Antioquia POIs ──────
 export const locationLayers: LocationLayer[] = [
@@ -134,7 +134,7 @@ export default function MapView({
   onPoiClick,
   flyToTarget,
   layers = locationLayers,
-  center = DEFAULT_center,
+  center = DEFAULT_PRAGA_CENTER,
 }: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null)
   const mapContainerRef = useRef<HTMLDivElement>(null)
