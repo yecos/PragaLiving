@@ -39,6 +39,20 @@ export default function Footer() {
       ],
     },
   ]
+  const publicPhone = generalConfig?.phone || '+57 300 4203548'
+  const publicEmail = generalConfig?.email || 'urbanovagrupoempresarial@gmail.com'
+  const publicWhatsapp = generalConfig?.whatsapp || publicPhone
+  const resolvedLinkGroups = linkGroups.map((section: { title: string; links: { label: string; href: string }[] }) => ({
+    ...section,
+    links: section.links.map((link) => {
+      const label = link.label.toLowerCase()
+      if (label.includes('whatsapp')) return { ...link, href: `https://wa.me/${publicWhatsapp.replace(/[^0-9]/g, '')}` }
+      if (label.includes('llamada') || label.includes('teléfono') || label.includes('telefono')) return { ...link, href: `tel:${publicPhone.replace(/[^0-9+]/g, '')}` }
+      if (label.includes('email') || label.includes('correo')) return { ...link, href: `mailto:${publicEmail}` }
+      return link
+    }),
+  }))
+
   const legalLinks = footerConfig?.legalLinks || ['Política de Privacidad', 'Términos de Uso']
   const copyright = (footerConfig?.copyright || '© {year} PRAGA Living. Todos los derechos reservados.').replace('{year}', String(currentYear))
   const logo = generalConfig?.logo || '/images/logo.png'
@@ -64,7 +78,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          {linkGroups.map((section: { title: string; links: { label: string; href: string }[] }) => (
+          {resolvedLinkGroups.map((section: { title: string; links: { label: string; href: string }[] }) => (
             <div key={section.title}>
               <h4 className="text-[10px] tracking-[0.3em] uppercase text-[#8B6B4B] mb-6">
                 {section.title}
