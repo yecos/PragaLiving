@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
@@ -72,6 +72,20 @@ const defaultTypologies: Typology[] = [
 export default function Tipologias() {
   const { config } = useSiteConfig()
   const tipoConfig = config?.tipologias
+  const [inventory, setInventory] = useState<Array<{ area: number; status: string }>>([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/apartments', { cache: 'no-store' })
+      .then((res) => res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`)))
+      .then((data) => {
+        if (!cancelled) setInventory(Array.isArray(data.apartments) ? data.apartments : [])
+      })
+      .catch(() => {
+        if (!cancelled) setInventory([])
+      })
+    return () => { cancelled = true }
+  }, [])
 
   const label = tipoConfig?.label || 'Tipologías'
   const title = tipoConfig?.title || 'Comparar Residencias'
@@ -84,11 +98,33 @@ export default function Tipologias() {
         ? [configured.image.trim(), ...base.images.slice(1)]
         : base.images
 
+    const areaText = String(configured.area || base.area)
+    const numericParts = areaText.match(/\d+(?:\.\d+)?/g)?.map(Number) || []
+    const matchingInventory = inventory.filter((apartment) => {
+      if (numericParts.length >= 2) {
+        return apartment.area >= numericParts[0] - 0.25 && apartment.area <= numericParts[1] + 0.25
+      }
+      if (numericParts.length === 1) {
+        return Math.abs(apartment.area - numericParts[0]) < 0.75
+      }
+      return false
+    })
+    const availableCount = matchingInventory.filter((apartment) => apartment.status === 'available').length
+    const reservedCount = matchingInventory.filter((apartment) => apartment.status === 'reserved').length
+    const inventoryStatus = matchingInventory.length === 0
+      ? undefined
+      : availableCount > 0
+        ? 'Disponible'
+        : reservedCount > 0
+          ? 'Reservado'
+          : 'Agotado'
+
     return {
       ...base,
       ...configured,
       id: configured.id || base.id,
       images,
+      status: inventoryStatus || configured.status || base.status,
     }
   })
   const ctaText = tipoConfig?.ctaText || 'Solicitar Información'
