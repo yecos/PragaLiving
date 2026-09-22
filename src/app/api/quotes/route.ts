@@ -62,9 +62,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Apartamento no encontrado' }, { status: 404 })
     }
 
-    const discountAmount = discount || 0
+    const discountAmount = Number(discount || 0)
+    if (!Number.isFinite(discountAmount) || discountAmount < 0) {
+      return NextResponse.json({ error: 'Descuento inválido' }, { status: 400 })
+    }
+    if (discountAmount > apartment.price) {
+      return NextResponse.json({ error: 'El descuento no puede superar el precio del apartamento' }, { status: 400 })
+    }
+
     const finalPrice = apartment.price - discountAmount
-    const days = validDays || 30
+    const days = Number(validDays || 30)
     const validUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString()
 
     const result = await createQuote({
