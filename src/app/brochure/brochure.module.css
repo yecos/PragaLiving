@@ -781,6 +781,14 @@
   letter-spacing: -.04em;
 }
 
+.interiorTitle p {
+  margin-top: 6%;
+  width: 78%;
+  color: var(--muted);
+  font-size: clamp(9px, .78vw, 14px);
+  line-height: 1.68;
+}
+
 .interiorMosaic {
   height: 100%;
   display: grid;
@@ -812,7 +820,7 @@
 }
 
 .locationIntro {
-  width: 43%;
+  width: 39%;
   position: relative;
   z-index: 4;
 }
@@ -820,122 +828,301 @@
 .locationIntro h2 {
   margin: 5% 0 6%;
   font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(42px, 4.1vw, 78px);
+  font-size: clamp(39px, 3.8vw, 72px);
   line-height: .96;
   font-weight: 400;
   letter-spacing: -.04em;
 }
 
-.locationIntro p {
-  max-width: 80%;
+.locationIntro > p {
+  max-width: 88%;
   color: var(--muted);
-  font-size: clamp(10px, .86vw, 15px);
-  line-height: 1.7;
+  font-size: clamp(9px, .8vw, 14px);
+  line-height: 1.68;
 }
 
-.mapGraphic {
-  position: absolute;
-  right: 3.5%;
-  top: 5%;
-  width: 55%;
-  height: 90%;
-  background:
-    linear-gradient(rgba(24,24,20,.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(24,24,20,.055) 1px, transparent 1px);
-  background-size: 42px 42px;
-  overflow: hidden;
-}
-
-.ringOne,
-.ringTwo {
-  position: absolute;
-  border: 1px solid rgba(52,71,58,.28);
-  border-radius: 50%;
-  left: 50%;
-  top: 51%;
-  transform: translate(-50%, -50%);
-}
-
-.ringOne { width: 48%; aspect-ratio: 1; }
-.ringTwo { width: 82%; aspect-ratio: 1; }
-
-.mapCenter {
-  position: absolute;
-  left: 50%;
-  top: 51%;
-  transform: translate(-50%, -50%);
+.locationAddress {
+  margin-top: 10%;
+  padding-top: 5%;
+  border-top: 1px solid rgba(21,20,16,.2);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: 5px;
 }
 
-.mapCenter strong {
-  width: clamp(55px, 5vw, 92px);
+.locationAddress span {
+  color: var(--bronze);
+  font-size: clamp(7px, .56vw, 10px);
+  letter-spacing: .2em;
+  font-weight: 600;
+}
+
+.locationAddress strong {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: clamp(18px, 1.55vw, 29px);
+  font-weight: 500;
+}
+
+.locationAddress small {
+  color: var(--muted);
+  font-size: clamp(7px, .54vw, 10px);
+  letter-spacing: .08em;
+}
+
+.streetMap {
+  position: absolute;
+  right: 3.8%;
+  top: 5.5%;
+  width: 55%;
+  height: 86%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 12%, rgba(52,71,58,.07), transparent 27%),
+    linear-gradient(135deg, #ebe3d7 0%, #f3eee5 58%, #e9e1d4 100%);
+  border: 1px solid rgba(21,20,16,.10);
+}
+
+.streetMap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(28deg, transparent 48%, rgba(52,71,58,.055) 49%, rgba(52,71,58,.055) 51%, transparent 52%),
+    linear-gradient(115deg, transparent 49%, rgba(146,113,85,.045) 50%, transparent 51%);
+  background-size: 160px 160px, 220px 220px;
+  opacity: .55;
+}
+
+.street {
+  position: absolute;
+  z-index: 1;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 0 0 1px rgba(21,20,16,.08);
+}
+
+.street span {
+  position: absolute;
+  color: rgba(21,20,16,.55);
+  font-size: clamp(6px, .48vw, 9px);
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.streetVertical {
+  top: -2%;
+  bottom: -2%;
+  width: 2.1%;
+}
+
+.streetVertical::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed rgba(21,20,16,.10);
+}
+
+.streetVertical span {
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+  transform-origin: center;
+}
+
+.cra45 { left: 13%; width: 3.2%; background: rgba(255,255,255,.92); }
+.cra48 { left: 35%; }
+.cra49 { left: 50%; width: 2.6%; background: rgba(255,255,255,.9); }
+.cra50 { left: 65%; }
+.cra51 { left: 80%; }
+
+.streetHorizontal {
+  left: -2%;
+  right: -2%;
+  height: 2.1%;
+}
+
+.streetHorizontal::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(21,20,16,.10);
+}
+
+.streetHorizontal span {
+  left: 2.5%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(243,238,229,.92);
+  padding: 2px 5px;
+}
+
+.cl118 { top: 12%; }
+.cl126 { top: 31%; }
+.cl130 { top: 48%; }
+.cl133 { top: 64%; height: 2.8%; background: rgba(255,255,255,.93); }
+.cl135 { top: 79%; }
+
+.mapPoi {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 14px;
+  color: var(--ink);
+}
+
+.mapPoi i {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--bronze);
+  border-radius: 50%;
+  background: #f4efe7;
+}
+
+.mapPoi span {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: clamp(12px, 1.05vw, 19px);
+  line-height: 1;
+  font-weight: 600;
+}
+
+.mapPoi small {
+  color: var(--muted);
+  font-size: clamp(6px, .47vw, 9px);
+}
+
+.poiSalle { left: 72%; top: 7%; }
+.poiMontpellier { left: 56%; top: 25%; }
+.poiParque { left: 42%; top: 41%; }
+.poiHospital { left: 25%; top: 81%; }
+
+.projectPin {
+  position: absolute;
+  z-index: 8;
+  left: 47%;
+  top: 60.5%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-10%, -50%);
+  padding: 9px 12px 9px 8px;
+  background: rgba(22,31,25,.95);
+  color: white;
+  box-shadow: 0 10px 30px rgba(21,20,16,.18);
+}
+
+.projectMarker {
+  width: clamp(34px, 3vw, 54px);
   aspect-ratio: 1;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--green);
-  color: white;
+  background: #d4b18f;
+  color: #1a1815;
   font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(28px, 2.6vw, 50px);
-  font-weight: 500;
+  font-size: clamp(20px, 1.8vw, 34px);
+  font-weight: 700;
 }
 
-.mapCenter span {
-  margin-top: 12px;
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(18px, 1.6vw, 30px);
-}
-
-.mapCenter small {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: clamp(7px, .55vw, 10px);
-  letter-spacing: .1em;
-}
-
-.mapNode {
-  position: absolute;
-  width: clamp(100px, 9vw, 160px);
-  aspect-ratio: 1;
-  border: 1px solid rgba(21,20,16,.22);
-  border-radius: 50%;
-  background: rgba(244,239,231,.86);
+.projectPin > div:last-child {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  backdrop-filter: blur(4px);
 }
 
-.mapNode strong {
+.projectPin strong {
   font-family: var(--font-cormorant), Georgia, serif;
-  font-size: clamp(21px, 2vw, 38px);
-  font-weight: 500;
+  font-size: clamp(13px, 1.08vw, 20px);
+  font-weight: 600;
 }
 
-.mapNode span {
-  margin-top: 3px;
+.projectPin span {
+  margin-top: 1px;
+  color: rgba(255,255,255,.65);
+  font-size: clamp(6px, .5vw, 9px);
+  letter-spacing: .04em;
+}
+
+.northArrow {
+  position: absolute;
+  right: 4%;
+  top: 4%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--green);
+  font-size: clamp(7px, .55vw, 10px);
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.northArrow i {
+  display: block;
+  width: 1px;
+  height: clamp(26px, 2.5vw, 46px);
+  margin-top: 4px;
+  background: var(--green);
+  position: relative;
+}
+
+.northArrow i::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  border-left: 1px solid var(--green);
+  border-top: 1px solid var(--green);
+  transform: rotate(45deg);
+}
+
+.metroConnector {
+  position: absolute;
+  z-index: 5;
+  left: 8%;
+  top: 5%;
+  padding: 9px 12px;
+  border-left: 2px solid var(--green);
+  background: rgba(244,239,231,.8);
+}
+
+.metroConnector span,
+.metroConnector strong {
+  display: block;
+}
+
+.metroConnector span {
   color: var(--muted);
-  font-size: clamp(7px, .6vw, 11px);
+  font-size: clamp(6px, .48vw, 9px);
+  text-transform: uppercase;
+  letter-spacing: .12em;
 }
 
-.nodeA { left: 8%; top: 17%; }
-.nodeB { right: 4%; top: 23%; }
-.nodeC { right: 13%; bottom: 7%; }
+.metroConnector strong {
+  margin-top: 2px;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: clamp(13px, 1.05vw, 19px);
+  font-weight: 600;
+}
 
 .locationNote {
   position: absolute;
   left: 5.5%;
   bottom: 5.5%;
-  width: 36%;
+  width: 35%;
   padding-top: 1.2%;
   border-top: 1px solid rgba(21,20,16,.2);
   color: var(--muted);
-  font-size: clamp(7px, .58vw, 10px);
+  font-size: clamp(6px, .52vw, 9px);
+  line-height: 1.5;
 }
 
 /* 13 CONTACT */
