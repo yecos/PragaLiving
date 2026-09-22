@@ -7,7 +7,7 @@ export function useSiteConfig() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/site-config')
+    fetch('/api/site-config', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         setConfig(data)
