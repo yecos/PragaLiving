@@ -74,10 +74,10 @@ async function uploadImage(file: File, category?: string): Promise<string | null
 function TextField({ label, value, onChange, multiline = false, placeholder = '' }: {
   label: string; value: string; onChange: (v: string) => void; multiline?: boolean; placeholder?: string
 }) {
-  const cls = "w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[12px] text-[#F5F1EA] font-[family-name:var(--font-inter)] focus:border-[#8B6B4B] focus:outline-none transition-colors placeholder:text-[#D8D1C8]/15 resize-none"
+  const cls = "w-full rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-4 py-3 text-[13px] text-[#F7F1E8] font-[family-name:var(--font-inter)] shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-all placeholder:text-[#E9E0D3]/20 resize-none"
   return (
     <div>
-      <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">{label}</label>
+      <label className="text-[9px] font-medium tracking-[0.18em] uppercase text-[#CFC4B5]/55 block mb-2">{label}</label>
       {multiline ? (
         <textarea value={value || ''} onChange={e => onChange(e.target.value)} className={cls} rows={3} placeholder={placeholder} />
       ) : (
@@ -90,8 +90,8 @@ function TextField({ label, value, onChange, multiline = false, placeholder = ''
 function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <div>
-      <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">{label}</label>
-      <input type="number" value={value || ''} onChange={e => onChange(Number(e.target.value))} className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[12px] text-[#F5F1EA] font-[family-name:var(--font-inter)] focus:border-[#8B6B4B] focus:outline-none transition-colors" />
+      <label className="text-[9px] font-medium tracking-[0.18em] uppercase text-[#CFC4B5]/55 block mb-2">{label}</label>
+      <input type="number" value={value || ''} onChange={e => onChange(Number(e.target.value))} className="w-full rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-4 py-3 text-[13px] text-[#F7F1E8] font-[family-name:var(--font-inter)] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-all" />
     </div>
   )
 }
@@ -100,15 +100,15 @@ function ImageField({ label, value, onChange, category }: { label: string; value
   const [uploading, setUploading] = useState(false)
   return (
     <div>
-      <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">{label}</label>
+      <label className="text-[9px] font-medium tracking-[0.18em] uppercase text-[#CFC4B5]/55 block mb-2">{label}</label>
       <div className="flex items-center gap-3">
         {value && (
-          <div className="w-16 h-12 bg-[#0A0A0A] border border-[#D8D1C8]/10 overflow-hidden flex-shrink-0">
+          <div className="w-20 h-14 rounded-xl bg-[#0E0E0D] border border-[#E9E0D3]/10 overflow-hidden flex-shrink-0 shadow-lg">
             <img src={value} alt="" className="w-full h-full object-cover" />
           </div>
         )}
-        <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} className="flex-1 bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors" placeholder="/images/..." />
-        <label className={`text-[9px] tracking-wider uppercase border border-[#8B6B4B]/30 text-[#8B6B4B] px-3 py-2 hover:bg-[#8B6B4B]/10 transition-colors cursor-pointer flex-shrink-0 ${uploading ? 'opacity-50' : ''}`}>
+        <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} className="flex-1 rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-4 py-3 text-[12px] text-[#F7F1E8] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-all" placeholder="/images/..." />
+        <label className={`text-[9px] font-medium tracking-[0.14em] uppercase rounded-xl border border-[#B89268]/30 bg-[#B89268]/5 text-[#CDAF8A] px-4 py-3 hover:bg-[#B89268]/12 hover:border-[#B89268]/50 transition-all cursor-pointer flex-shrink-0 ${uploading ? 'opacity-50' : ''}`}>
           {uploading ? '...' : 'Subir'}
           <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={async (e) => {
             const file = e.target.files?.[0]
@@ -127,10 +127,10 @@ function ImageField({ label, value, onChange, category }: { label: string; value
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">{label}</label>
+      <label className="text-[9px] font-medium tracking-[0.18em] uppercase text-[#CFC4B5]/55 block mb-2">{label}</label>
       <div className="flex items-center gap-2">
-        <input type="color" value={value || '#8B6B4B'} onChange={e => onChange(e.target.value)} className="w-8 h-8 border border-[#D8D1C8]/10 bg-transparent cursor-pointer" />
-        <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} className="flex-1 bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors" />
+        <input type="color" value={value || '#8B6B4B'} onChange={e => onChange(e.target.value)} className="w-10 h-10 rounded-xl border border-[#E9E0D3]/10 bg-transparent cursor-pointer overflow-hidden" />
+        <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} className="flex-1 rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-4 py-3 text-[12px] text-[#F7F1E8] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-all" />
       </div>
     </div>
   )
@@ -155,15 +155,15 @@ function ArrayEditor<T extends Record<string, unknown>>({
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <div key={i} className="border border-[#D8D1C8]/5 p-4 bg-[#0A0A0A]/50">
+        <div key={i} className="rounded-2xl border border-[#E9E0D3]/8 p-5 bg-gradient-to-br from-[#151513] to-[#10100F] shadow-[0_16px_40px_rgba(0,0,0,0.14)]">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] tracking-[0.15em] uppercase text-[#8B6B4B]">#{i + 1}</span>
-            <button onClick={() => removeItem(i)} className="text-[9px] tracking-wider uppercase text-red-400/50 hover:text-red-400 transition-colors">Eliminar</button>
+            <button onClick={() => removeItem(i)} className="rounded-lg px-2.5 py-1.5 text-[9px] tracking-wider uppercase text-red-300/45 hover:text-red-300 hover:bg-red-400/5 transition-all">Eliminar</button>
           </div>
           {renderItem(item, i, updateItem, removeItem)}
         </div>
       ))}
-      <button onClick={() => onChange([...items, createNew()])} className="w-full text-[10px] tracking-[0.15em] uppercase border border-dashed border-[#8B6B4B]/20 text-[#8B6B4B]/50 hover:border-[#8B6B4B]/40 hover:text-[#8B6B4B] py-3 transition-colors">
+      <button onClick={() => onChange([...items, createNew()])} className="w-full rounded-xl text-[10px] font-medium tracking-[0.15em] uppercase border border-dashed border-[#B89268]/25 bg-[#B89268]/[0.025] text-[#B89268]/70 hover:border-[#B89268]/50 hover:bg-[#B89268]/[0.06] hover:text-[#D0AF88] py-3.5 transition-all">
         + {addLabel}
       </button>
     </div>
@@ -173,8 +173,8 @@ function ArrayEditor<T extends Record<string, unknown>>({
 // ─── Save Button ───
 function SaveButton({ onSave, saving }: { onSave: () => void; saving: boolean }) {
   return (
-    <div className="flex justify-end pt-4 border-t border-[#D8D1C8]/5 mt-6">
-      <button onClick={onSave} disabled={saving} className="text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] px-8 py-3 hover:bg-[#7A5C3E] transition-all duration-300 disabled:opacity-50">
+    <div className="sticky bottom-4 z-20 flex justify-end pt-4 mt-8">
+      <button onClick={onSave} disabled={saving} className="rounded-xl text-[10px] font-semibold tracking-[0.16em] uppercase bg-[#B89268] text-[#15120F] px-7 py-3.5 shadow-[0_12px_30px_rgba(184,146,104,0.22)] hover:bg-[#C6A47C] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:translate-y-0">
         {saving ? 'Guardando...' : 'Guardar Cambios'}
       </button>
     </div>
@@ -255,18 +255,18 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
   }
 
   return (
-    <div>
+    <div className="rounded-[28px] border border-[#E9E0D3]/7 bg-[#0E0E0D]/70 p-4 md:p-6 shadow-[0_30px_90px_rgba(0,0,0,0.18)]">
       {/* Sub-tabs */}
       {tabs.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto mb-6 pb-2" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-2 overflow-x-auto mb-7 pb-2" style={{ scrollbarWidth: 'none' }}>
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`whitespace-nowrap px-4 py-2 text-[10px] tracking-[0.12em] uppercase transition-all duration-300 border ${
+              className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-[9px] font-medium tracking-[0.14em] uppercase transition-all duration-300 border ${
                 activeSubTab === tab.id
-                  ? 'border-[#8B6B4B] bg-[#8B6B4B]/10 text-[#8B6B4B]'
-                  : 'border-[#D8D1C8]/10 text-[#D8D1C8]/30 hover:border-[#8B6B4B]/30 hover:text-[#D8D1C8]/50'
+                  ? 'border-[#B89268]/45 bg-[#B89268]/12 text-[#D2B18A] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
+                  : 'border-[#E9E0D3]/8 bg-[#121210] text-[#CFC4B5]/40 hover:border-[#B89268]/25 hover:text-[#E9E0D3]/70 hover:bg-[#171714]'
               }`}
             >
               {tab.label}
