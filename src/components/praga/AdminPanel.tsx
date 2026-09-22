@@ -524,24 +524,25 @@ export default function AdminPanel() {
   // Login screen
   if (status !== 'authenticated') {
     return (
-      <div className="min-h-screen bg-[#111111] flex items-center justify-center p-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
+      <div className="relative min-h-screen overflow-hidden bg-[#0A0A09] flex items-center justify-center p-6">
+        <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 15%, rgba(184,146,104,0.13), transparent 32%)' }} />
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md rounded-[28px] border border-[#E9E0D3]/10 bg-[#10100F]/90 p-7 md:p-9 shadow-[0_35px_100px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="text-center mb-8">
-            <img src="/images/logo.png" alt="PRAGA" className="h-12 w-auto mx-auto brightness-0 invert opacity-70 mb-4" />
-            <h1 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] tracking-wider">Panel Administrativo</h1>
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#B89268]/20 bg-[#B89268]/5"><img src="/images/logo.png" alt="PRAGA" className="h-9 w-auto brightness-0 invert opacity-90" /></div>
+            <h1 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8] tracking-wider">Panel Administrativo</h1>
             <p className="text-[10px] text-[#D8D1C8]/30 tracking-widest uppercase mt-2">Acceso restringido</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-2">Usuario</label>
-              <input type="text" value={loginData.user} onChange={(e) => setLoginData({ ...loginData, user: e.target.value })} className="w-full bg-transparent border border-[#D8D1C8]/20 px-4 py-3 text-sm text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors" placeholder="admin" />
+              <input type="text" value={loginData.user} onChange={(e) => setLoginData({ ...loginData, user: e.target.value })} className="w-full rounded-xl bg-[#151513] border border-[#E9E0D3]/10 px-4 py-3.5 text-sm text-[#F7F1E8] focus:border-[#B89268]/60 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-all" placeholder="admin" />
             </div>
             <div>
               <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-2">Contraseña</label>
-              <input type="password" value={loginData.pass} onChange={(e) => setLoginData({ ...loginData, pass: e.target.value })} className="w-full bg-transparent border border-[#D8D1C8]/20 px-4 py-3 text-sm text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors" placeholder="••••••••" />
+              <input type="password" value={loginData.pass} onChange={(e) => setLoginData({ ...loginData, pass: e.target.value })} className="w-full bg-transparent border border-[#D8D1C8]/20 px-4 py-3 text-sm text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none transition-colors" placeholder="••••••••" />
             </div>
             {loginError && <p className="text-[10px] text-red-400">{loginError}</p>}
-            <button type="submit" className="w-full text-[11px] tracking-[0.2em] uppercase bg-[#8B6B4B] text-[#F5F1EA] py-3.5 hover:bg-[#7A5C3E] transition-colors">Iniciar Sesión</button>
+            <button type="submit" className="w-full rounded-xl text-[10px] font-semibold tracking-[0.16em] uppercase bg-[#B89268] text-[#15120F] py-3.5 shadow-[0_14px_34px_rgba(184,146,104,0.2)] hover:bg-[#C6A47C] hover:-translate-y-0.5 transition-all">Iniciar Sesión</button>
           </form>
         </motion.div>
       </div>
@@ -674,7 +675,7 @@ export default function AdminPanel() {
               {/* ═══ DASHBOARD ═══ */}
               {activeTab === 'dashboard' && (
                 <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] mb-6">Dashboard</h2>
+                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8] mb-6">Dashboard</h2>
 
                   {/* KPI Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -685,7 +686,7 @@ export default function AdminPanel() {
                       { label: 'Vendidas', value: sold, color: 'text-[#D8D1C8]' },
                       { label: '% Vendido', value: `${soldPct}%`, color: 'text-[#8B6B4B]' },
                     ].map((stat) => (
-                      <div key={stat.label} className="bg-[#111111] border border-[#D8D1C8]/5 p-5">
+                      <div key={stat.label} className="rounded-2xl bg-gradient-to-br from-[#151513] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
                         <p className={`font-[family-name:var(--font-cormorant)] text-3xl ${stat.color}`}>{stat.value}</p>
                         <p className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/30 mt-1">{stat.label}</p>
                       </div>
@@ -694,8 +695,8 @@ export default function AdminPanel() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Pie Chart */}
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-5">
-                      <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#8B6B4B] mb-4">Distribución por Estado</h3>
+                    <div className="rounded-2xl bg-gradient-to-br from-[#151513] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
+                      <h3 className="text-[9px] font-semibold tracking-[0.18em] uppercase text-[#B89268] mb-4">Distribución por Estado</h3>
                       <div className="h-52">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
@@ -719,8 +720,8 @@ export default function AdminPanel() {
                     </div>
 
                     {/* Availability by Floor */}
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-5">
-                      <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#8B6B4B] mb-4">Disponibilidad por Piso</h3>
+                    <div className="rounded-2xl bg-gradient-to-br from-[#151513] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)]">
+                      <h3 className="text-[9px] font-semibold tracking-[0.18em] uppercase text-[#B89268] mb-4">Disponibilidad por Piso</h3>
                       <div className="max-h-52 overflow-y-auto custom-scrollbar space-y-2">
                         {Object.entries(floorAvailability).sort((a, b) => {
                           const fa = parseInt(a[0].replace('Piso ', ''))
@@ -741,8 +742,8 @@ export default function AdminPanel() {
                     </div>
 
                     {/* Recent Leads */}
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-5 md:col-span-2">
-                      <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#8B6B4B] mb-4">Leads Recientes</h3>
+                    <div className="rounded-2xl bg-gradient-to-br from-[#151513] to-[#10100F] border border-[#E9E0D3]/7 p-5 shadow-[0_14px_40px_rgba(0,0,0,0.14)] md:col-span-2">
+                      <h3 className="text-[9px] font-semibold tracking-[0.18em] uppercase text-[#B89268] mb-4">Leads Recientes</h3>
                       {leads.length === 0 ? (
                         <p className="text-[11px] text-[#D8D1C8]/20">No hay leads registrados</p>
                       ) : (
@@ -770,16 +771,16 @@ export default function AdminPanel() {
               {activeTab === 'apartments' && (
                 <motion.div key="apartments" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Apartamentos</h2>
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Apartamentos</h2>
                     <div className="flex flex-wrap gap-3 items-center">
-                      <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => { setAptSearch(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#8B6B4B] focus:outline-none" />
-                      <select value={aptStatusFilter} onChange={e => { setAptStatusFilter(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
+                      <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => { setAptSearch(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none" />
+                      <select value={aptStatusFilter} onChange={e => { setAptStatusFilter(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todos los estados</option>
                         <option value="available" className="bg-[#111111]">Disponible</option>
                         <option value="reserved" className="bg-[#111111]">Reservado</option>
                         <option value="sold" className="bg-[#111111]">Vendido</option>
                       </select>
-                      <select value={aptTypologyFilter} onChange={e => { setAptTypologyFilter(e.target.value); setAptPage(0) }} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
+                      <select value={aptTypologyFilter} onChange={e => { setAptTypologyFilter(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todas las tipologías</option>
                         <option value="78.51 m²" className="bg-[#111111]">78.51 m²</option>
                         <option value="60 m²" className="bg-[#111111]">60 m²</option>
@@ -794,7 +795,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <div className="bg-[#111111] border border-[#D8D1C8]/5 overflow-x-auto">
+                  <div className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-[#D8D1C8]/10">
@@ -805,7 +806,7 @@ export default function AdminPanel() {
                       </thead>
                       <tbody>
                         {paginatedApartments.map((apt) => (
-                          <tr key={apt.id} className="border-b border-[#D8D1C8]/5 hover:bg-[#1A1A1A] transition-colors">
+                          <tr key={apt.id} className="border-b border-[#E9E0D3]/6 hover:bg-[#1A1A1A] transition-colors">
                             <td className="text-[11px] text-[#F5F1EA] p-3 whitespace-nowrap">{apt.name}</td>
                             <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.area} m²</td>
                             <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.bedrooms}</td>
@@ -872,9 +873,9 @@ export default function AdminPanel() {
               {activeTab === 'leads' && (
                 <motion.div key="leads" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Leads</h2>
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Leads</h2>
                     <div className="flex items-center gap-3">
-                      <select value={leadStatusFilter} onChange={e => setLeadStatusFilter(e.target.value)} className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none">
+                      <select value={leadStatusFilter} onChange={e => setLeadStatusFilter(e.target.value)} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todos</option>
                         <option value="new" className="bg-[#111111]">Nuevo</option>
                         <option value="contacted" className="bg-[#111111]">Contactado</option>
@@ -904,14 +905,14 @@ export default function AdminPanel() {
                   </div>
 
                   {filteredLeads.length === 0 ? (
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-12 text-center">
+                    <div className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 p-12 text-center">
                       <p className="text-[11px] text-[#D8D1C8]/20">No hay leads registrados aún</p>
                       <p className="text-[10px] text-[#D8D1C8]/10 mt-1">Los leads del formulario aparecerán aquí</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredLeads.map((lead) => (
-                        <motion.div key={lead.id} layout className="bg-[#111111] border border-[#D8D1C8]/5 p-4">
+                        <motion.div key={lead.id} layout className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 p-4">
                           <div className="flex items-center justify-between mb-2">
                             <p className="text-[13px] text-[#F5F1EA] font-medium">{lead.name}</p>
                             <select value={lead.status} onChange={e => void updateLeadStatus(lead.id, e.target.value)} className="bg-transparent text-[9px] tracking-wider uppercase border-none focus:outline-none cursor-pointer" style={{ color: lead.status === 'new' ? '#4B5646' : lead.status === 'contacted' ? '#8B6B4B' : lead.status === 'qualified' ? '#6B8B4B' : '#D8D1C8' }}>
@@ -933,7 +934,7 @@ export default function AdminPanel() {
                           <AnimatePresence>
                             {expandedLead === lead.id && (
                               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                <textarea value={leadNotes} onChange={e => setLeadNotes(e.target.value)} className="w-full mt-2 bg-[#0A0A0A] border border-[#D8D1C8]/10 px-3 py-2 text-[10px] text-[#F5F1EA] resize-none h-16 focus:border-[#8B6B4B] focus:outline-none" placeholder="Agregar notas..." />
+                                <textarea value={leadNotes} onChange={e => setLeadNotes(e.target.value)} className="w-full mt-2 bg-[#0A0A0A] border border-[#E9E0D3]/8 px-3 py-2 text-[10px] text-[#F5F1EA] resize-none h-16 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none" placeholder="Agregar notas..." />
                                 <button onClick={() => void saveLeadNotes(lead.id)} className="text-[9px] tracking-wider uppercase text-[#8B6B4B] hover:text-[#C4A265] transition-colors mt-1">Guardar</button>
                               </motion.div>
                             )}
@@ -977,12 +978,12 @@ export default function AdminPanel() {
               {activeTab === 'medios' && (
                 <motion.div key="medios" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Medios</h2>
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Medios</h2>
                     <div className="flex items-center gap-3">
                       <select
                         value={uploadCategory}
                         onChange={e => setUploadCategory(e.target.value)}
-                        className="bg-[#111111] border border-[#D8D1C8]/15 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                        className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none"
                       >
                         <option value="renders" className="bg-[#111111]">Renders</option>
                         <option value="planos" className="bg-[#111111]">Planos</option>
@@ -1057,7 +1058,7 @@ export default function AdminPanel() {
                         className={`px-4 py-2 text-[10px] tracking-[0.1em] uppercase whitespace-nowrap transition-all duration-300 ${
                           mediaCategory === cat.id
                             ? 'bg-[#8B6B4B] text-[#F5F1EA]'
-                            : 'bg-[#111111] text-[#D8D1C8]/40 border border-[#D8D1C8]/10 hover:text-[#D8D1C8]/60 hover:border-[#8B6B4B]/30'
+                            : 'bg-[#111111] text-[#D8D1C8]/40 border border-[#E9E0D3]/8 hover:text-[#D8D1C8]/60 hover:border-[#8B6B4B]/30'
                         }`}
                       >
                         {cat.label}
@@ -1076,7 +1077,7 @@ export default function AdminPanel() {
                       <div className="w-8 h-8 border-2 border-[#8B6B4B] border-t-transparent rounded-full animate-spin" />
                     </div>
                   ) : Object.values(mediaData).every(v => v.length === 0) ? (
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-12 text-center">
+                    <div className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 p-12 text-center">
                       <ImageIcon className="w-8 h-8 text-[#D8D1C8]/15 mx-auto mb-3" />
                       <p className="text-[11px] text-[#D8D1C8]/20">No hay imágenes en la biblioteca</p>
                       <p className="text-[10px] text-[#D8D1C8]/10 mt-1">Sube imágenes usando el botón de arriba</p>
@@ -1091,7 +1092,7 @@ export default function AdminPanel() {
                         if (images.length === 0) return null
                         return (
                           <div key={cat}>
-                            <h3 className="text-[10px] tracking-[0.2em] uppercase text-[#8B6B4B] mb-3 flex items-center gap-2">
+                            <h3 className="text-[9px] font-semibold tracking-[0.18em] uppercase text-[#B89268] mb-3 flex items-center gap-2">
                               {cat.charAt(0).toUpperCase() + cat.slice(1)}
                               <span className="text-[9px] text-[#D8D1C8]/20">({images.length})</span>
                             </h3>
@@ -1099,7 +1100,7 @@ export default function AdminPanel() {
                               {images.map((img) => (
                                 <div
                                   key={img.url}
-                                  className="group bg-[#111111] border border-[#D8D1C8]/5 hover:border-[#8B6B4B]/30 transition-all duration-300 overflow-hidden"
+                                  className="group rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 hover:border-[#8B6B4B]/30 transition-all duration-300 overflow-hidden"
                                 >
                                   <div className="aspect-square bg-[#0A0A0A] relative overflow-hidden">
                                     <img
@@ -1118,7 +1119,7 @@ export default function AdminPanel() {
                                           setTimeout(() => setCopiedUrl(null), 2000)
                                         })
                                       }}
-                                      className="mt-2 w-full flex items-center justify-center gap-1 text-[9px] tracking-wider uppercase border border-[#D8D1C8]/10 text-[#D8D1C8]/40 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 py-1.5 transition-colors"
+                                      className="mt-2 w-full flex items-center justify-center gap-1 text-[9px] tracking-wider uppercase border border-[#E9E0D3]/8 text-[#D8D1C8]/40 hover:text-[#8B6B4B] hover:border-[#8B6B4B]/30 py-1.5 transition-colors"
                                     >
                                       {copiedUrl === img.url ? (
                                         <>
@@ -1147,10 +1148,10 @@ export default function AdminPanel() {
               {/* ═══ AMENITIES ═══ */}
               {activeTab === 'amenities' && (
                 <motion.div key="amenities" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] mb-6">Amenidades</h2>
+                  <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8] mb-6">Amenidades</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {amenities.map((amenity) => (
-                      <div key={amenity.id} className="bg-[#111111] border border-[#D8D1C8]/5 p-4">
+                      <div key={amenity.id} className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 border border-[#8B6B4B]/30 flex items-center justify-center text-[#8B6B4B] text-xs">◇</div>
@@ -1167,8 +1168,8 @@ export default function AdminPanel() {
 
                         {editingAmenity === amenity.id ? (
                           <div className="space-y-2 mt-2">
-                            <textarea value={amenityEditData.description} onChange={e => setAmenityEditData({ ...amenityEditData, description: e.target.value })} className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/10 px-3 py-2 text-[10px] text-[#F5F1EA] resize-none h-16 focus:border-[#8B6B4B] focus:outline-none" />
-                            <select value={amenityEditData.category} onChange={e => setAmenityEditData({ ...amenityEditData, category: e.target.value })} className="bg-[#0A0A0A] border border-[#D8D1C8]/10 px-2 py-1 text-[10px] text-[#F5F1EA] focus:outline-none appearance-none">
+                            <textarea value={amenityEditData.description} onChange={e => setAmenityEditData({ ...amenityEditData, description: e.target.value })} className="w-full bg-[#0A0A0A] border border-[#E9E0D3]/8 px-3 py-2 text-[10px] text-[#F5F1EA] resize-none h-16 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none" />
+                            <select value={amenityEditData.category} onChange={e => setAmenityEditData({ ...amenityEditData, category: e.target.value })} className="bg-[#0A0A0A] border border-[#E9E0D3]/8 px-2 py-1 text-[10px] text-[#F5F1EA] focus:outline-none appearance-none">
                               <option value="wellness" className="bg-[#111111]">Bienestar</option>
                               <option value="social" className="bg-[#111111]">Social</option>
                               <option value="work" className="bg-[#111111]">Trabajo</option>
@@ -1200,7 +1201,7 @@ export default function AdminPanel() {
               {activeTab === 'cotizaciones' && (
                 <motion.div key="cotizaciones" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA]">Cotizaciones</h2>
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Cotizaciones</h2>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowNewQuote(true)}
@@ -1230,7 +1231,7 @@ export default function AdminPanel() {
                               <select
                                 value={newQuoteData.leadId}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, leadId: e.target.value })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none"
                               >
                                 <option value="" className="bg-[#111111]">Seleccionar lead...</option>
                                 {leads.map(lead => (
@@ -1244,7 +1245,7 @@ export default function AdminPanel() {
                               <select
                                 value={newQuoteData.apartmentId}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, apartmentId: e.target.value })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none"
                               >
                                 <option value="" className="bg-[#111111]">Seleccionar apartamento...</option>
                                 {apartments.filter(a => a.status === 'available').map(apt => (
@@ -1259,7 +1260,7 @@ export default function AdminPanel() {
                                 type="number"
                                 value={newQuoteData.discount || ''}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, discount: parseInt(e.target.value) || 0 })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none"
                                 placeholder="0"
                               />
                             </div>
@@ -1269,7 +1270,7 @@ export default function AdminPanel() {
                               <select
                                 value={newQuoteData.paymentPlan}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, paymentPlan: e.target.value })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none"
                               >
                                 <option value="Contado" className="bg-[#111111]">Contado</option>
                                 <option value="Crédito 5 años" className="bg-[#111111]">Crédito 5 años</option>
@@ -1285,7 +1286,7 @@ export default function AdminPanel() {
                                 type="number"
                                 value={newQuoteData.validDays}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, validDays: parseInt(e.target.value) || 30 })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none"
                                 placeholder="30"
                               />
                             </div>
@@ -1295,7 +1296,7 @@ export default function AdminPanel() {
                               <textarea
                                 value={newQuoteData.notes}
                                 onChange={e => setNewQuoteData({ ...newQuoteData, notes: e.target.value })}
-                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] resize-none h-16 focus:border-[#8B6B4B] focus:outline-none"
+                                className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[11px] text-[#F5F1EA] resize-none h-16 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none"
                                 placeholder="Notas adicionales..."
                               />
                             </div>
@@ -1370,13 +1371,13 @@ export default function AdminPanel() {
 
                   {/* Quotes Table */}
                   {quotes.length === 0 ? (
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 p-12 text-center">
+                    <div className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 p-12 text-center">
                       <FileText className="w-8 h-8 mx-auto text-[#D8D1C8]/10 mb-3" />
                       <p className="text-[11px] text-[#D8D1C8]/20">No hay cotizaciones registradas</p>
                       <p className="text-[10px] text-[#D8D1C8]/10 mt-1">Crea una nueva cotización para comenzar</p>
                     </div>
                   ) : (
-                    <div className="bg-[#111111] border border-[#D8D1C8]/5 overflow-x-auto">
+                    <div className="rounded-2xl bg-[#121210] border border-[#E9E0D3]/7 overflow-x-auto">
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-[#D8D1C8]/10">
@@ -1387,7 +1388,7 @@ export default function AdminPanel() {
                         </thead>
                         <tbody>
                           {quotes.map((quote) => (
-                            <tr key={quote.id} className="border-b border-[#D8D1C8]/5 hover:bg-[#1A1A1A] transition-colors">
+                            <tr key={quote.id} className="border-b border-[#E9E0D3]/6 hover:bg-[#1A1A1A] transition-colors">
                               <td className="text-[11px] text-[#8B6B4B] p-3 whitespace-nowrap font-medium">{quote.number}</td>
                               <td className="text-[11px] text-[#F5F1EA] p-3">{quote.leadName || '—'}</td>
                               <td className="text-[11px] text-[#D8D1C8]/60 p-3">{quote.apartmentName || '—'}</td>
