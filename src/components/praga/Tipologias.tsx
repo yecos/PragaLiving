@@ -79,11 +79,7 @@ export default function Tipologias() {
   const typologies: Typology[] = defaultTypologies.map((base, index) => ({
     ...base,
     ...(configuredItems[index] || {}),
-    images: Array.isArray(configuredItems[index]?.images) && configuredItems[index]?.images?.length
-      ? configuredItems[index]!.images!
-      : typeof (configuredItems[index] as Partial<Typology> & { image?: string })?.image === 'string' && (configuredItems[index] as Partial<Typology> & { image?: string }).image
-        ? [(configuredItems[index] as Partial<Typology> & { image?: string }).image!, ...base.images.slice(1)]
-        : base.images,
+    images: base.images,
   }))
   const ctaText = tipoConfig?.ctaText || 'Solicitar Información'
   const ctaLink = tipoConfig?.ctaLink || '#contacto'
