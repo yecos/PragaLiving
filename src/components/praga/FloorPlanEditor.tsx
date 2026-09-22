@@ -26,6 +26,7 @@ import ConfirmDialog from './ConfirmDialog'
 
 interface ApartmentZone {
   id: string
+  apartmentId?: string
   polygon: number[][]
   name: string
   area: number
@@ -33,6 +34,7 @@ interface ApartmentZone {
   bathrooms: number
   typology: string
   priceRange: string
+  price?: number
   status: string
   view: string
 }
@@ -1493,30 +1495,23 @@ export default function FloorPlanEditor() {
                   </select>
                 </div>
 
-                {/* Price range */}
+                {/* Commercial data is mastered in Residencias */}
                 <div>
-                  <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Rango de precio</label>
-                  <input
-                    type="text"
-                    value={selectedApt.priceRange}
-                    onChange={(e) => updateApartment('priceRange', e.target.value)}
-                    placeholder="$230M – $310M"
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors"
-                  />
+                  <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Precio</label>
+                  <div className="w-full border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 px-3 py-2 text-[12px] text-[#F5F1EA]">
+                    {selectedApt.priceRange || 'Sin precio vinculado'}
+                  </div>
+                  <p className="mt-1 text-[8px] tracking-wide text-[#D8D1C8]/25">Se actualiza desde Residencias</p>
                 </div>
 
-                {/* Status */}
                 <div>
-                  <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Estado</label>
-                  <select
-                    value={selectedApt.status}
-                    onChange={(e) => updateApartment('status', e.target.value)}
-                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
-                  >
-                    {STATUS_OPTIONS.map(s => (
-                      <option key={s} value={s} className="bg-[#111111]">{STATUS_LABELS[s]}</option>
-                    ))}
-                  </select>
+                  <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Estado comercial</label>
+                  <div className="w-full border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 px-3 py-2 text-[12px] text-[#F5F1EA]">
+                    {STATUS_LABELS[selectedApt.status] || selectedApt.status}
+                  </div>
+                  <p className="mt-1 text-[8px] tracking-wide text-[#D8D1C8]/25">
+                    {selectedApt.apartmentId ? 'Vinculado a Residencias' : 'Sin vínculo automático: revisa nombre, piso y tipología'}
+                  </p>
                 </div>
 
                 {/* View */}
