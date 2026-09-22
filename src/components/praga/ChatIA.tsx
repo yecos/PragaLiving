@@ -62,7 +62,7 @@ export default function ChatIA() {
         'tipologías': 'PRAGA Living ofrece 8 tipologías desde Studio de 33 m² hasta Penthouse de 97 m². Cada residencia está diseñada con acabados premium, balcones privados y ventilación cruzada. ¿Te gustaría conocer más detalles de alguna en particular?',
         'amenidades': 'Nuestras amenidades incluyen: Coworking, Gimnasio premium, Salón Social, Ludoteca, Sauna, Baño Turco, Vitality Pool, Hidromasaje, Hidroterapia y Zona de Descanso. Todo diseñado para un estilo de vida excepcional.',
         'precio': 'Los precios varían según la tipología y el piso. Te recomiendo agendar una visita con nuestros asesores para recibir información personalizada y actualizada. ¿Te gustaría que te contacte un asesor?',
-        'visita': 'Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 123 4567, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 601 234 5678. ¿Cuál prefieres?',
+        'visita': 'Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 4203548, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 300 4203548. ¿Cuál prefieres?',
       }
 
       const key = Object.keys(fallbackResponses).find(k => message.toLowerCase().includes(k))

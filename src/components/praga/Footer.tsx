@@ -33,9 +33,9 @@ export default function Footer() {
       title: 'Contacto',
       links: [
         { label: 'Agendar Visita', href: '#contacto' },
-        { label: 'WhatsApp', href: 'https://wa.me/573001234567' },
-        { label: 'Llamada', href: 'tel:+576012345678' },
-        { label: 'Email', href: 'mailto:info@pragaliving.com' },
+        { label: 'WhatsApp', href: 'https://wa.me/573004203548' },
+        { label: 'Llamada', href: 'tel:+573004203548' },
+        { label: 'Email', href: 'mailto:urbanovagrupoempresarial@gmail.com' },
       ],
     },
   ]

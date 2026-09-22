@@ -22,6 +22,7 @@ import WhatsAppButton from '@/components/praga/WhatsAppButton'
 import ChatIA from '@/components/praga/ChatIA'
 
 const SHOW_DIGITAL_TWIN = false // Activar cuando el módulo esté listo para volver a publicarse.
+const SHOW_EXPERIENCE = false // Reactivar cuando la experiencia 360° esté lista.
 
 export default function Home() {
   const [minTimePassed, setMinTimePassed] = useState(false)
@@ -140,7 +141,7 @@ export default function Home() {
         <Amenidades />
         <Tipologias />
         <PlantaInteractiva />
-        <Recorridos360 />
+        {SHOW_EXPERIENCE && <Recorridos360 />}
         <Ubicacion />
         <Galeria />
         <Inversion />

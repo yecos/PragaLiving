@@ -30,9 +30,12 @@ export default function Navigation() {
 
   const allNavItems: NavItem[] = navConfig?.items || defaultNavItems
   const SHOW_DIGITAL_TWIN = false // Mantener oculto temporalmente; cambiar a true para reactivarlo.
-  const navItems: NavItem[] = SHOW_DIGITAL_TWIN
-    ? allNavItems
-    : allNavItems.filter((item) => item.href !== '#edificio')
+  const SHOW_EXPERIENCE = false // Mantener ocultos temporalmente los recorridos 360°.
+  const navItems: NavItem[] = allNavItems.filter((item) => {
+    if (!SHOW_DIGITAL_TWIN && item.href === '#edificio') return false
+    if (!SHOW_EXPERIENCE && item.href === '#recorridos') return false
+    return true
+  })
   const ctaText = navConfig?.ctaText || 'Agendar Visita'
   const ctaLink = navConfig?.ctaLink || '#contacto'
 

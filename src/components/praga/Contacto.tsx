@@ -28,9 +28,9 @@ const defaultInterestOptions = [
 ]
 
 const defaultContactMethods = [
-  { label: 'Llamada', value: '+57 601 234 5678', href: 'tel:+576012345678', icon: 'phone' as const },
-  { label: 'Email', value: 'info@pragaliving.com', href: 'mailto:info@pragaliving.com', icon: 'email' as const },
-  { label: 'WhatsApp', value: '+57 300 123 4567', href: 'https://wa.me/573001234567?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20PRAGA%20Living', icon: 'whatsapp' as const },
+  { label: 'Llamada', value: '+57 300 4203548', href: 'tel:+573004203548', icon: 'phone' as const },
+  { label: 'Email', value: 'urbanovagrupoempresarial@gmail.com', href: 'mailto:urbanovagrupoempresarial@gmail.com', icon: 'email' as const },
+  { label: 'WhatsApp', value: '+57 300 4203548', href: 'https://wa.me/573004203548?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20PRAGA%20Living', icon: 'whatsapp' as const },
 ]
 
 const defaultSchedule = [
@@ -78,7 +78,7 @@ export default function Contacto() {
   const schedule = contactoConfig?.schedule || defaultSchedule
   const interestOptionsRaw = contactoConfig?.interestOptions || defaultInterestOptions.map(o => o.value)
   const interestOptions = interestOptionsRaw.map((opt: string) => ({ value: opt, label: opt }))
-  const whatsappNumber = generalConfig?.whatsapp || '+57 300 123 4567'
+  const whatsappNumber = generalConfig?.whatsapp || '+57 300 4203548'
   const whatsappMessage = contactoConfig?.whatsappMessage || 'Hola, me interesa conocer más sobre PRAGA Living'
 
   const ref = useRef<HTMLElement>(null)

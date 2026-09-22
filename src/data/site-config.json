@@ -3,9 +3,9 @@
     "projectName": "PRAGA Living",
     "logo": "/images/logo.png",
     "tagline": "Arquitectura para quienes valoran lo excepcional",
-    "phone": "+57 601 234 5678",
-    "whatsapp": "+57 300 123 4567",
-    "email": "info@pragaliving.com",
+    "phone": "+57 300 4203548",
+    "whatsapp": "+57 300 4203548",
+    "email": "urbanovagrupoempresarial@gmail.com",
     "address": "Cl. 133 Sur #49-94, Caldas, Antioquia",
     "coordinates": [
       6.08895,
@@ -1057,26 +1057,26 @@
       {
         "id": 14,
         "category": "Tipologías",
-        "src": "/images/renders/studio-33.png",
-        "title": "Studio 33 m²"
+        "src": "/images/typologies/104-01.jpg",
+        "title": "Apartamento 104 m²"
       },
       {
         "id": 15,
         "category": "Tipologías",
-        "src": "/images/renders/apto-57.png",
-        "title": "Apartamento 57 m²"
+        "src": "/images/typologies/78-03.jpg",
+        "title": "Apartamento 78.51 m²"
       },
       {
         "id": 16,
         "category": "Tipologías",
-        "src": "/images/renders/apto-74.png",
-        "title": "Apartamento 74 m²"
+        "src": "/images/typologies/60-01.jpg",
+        "title": "Apartamento 60 m²"
       },
       {
         "id": 17,
         "category": "Tipologías",
-        "src": "/images/renders/apto-97.png",
-        "title": "Penthouse 97 m²"
+        "src": "/images/typologies/33-01.jpg",
+        "title": "Apartamento 33–36 m²"
       }
     ]
   },
@@ -1129,25 +1129,25 @@
   "contacto": {
     "label": "Contacto",
     "title": "Agendar Visita",
-    "notificationEmail": "info@pragaliving.com",
+    "notificationEmail": "urbanovagrupoempresarial@gmail.com",
     "intro": "Nuestro equipo de asesores está disponible para acompañarle en cada paso del proceso. Desde la primera consulta hasta la firma de su nueva residencia, le garantizamos una experiencia personalizada y discreta.",
     "methods": [
       {
         "label": "Llamada",
-        "value": "+57 601 234 5678",
-        "href": "tel:+576012345678",
+        "value": "+57 300 4203548",
+        "href": "tel:+573004203548",
         "icon": "phone"
       },
       {
         "label": "Email",
-        "value": "info@pragaliving.com",
-        "href": "mailto:info@pragaliving.com",
+        "value": "urbanovagrupoempresarial@gmail.com",
+        "href": "mailto:urbanovagrupoempresarial@gmail.com",
         "icon": "email"
       },
       {
         "label": "WhatsApp",
-        "value": "+57 300 123 4567",
-        "href": "https://wa.me/573001234567?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20PRAGA%20Living",
+        "value": "+57 300 4203548",
+        "href": "https://wa.me/573004203548?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20PRAGA%20Living",
         "icon": "whatsapp"
       }
     ],
@@ -1229,15 +1229,15 @@
           },
           {
             "label": "WhatsApp",
-            "href": "https://wa.me/573001234567"
+            "href": "https://wa.me/573004203548"
           },
           {
             "label": "Llamada",
-            "href": "tel:+576012345678"
+            "href": "tel:+573004203548"
           },
           {
             "label": "Email",
-            "href": "mailto:info@pragaliving.com"
+            "href": "mailto:urbanovagrupoempresarial@gmail.com"
           }
         ]
       }
@@ -1261,7 +1261,7 @@
       "tipologías": "PRAGA Living ofrece 8 tipologías desde Studio de 33 m² hasta Penthouse de 97 m². Cada residencia está diseñada con acabados premium, balcones privados y ventilación cruzada. ¿Te gustaría conocer más detalles de alguna en particular?",
       "amenidades": "Nuestras amenidades incluyen: Coworking, Gimnasio premium, Salón Social, Ludoteca, Sauna, Baño Turco, Vitality Pool, Hidromasaje, Hidroterapia y Zona de Descanso. Todo diseñado para un estilo de vida excepcional.",
       "precio": "Los precios varían según la tipología y el piso. Te recomiendo agendar una visita con nuestros asesores para recibir información personalizada y actualizada. ¿Te gustaría que te contacte un asesor?",
-      "visita": "Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 123 4567, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 601 234 5678. ¿Cuál prefieres?"
+      "visita": "Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 4203548, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 300 4203548. ¿Cuál prefieres?"
     }
   },
   "navigation": {

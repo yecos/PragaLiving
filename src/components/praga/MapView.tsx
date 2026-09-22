@@ -146,9 +146,8 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
     })
 
     // Dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      subdomains: 'abcd',
     }).addTo(map)
 
     // Add zoom control top-right
@@ -156,7 +155,7 @@ export default function MapView({ activeLayer, onPoiClick, flyToTarget }: MapVie
 
     // Minimal attribution
     L.control.attribution({ position: 'bottomright', prefix: false })
-      .addAttribution('&copy; <a href="https://carto.com/">CARTO</a>')
+      .addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors')
       .addTo(map)
 
     // ─── Distance circles ──────────────────────────────

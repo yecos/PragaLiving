@@ -7,7 +7,7 @@ import { useSiteConfig } from '@/hooks/useSiteConfig'
 export default function WhatsAppButton() {
   const { config } = useSiteConfig()
   const generalConfig = config?.general
-  const whatsapp = generalConfig?.whatsapp || '+57 300 123 4567'
+  const whatsapp = generalConfig?.whatsapp || '+57 300 4203548'
   const contactoConfig = config?.contacto
   const message = contactoConfig?.whatsappMessage || 'Hola, me interesa conocer más sobre PRAGA Living'
 
