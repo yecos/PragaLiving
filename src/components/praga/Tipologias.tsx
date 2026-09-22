@@ -75,12 +75,22 @@ export default function Tipologias() {
 
   const label = tipoConfig?.label || 'Tipologías'
   const title = tipoConfig?.title || 'Comparar Residencias'
-  const configuredItems = (tipoConfig?.items || []) as Partial<Typology>[]
-  const typologies: Typology[] = defaultTypologies.map((base, index) => ({
-    ...base,
-    ...(configuredItems[index] || {}),
-    images: base.images,
-  }))
+  const configuredItems = (tipoConfig?.items || []) as Array<Partial<Typology> & { image?: string }>
+  const typologies: Typology[] = defaultTypologies.map((base, index) => {
+    const configured = configuredItems.find(item => item.id === base.id) || configuredItems[index] || {}
+    const images = Array.isArray(configured.images) && configured.images.length > 0
+      ? configured.images
+      : typeof configured.image === 'string' && configured.image.trim()
+        ? [configured.image.trim(), ...base.images.slice(1)]
+        : base.images
+
+    return {
+      ...base,
+      ...configured,
+      id: configured.id || base.id,
+      images,
+    }
+  })
   const ctaText = tipoConfig?.ctaText || 'Solicitar Información'
   const ctaLink = tipoConfig?.ctaLink || '#contacto'
 
