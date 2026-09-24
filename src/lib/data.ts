@@ -12,7 +12,6 @@ import type { Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
 import canonicalFloorPlans from '@/data/floor-plans.json'
 import {
-  COMMERCIAL_UNITS,
   DEFAULT_COMMERCIAL_PRICING,
   commercialPriceForUnit,
   normalizeCommercialPricing,
