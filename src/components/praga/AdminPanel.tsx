@@ -569,7 +569,7 @@ export default function AdminPanel() {
     { id: 'contenido', label: 'Contenido web', description: 'Textos, imágenes y secciones', icon: PanelsTopLeft },
     { id: 'ubicacion', label: 'Ubicación', description: 'Mapa y puntos de interés', icon: MapPin },
     { id: 'medios', label: 'Biblioteca', description: 'Archivos e imágenes', icon: Images },
-    { id: 'configuracion', label: 'Configuración', description: 'Contacto, SEO y sistema', icon: Settings2 },
+    { id: 'configuracion', label: 'Configuración', description: 'Comercial, contacto, SEO y sistema', icon: Settings2 },
   ]
   const activeTabMeta = tabs.find(tab => tab.id === activeTab) || tabs[0]
 
