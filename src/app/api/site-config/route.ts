@@ -30,7 +30,7 @@ function hasApprovedBaseline(dbConfig: Record<string, unknown>) {
 function publishedConfig(dbConfig: Record<string, unknown>) {
   if (!hasApprovedBaseline(dbConfig)) return staticConfig
   const cleanDb = Object.fromEntries(
-    Object.entries(dbConfig).filter(([key]) => key !== CONFIG_META_SECTION),
+    Object.entries(dbConfig).filter(([key]) => !key.startsWith('__')),
   )
   return deepMerge(staticConfig, cleanDb) as Record<string, any>
 }
