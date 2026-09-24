@@ -17,22 +17,27 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PUT — ADMIN ONLY: change apartment price/status (commercial value)
+// PUT — ADMIN ONLY: change apartment availability status.
+// Price is canonical and derived from area + level premium.
 export async function PUT(req: NextRequest) {
   const auth = await requireAdminWithCsrf(req)
   if (!auth.authorized) return auth.error!
 
   try {
     const body = await req.json()
-    const { id, status, price } = body
+    const { id, status } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
     }
 
-    const data: { status?: string; price?: number } = {}
+    const validStatuses = ['consult', 'available', 'reserved', 'sold']
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Estado inválido' }, { status: 400 })
+    }
+
+    const data: { status?: string } = {}
     if (status) data.status = status
-    if (price !== undefined) data.price = parseFloat(price)
 
     const apartment = await updateApartment(id, data)
     return NextResponse.json({ success: true, apartment })
