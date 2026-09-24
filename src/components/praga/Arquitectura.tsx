@@ -12,7 +12,8 @@ export default function Arquitectura() {
   const label = arqConfig?.label || 'Arquitectura'
   const heading1 = arqConfig?.heading1 || 'Donde la arquitectura'
   const heading2Accent = arqConfig?.heading2Accent || 'y la naturaleza se encuentran'
-  const paragraph1 = arqConfig?.paragraph1 || 'PRAGA Living integra diseño biophilic en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.'
+  const paragraph1Raw = arqConfig?.paragraph1 || 'PRAGA Living integra diseño biofílico en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.'
+  const paragraph1 = paragraph1Raw.replace(/\bbiophilic\b/gi, 'biofílico')
   const paragraph2 = arqConfig?.paragraph2 || 'Cada residencia ha sido diseñada para maximizar la luz natural, la ventilación cruzada y las vistas panorámicas, creando espacios que respiran y se adaptan al ritmo de quienes los habitan.'
   const stats = arqConfig?.stats || [
     { number: '12', label: 'Niveles Residenciales' },
