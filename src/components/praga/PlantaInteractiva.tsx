@@ -673,10 +673,11 @@ export default function PlantaInteractiva() {
           fetch('/api/site-config', { cache: 'no-store' }),
         ])
         const floorData = await floorRes.json()
-        setConfig(floorData)
-        // Find first residential floor
-        const firstRes = floorData.floors?.findIndex((f: FloorConfig) => f.isResidential)
-        if (firstRes >= 0) setSelectedFloor(firstRes)
+        const residentialOnly = Array.isArray(floorData.floors)
+          ? floorData.floors.filter((f: FloorConfig) => f.isResidential)
+          : []
+        setConfig({ floors: residentialOnly })
+        setSelectedFloor(0)
 
         // Load typology renders from site_config
         if (configRes.ok) {
@@ -694,7 +695,7 @@ export default function PlantaInteractiva() {
     fetchConfig()
   }, [])
 
-  const floors = config?.floors ?? []
+  const floors = (config?.floors ?? []).filter((item) => item.isResidential)
   const floor = floors[selectedFloor] ?? null
   const units = useMemo(() => {
     if (!floor) return []
