@@ -1,0 +1,17 @@
+name: Bootstrap clean PRAGA database
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bootstrap-clean-db.yml'
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create and seed praga_clean
+        run: |
+          set -euo pipefail
+          RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 60 'https://my-project-psi-sage.vercel.app/api/internal/bootstrap-clean-db?confirm=praga-clean-2026-09-24')"
+          echo "$RESPONSE"
