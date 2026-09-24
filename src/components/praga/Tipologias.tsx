@@ -131,13 +131,16 @@ export default function Tipologias() {
     const matchingInventory = canonicalInventory.filter((apartment) => apartment.name.trim().toLowerCase() === unitName)
     const availableCount = matchingInventory.filter((apartment) => apartment.status === 'available').length
     const reservedCount = matchingInventory.filter((apartment) => apartment.status === 'reserved').length
+    const consultCount = matchingInventory.filter((apartment) => apartment.status === 'consult').length
     const inventoryStatus = matchingInventory.length === 0
       ? undefined
       : availableCount > 0
         ? 'Disponible'
         : reservedCount > 0
           ? 'Reservado'
-          : 'Agotado'
+          : consultCount > 0
+            ? 'Consultar disponibilidad'
+            : 'Agotado'
 
     const unitNumber = Number(base.unit)
     const rate = unitNumber <= 4
