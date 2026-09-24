@@ -59,6 +59,11 @@ function formatCommercialValue(value: number) {
   }).format(value)
 }
 
+function commercialNumber(value: unknown, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
 // UnitData for the detail panel (derived from ApartmentZone)
 interface UnitData {
   id: string
@@ -761,10 +766,10 @@ export default function PlantaInteractiva() {
           const pricing = siteConfig.commercialPricing
           if (pricing && typeof pricing === 'object') {
             setCommercialPricing({
-              parkingCar: Number(pricing.parkingCar) || DEFAULT_EXTRAS.parkingCar,
-              parkingMoto: Number(pricing.parkingMoto) || DEFAULT_EXTRAS.parkingMoto,
-              utilitySmall: Number(pricing.utilitySmall) || DEFAULT_EXTRAS.utilitySmall,
-              utilityLarge: Number(pricing.utilityLarge) || DEFAULT_EXTRAS.utilityLarge,
+              parkingCar: commercialNumber(pricing.parkingCar, DEFAULT_EXTRAS.parkingCar),
+              parkingMoto: commercialNumber(pricing.parkingMoto, DEFAULT_EXTRAS.parkingMoto),
+              utilitySmall: commercialNumber(pricing.utilitySmall, DEFAULT_EXTRAS.utilitySmall),
+              utilityLarge: commercialNumber(pricing.utilityLarge, DEFAULT_EXTRAS.utilityLarge),
             })
           }
 
