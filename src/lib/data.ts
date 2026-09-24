@@ -11,7 +11,13 @@ import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
 import canonicalFloorPlans from '@/data/floor-plans.json'
-import { COMMERCIAL_UNITS, apartmentCommercialPrice } from '@/data/commercial-pricing'
+import {
+  COMMERCIAL_UNITS,
+  DEFAULT_COMMERCIAL_PRICING,
+  commercialPriceForUnit,
+  normalizeCommercialPricing,
+  type CommercialPricing,
+} from '@/data/commercial-pricing'
 
 const prisma = db
 
@@ -19,37 +25,62 @@ const prisma = db
 // APARTMENTS
 // ==========================================
 
+function unitNumberFromName(name: string): number | null {
+  const match = name.match(/(\d{1,2})$/)
+  return match ? Number(match[1]) : null
+}
+
+function withCalculatedCommercialPrice<T extends { name: string; floor: number; price: number }>(
+  apartment: T,
+  pricing: CommercialPricing,
+): T {
+  const unitNumber = unitNumberFromName(apartment.name)
+  if (!unitNumber || apartment.floor < 5 || apartment.floor > 16) return apartment
+
+  const calculated = commercialPriceForUnit(apartment.floor, unitNumber, pricing)
+  return calculated === null ? apartment : { ...apartment, price: calculated }
+}
+
+export async function getCommercialPricing(): Promise<CommercialPricing> {
+  const row = await prisma.siteConfig.findUnique({ where: { section: 'commercialPricing' } })
+  return normalizeCommercialPricing(row?.data ?? DEFAULT_COMMERCIAL_PRICING)
+}
+
 export async function getApartments(filters?: { status?: string; floor?: number; typology?: string }) {
   const where: Prisma.ApartmentWhereInput = {}
   if (filters?.status) where.status = filters.status
   if (filters?.floor !== undefined) where.floor = filters.floor
   if (filters?.typology) where.typology = filters.typology
 
-  return prisma.apartment.findMany({
-    where,
-    orderBy: [{ floor: 'asc' }, { name: 'asc' }],
-  })
+  const [apartments, pricing] = await Promise.all([
+    prisma.apartment.findMany({
+      where,
+      orderBy: [{ floor: 'asc' }, { name: 'asc' }],
+    }),
+    getCommercialPricing(),
+  ])
+
+  return apartments.map((apartment) => withCalculatedCommercialPrice(apartment, pricing))
 }
 
 export async function getApartmentById(id: string) {
-  return prisma.apartment.findUnique({ where: { id } })
+  const [apartment, pricing] = await Promise.all([
+    prisma.apartment.findUnique({ where: { id } }),
+    getCommercialPricing(),
+  ])
+  return apartment ? withCalculatedCommercialPrice(apartment, pricing) : null
 }
 
-export async function updateApartment(id: string, data: { status?: string; price?: number }) {
+export async function updateApartment(id: string, data: { status?: string }) {
   const current = await prisma.apartment.findUnique({ where: { id } })
   if (!current) throw new Error('Apartamento no encontrado')
 
   const updateData: Prisma.ApartmentUpdateInput = {}
   if (data.status) updateData.status = data.status
 
-  const unitMatch = current.name.match(/(\d{1,2})$/)
-  const unitNumber = unitMatch ? Number(unitMatch[1]) : null
-  const template = unitNumber ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber) : undefined
-  if (template && current.floor >= 5 && current.floor <= 16) {
-    updateData.price = apartmentCommercialPrice(current.floor, template.area, template.pricePerM2)
-  }
-
-  return prisma.apartment.update({ where: { id }, data: updateData })
+  const updated = await prisma.apartment.update({ where: { id }, data: updateData })
+  const pricing = await getCommercialPricing()
+  return withCalculatedCommercialPrice(updated, pricing)
 }
 
 // ==========================================
