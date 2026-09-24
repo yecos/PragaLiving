@@ -28,10 +28,29 @@ function normalizeDbUrl(url: string | undefined): string | undefined {
   return cleaned
 }
 
-const normalizedDatabaseUrl = normalizeDbUrl(process.env.DATABASE_URL)
+function pinDatabase(url: string | undefined, databaseName: string): string | undefined {
+  if (!url) return url
+  try {
+    const parsed = new URL(url)
+    // Only rewrite Neon connections. Local/dev databases keep their original name.
+    if (!parsed.hostname.includes('neon.tech')) return url
+    parsed.pathname = `/${databaseName}`
+    return parsed.toString()
+  } catch {
+    return url
+  }
+}
 
-if (process.env.DATABASE_URL && process.env.DATABASE_URL !== normalizedDatabaseUrl) {
+const baseDatabaseUrl = normalizeDbUrl(process.env.DATABASE_URL)
+const activeDatabaseName = process.env.PRAGA_DATABASE_NAME || 'praga_clean'
+const normalizedDatabaseUrl = pinDatabase(baseDatabaseUrl, activeDatabaseName)
+
+if (process.env.DATABASE_URL && process.env.DATABASE_URL !== baseDatabaseUrl) {
   console.warn('[db] DATABASE_URL had leading/trailing whitespace or quotes — normalized.')
+}
+
+if (baseDatabaseUrl && normalizedDatabaseUrl !== baseDatabaseUrl) {
+  console.info(`[db] Using Neon database: ${activeDatabaseName}`)
 }
 
 export const db =
