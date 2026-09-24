@@ -10,6 +10,7 @@ import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
+import canonicalFloorPlans from '@/data/floor-plans.json'
 
 const prisma = db
 
@@ -343,27 +344,21 @@ export async function getFloorPlans() {
   // 1. Read from site_config.floor_plans (primary — what the editor saves to)
   const row = await prisma.siteConfig.findUnique({ where: { section: 'floor_plans' } })
   if (row?.data) {
-    const data = row.data as { floors?: unknown[] }
+    const data = row.data as { floors?: Array<{ id?: string; name?: string; isResidential?: boolean }> }
     if (Array.isArray(data.floors) && data.floors.length > 0) {
-      return data.floors as unknown[]
+      const residential = data.floors.filter((floor) => floor.isResidential)
+      const usesCommercialLevels = residential.length === 12 &&
+        residential.every((floor) => /nivel-(?:0[5-9]|1[0-6])/i.test(String(floor.id || '')))
+      if (usesCommercialLevels) return data.floors as unknown[]
     }
   }
 
-  // 2. Fallback: read from floor_plans table and map to the expected shape
-  const rows = await prisma.floorPlan.findMany({ orderBy: { floorNumber: 'asc' } })
-  if (rows.length > 0) {
-    return rows.map((row) => ({
-      id: `piso-${row.floorNumber}`,
-      name: row.floorName || `Piso ${row.floorNumber}`,
-      typeLabel: row.floorNumber > 0 && row.floorNumber <= 11 ? 'Residencial' : 'Áreas Comunes',
-      isResidential: row.floorNumber > 0 && row.floorNumber <= 11,
-      image: row.image || '',
-      apartments: row.apartments as unknown,
-    }))
-  }
+  // Commercial baseline: levels 05–16, 10 units per level and official prices.
+  // This intentionally replaces the old demo floor numbering until the admin
+  // saves a floor-plan configuration using the canonical commercial levels.
+  return (canonicalFloorPlans as { floors: unknown[] }).floors
 
-  // 3. Last resort: empty array (component will show fallback message)
-  return []
+  
 }
 
 export async function updateFloorPlan(
