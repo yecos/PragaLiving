@@ -14,19 +14,19 @@ const defaultIndicators = [
 const defaultSections = [
   {
     title: 'Ubicación Estratégica',
-    description: 'PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura en curso garantizan la revalorización continua del entorno.',
+    description: 'PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura y la consolidación urbana del sector pueden favorecer la valorización futura del entorno.',
   },
   {
     title: 'Escasez de Oferta',
-    description: 'La oferta de residencias premium con características biophilic y amenidades de nivel hotelero es limitada en el mercado. PRAGA Living representa una oportunidad única de acceder a un producto diferenciado que no tendrá réplicas en la zona, protegiendo su valor a largo plazo.',
+    description: 'La oferta de residencias premium con características biophilic y amenidades de nivel hotelero es limitada en el mercado. PRAGA Living propone un producto diferenciado por su arquitectura, amenidades y enfoque residencial, factores que pueden contribuir a sostener su atractivo en el tiempo.',
   },
   {
     title: 'Arquitectura como Valor',
-    description: 'A diferencia de proyectos inmobiliarios tradicionales, PRAGA Living incorpora arquitectura de autor como factor de valoración. La calidad del diseño, los materiales y la construcción se traducen en un patrimonio que se aprecia con el tiempo, no solo en metros cuadrados.',
+    description: 'A diferencia de proyectos inmobiliarios tradicionales, PRAGA Living incorpora arquitectura de autor como factor de valoración. La calidad del diseño, los materiales y la construcción aportan valor de uso y diferenciación al activo, más allá de los metros cuadrados.',
   },
   {
     title: 'Proyección de Mercado',
-    description: 'El mercado inmobiliario premium en la zona muestra tendencias de crecimiento sostenido. La combinación de ubicación, diseño y exclusividad posiciona a PRAGA Living como una de las opciones de inversión más atractivas del mercado actual.',
+    description: 'El mercado inmobiliario premium en la zona muestra tendencias de crecimiento sostenido. La combinación de ubicación, diseño y exclusividad diferencia a PRAGA Living dentro de la oferta residencial del sector.',
   },
 ]
 
@@ -40,6 +40,7 @@ export default function Inversion() {
   const investmentSections = invConfig?.sections || defaultSections
   const ctaText = invConfig?.ctaText || 'Solicitar Información de Inversión'
   const ctaLink = invConfig?.ctaLink || '#contacto'
+  const disclaimer = invConfig?.disclaimer || 'Las cifras presentadas son estimaciones comerciales y no constituyen una garantía de rentabilidad, valorización, ocupación o plusvalía futura. Solicita la metodología y fuentes antes de tomar una decisión de inversión.'
 
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
@@ -95,6 +96,10 @@ export default function Inversion() {
             </motion.div>
           ))}
         </div>
+
+        <p className="-mt-10 mb-16 text-center text-[10px] leading-relaxed text-[#111111]/40 max-w-3xl mx-auto">
+          {disclaimer}
+        </p>
 
         {/* Investment sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
