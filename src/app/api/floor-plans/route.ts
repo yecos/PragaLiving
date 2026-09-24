@@ -81,16 +81,14 @@ function findApartmentRecord(
     if (byId) return byId
   }
 
-  const normalizedName = normalize(zone.name)
-  // Exact unit name is the strongest fallback and works even when the visual
-  // floor IDs use a different numbering convention than the commercial table.
-  const byName = apartments.find((apartment) => normalize(apartment.name) === normalizedName)
-  if (byName) return byName
-
   const floorNumber = floorNumberFromFloor(floor)
   const sameFloor = floorNumber === null
     ? apartments
     : apartments.filter((apartment) => apartment.floor === floorNumber)
+
+  const normalizedName = normalize(zone.name)
+  const byName = sameFloor.find((apartment) => normalize(apartment.name) === normalizedName)
+  if (byName) return byName
 
   return sameFloor.find((apartment) =>
     Math.abs(apartment.area - zone.area) < 0.25 &&
