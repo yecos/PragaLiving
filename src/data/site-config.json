@@ -63,7 +63,7 @@
     "label": "Arquitectura",
     "heading1": "Donde la arquitectura",
     "heading2Accent": "y la naturaleza se encuentran",
-    "paragraph1": "PRAGA Living integra diseño biophilic en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.",
+    "paragraph1": "PRAGA Living integra diseño biofílico en cada nivel del edificio. Fachadas vegetales, balcones con jardines privados y un atrio central que conecta visualmente todos los pisos, creando un ecosistema habitable donde la naturaleza no es un adorno, sino parte esencial de la experiencia arquitectónica.",
     "paragraph2": "Cada residencia ha sido diseñada para maximizar la luz natural, la ventilación cruzada y las vistas panorámicas, creando espacios que respiran y se adaptan al ritmo de quienes los habitan.",
     "stats": [
       {
@@ -931,8 +931,8 @@
           {
             "name": "Estación La Estrella (Metro)",
             "distance": "7.2 km",
-            "time": "25 min",
-            "description": "Estación del Metro de Medellín Línea A, accesible vía bus integrado por Carrera 50",
+            "time": "25 min en vehículo",
+            "description": "Estación del Metro de Medellín Línea A, accesible mediante conexión vial o transporte público por Carrera 50",
             "lat": 6.15278,
             "lng": -75.62633
           }
@@ -1488,23 +1488,24 @@
     "sections": [
       {
         "title": "Ubicación Estratégica",
-        "description": "PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura en curso garantizan la revalorización continua del entorno."
+        "description": "PRAGA Living se ubica en una de las zonas de mayor crecimiento y transformación urbana, donde la conectividad, los servicios y la plusvalía convergen para crear una oportunidad de inversión excepcional. Los proyectos de infraestructura y la consolidación urbana del sector pueden favorecer la valorización futura del entorno."
       },
       {
         "title": "Escasez de Oferta",
-        "description": "La oferta de residencias premium con características biophilic y amenidades de nivel hotelero es limitada en el mercado. PRAGA Living representa una oportunidad única de acceder a un producto diferenciado que no tendrá réplicas en la zona, protegiendo su valor a largo plazo."
+        "description": "La oferta de residencias premium con características biofílicas y amenidades de nivel hotelero es limitada en el mercado. PRAGA Living propone un producto diferenciado por su arquitectura, amenidades y enfoque residencial, factores que pueden contribuir a sostener su atractivo en el tiempo."
       },
       {
         "title": "Arquitectura como Valor",
-        "description": "A diferencia de proyectos inmobiliarios tradicionales, PRAGA Living incorpora arquitectura de autor como factor de valoración. La calidad del diseño, los materiales y la construcción se traducen en un patrimonio que se aprecia con el tiempo, no solo en metros cuadrados."
+        "description": "A diferencia de proyectos inmobiliarios tradicionales, PRAGA Living incorpora arquitectura de autor como factor de valoración. La calidad del diseño, los materiales y la construcción aportan valor de uso y diferenciación al activo, más allá de los metros cuadrados."
       },
       {
         "title": "Proyección de Mercado",
-        "description": "El mercado inmobiliario premium en la zona muestra tendencias de crecimiento sostenido. La combinación de ubicación, diseño y exclusividad posiciona a PRAGA Living como una de las opciones de inversión más atractivas del mercado actual."
+        "description": "El mercado inmobiliario premium en la zona muestra tendencias de crecimiento sostenido. La combinación de ubicación, diseño y exclusividad diferencia a PRAGA Living dentro de la oferta residencial del sector."
       }
     ],
     "ctaText": "Solicitar Información de Inversión",
-    "ctaLink": "#contacto"
+    "ctaLink": "#contacto",
+    "disclaimer": "Las cifras presentadas son estimaciones comerciales y no constituyen una garantía de rentabilidad, valorización, ocupación o plusvalía futura. Solicita la metodología y fuentes antes de tomar una decisión de inversión."
   },
   "contacto": {
     "label": "Contacto",
