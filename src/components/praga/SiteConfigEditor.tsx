@@ -406,15 +406,25 @@ function CommercialPricingEditor({ data, onChange, onSave, saving }: { data: any
       </div>
 
       <div className="rounded-xl border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 p-4">
-        <p className="text-[9px] uppercase tracking-[0.14em] text-[#D8D1C8]/35">Ejemplo automático</p>
-        <p className="mt-2 font-[family-name:var(--font-cormorant)] text-lg text-[#F5F1EA]">
-          Nivel 12 · APTO 04 (104 m²)
-        </p>
-        <p className="mt-1 text-[11px] text-[#8B6B4B]">
-          {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(
-            104 * Number(d.apartmentM2 || 0) + Number(d.heightPremium?.['12'] || 0)
-          )}
-        </p>
+        <p className="text-[9px] uppercase tracking-[0.14em] text-[#D8D1C8]/35">Ejemplo automático · Nivel 12 · APTO 04 (104 m²)</p>
+        {(() => {
+          const apartmentValue = 104 * Number(d.apartmentM2 || 0)
+          const parkingValue = Number(d.parkingCar || 0)
+          const premiumValue = Number(d.heightPremium?.['12'] || 0)
+          const money = (value: number) => new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            maximumFractionDigits: 0,
+          }).format(value)
+          return (
+            <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div><p className="text-[8px] uppercase tracking-wider text-[#D8D1C8]/30">Apartamento</p><p className="mt-1 text-[11px] text-[#F5F1EA]">{money(apartmentValue)}</p></div>
+              <div><p className="text-[8px] uppercase tracking-wider text-[#D8D1C8]/30">Parqueadero</p><p className="mt-1 text-[11px] text-[#F5F1EA]">{money(parkingValue)}</p></div>
+              <div><p className="text-[8px] uppercase tracking-wider text-[#D8D1C8]/30">Prima altura</p><p className="mt-1 text-[11px] text-[#F5F1EA]">{money(premiumValue)}</p></div>
+              <div><p className="text-[8px] uppercase tracking-wider text-[#8B6B4B]">Total con parqueadero</p><p className="mt-1 text-[12px] font-semibold text-[#8B6B4B]">{money(apartmentValue + parkingValue + premiumValue)}</p></div>
+            </div>
+          )
+        })()}
       </div>
 
       <SaveButton onSave={onSave} saving={saving} />
