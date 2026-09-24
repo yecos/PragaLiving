@@ -109,10 +109,24 @@ export async function GET() {
       ...floor,
       apartments: (floor.apartments || []).map((zone) => {
         const apartment = findApartmentRecord(zone, floor, apartments)
-        const officialPrice = officialCommercialPrice(zone, floor)
+        const level = floorNumberFromFloor(floor)
+        const unitNumber = commercialUnitNumber(zone)
+        const template = unitNumber !== null
+          ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
+          : undefined
+        const officialPrice = template && level !== null
+          ? apartmentCommercialPrice(level, template.area, template.pricePerM2)
+          : null
 
         return {
           ...zone,
+          ...(template ? {
+            name: `Apto ${String(template.unit).padStart(2, '0')}`,
+            area: template.area,
+            bedrooms: template.bedrooms,
+            bathrooms: template.bathrooms,
+            typology: template.typology,
+          } : {}),
           ...(apartment ? {
             apartmentId: apartment.id,
             status: apartment.status,
