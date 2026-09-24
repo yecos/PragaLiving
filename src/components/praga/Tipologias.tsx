@@ -7,6 +7,7 @@ import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 type Typology = {
   id: string
+  unit: string
   name: string
   area: string
   bedrooms: string
@@ -24,59 +25,81 @@ const typologyImages = (prefix: string, count: number) =>
 
 const defaultTypologies: Typology[] = [
   {
-    id: 'tipo-78',
-    name: '78.51 m²',
-    area: '78.51',
-    bedrooms: '3',
-    bathrooms: '2',
+    id: 'tipo-01', unit: '01', name: 'APTO 01 · 78.51 m²', area: '78.51', bedrooms: '3', bathrooms: '2',
     images: typologyImages('78', 5),
-    description: 'Apartamento de 78.51 m² con tres habitaciones, dos baños y una distribución amplia para vida familiar.',
-    features: ['3 Habitaciones', '2 Baños', '78.51 m²', 'Valor base por m²: $7.000.000'],
+    description: 'Tipología APTO 01 de 78.51 m². Se mantiene independiente de las demás por su posición, orientación y distribución dentro de la planta.',
+    features: ['APTO 01', '3 Habitaciones', '2 Baños', 'Valor base por m²: $7.000.000'],
     status: 'Consultar disponibilidad',
   },
   {
-    id: 'tipo-60',
-    name: '60 m²',
-    area: '60',
-    bedrooms: '2',
-    bathrooms: '1',
+    id: 'tipo-02', unit: '02', name: 'APTO 02 · 60 m²', area: '60', bedrooms: '2', bathrooms: '1',
     images: typologyImages('60', 6),
-    description: 'Apartamento de 60 m² con dos habitaciones, un baño y zona social integrada.',
-    features: ['2 Habitaciones', '1 Baño', '60 m²', 'Valor base por m²: $7.000.000'],
+    description: 'Tipología APTO 02 de 60 m². Aunque comparte metraje con APTO 03, corresponde a una tipología independiente.',
+    features: ['APTO 02', '2 Habitaciones', '1 Baño', 'Valor base por m²: $7.000.000'],
     status: 'Consultar disponibilidad',
   },
   {
-    id: 'tipo-104',
-    name: '104 m²',
-    area: '104',
-    bedrooms: '3',
-    bathrooms: '2',
-    images: typologyImages('104', 11),
-    description: 'La tipología de mayor área: 104 m², tres habitaciones y dos baños.',
-    features: ['3 Habitaciones', '2 Baños', '104 m²', 'Valor base por m²: $7.000.000'],
+    id: 'tipo-03', unit: '03', name: 'APTO 03 · 60 m²', area: '60', bedrooms: '2', bathrooms: '1',
+    images: typologyImages('60', 6),
+    description: 'Tipología APTO 03 de 60 m². Se presenta por separado de APTO 02 por su ubicación y configuración en planta.',
+    features: ['APTO 03', '2 Habitaciones', '1 Baño', 'Valor base por m²: $7.000.000'],
     status: 'Consultar disponibilidad',
   },
-  ...[
-    { id: 'tipo-34-28', name: '34.28 m²', area: '34.28' },
-    { id: 'tipo-35-6', name: '35.6 m²', area: '35.6' },
-    { id: 'tipo-35-8', name: '35.8 m²', area: '35.8' },
-    { id: 'tipo-33-75', name: '33.75 m²', area: '33.75' },
-    { id: 'tipo-33-05', name: '33.05 m²', area: '33.05' },
-  ].map((studio) => ({
-    ...studio,
-    bedrooms: '1',
-    bathrooms: '1',
-    images: typologyImages('33', 4),
-    description: `Apartaestudio de ${studio.area} m² con distribución eficiente y acabados del proyecto.`,
-    features: ['1 Alcoba', '1 Baño', `${studio.area} m²`, 'Valor base por m²: $7.500.000'],
+  {
+    id: 'tipo-04', unit: '04', name: 'APTO 04 · 104 m²', area: '104', bedrooms: '3', bathrooms: '2',
+    images: typologyImages('104', 11),
+    description: 'Tipología APTO 04 de 104 m², la unidad de mayor área del nivel.',
+    features: ['APTO 04', '3 Habitaciones', '2 Baños', 'Valor base por m²: $7.000.000'],
     status: 'Consultar disponibilidad',
-  })),
+  },
+  {
+    id: 'tipo-05', unit: '05', name: 'APTO 05 · 34.28 m²', area: '34.28', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 05, apartaestudio de 34.28 m².',
+    features: ['APTO 05', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
+  {
+    id: 'tipo-06', unit: '06', name: 'APTO 06 · 35.6 m²', area: '35.6', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 06, apartaestudio de 35.6 m².',
+    features: ['APTO 06', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
+  {
+    id: 'tipo-07', unit: '07', name: 'APTO 07 · 35.8 m²', area: '35.8', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 07, apartaestudio de 35.8 m².',
+    features: ['APTO 07', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
+  {
+    id: 'tipo-08', unit: '08', name: 'APTO 08 · 33.75 m²', area: '33.75', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 08 de 33.75 m². Se mantiene separada de APTO 10 aunque comparta el mismo metraje.',
+    features: ['APTO 08', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
+  {
+    id: 'tipo-09', unit: '09', name: 'APTO 09 · 33.05 m²', area: '33.05', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 09, apartaestudio de 33.05 m².',
+    features: ['APTO 09', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
+  {
+    id: 'tipo-10', unit: '10', name: 'APTO 10 · 33.75 m²', area: '33.75', bedrooms: '1', bathrooms: '1',
+    images: typologyImages('33', 4),
+    description: 'Tipología APTO 10 de 33.75 m². Se mantiene separada de APTO 08 por su posición y configuración dentro del nivel.',
+    features: ['APTO 10', '1 Alcoba', '1 Baño', 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  },
 ]
 
 export default function Tipologias() {
   const { config } = useSiteConfig()
   const tipoConfig = config?.tipologias
-  const [inventory, setInventory] = useState<Array<{ area: number; status: string }>>([])
+  const [inventory, setInventory] = useState<Array<{ name: string; area: number; status: string; floor?: number }>>([])
 
   useEffect(() => {
     let cancelled = false
@@ -102,18 +125,9 @@ export default function Tipologias() {
         ? [configured.image.trim(), ...base.images.slice(1)]
         : base.images
 
-    const areaText = String(configured.area || base.area)
-    const numericParts = areaText.match(/\d+(?:\.\d+)?/g)?.map(Number) || []
-    const canonicalInventory = inventory.filter((apartment: { area: number; status: string; floor?: number }) => apartment.floor !== undefined && apartment.floor >= 5 && apartment.floor <= 16)
-    const matchingInventory = canonicalInventory.filter((apartment) => {
-      if (numericParts.length >= 2) {
-        return apartment.area >= numericParts[0] - 0.25 && apartment.area <= numericParts[1] + 0.25
-      }
-      if (numericParts.length === 1) {
-        return Math.abs(apartment.area - numericParts[0]) < 0.75
-      }
-      return false
-    })
+    const canonicalInventory = inventory.filter((apartment) => apartment.floor !== undefined && apartment.floor >= 5 && apartment.floor <= 16)
+    const unitName = `apto ${base.unit}`.toLowerCase()
+    const matchingInventory = canonicalInventory.filter((apartment) => apartment.name.trim().toLowerCase() === unitName)
     const availableCount = matchingInventory.filter((apartment) => apartment.status === 'available').length
     const reservedCount = matchingInventory.filter((apartment) => apartment.status === 'reserved').length
     const inventoryStatus = matchingInventory.length === 0
