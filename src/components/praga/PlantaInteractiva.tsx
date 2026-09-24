@@ -235,6 +235,19 @@ function GlassDetailPanel({
     Promise.resolve().then(() => setCurrentRender(0))
   }, [unit?.id])
 
+  // Preload neighboring carousel images so next/previous feels immediate.
+  useEffect(() => {
+    if (renders.length < 2) return
+    const indexes = [
+      (currentRender + 1) % renders.length,
+      (currentRender - 1 + renders.length) % renders.length,
+    ]
+    indexes.forEach((index) => {
+      const preload = new window.Image()
+      preload.src = renders[index]
+    })
+  }, [currentRender, renders])
+
   // Status styling
   const statusColor = unit
     ? {
@@ -280,15 +293,25 @@ function GlassDetailPanel({
       {renders.length > 0 && (
         <div className="mb-6">
           <div className="relative w-full overflow-hidden bg-[#0A0A0A] mb-2" style={{ aspectRatio: '4 / 3' }}>
-            <motion.img
-              key={currentRender}
-              src={renders[currentRender]}
-              alt={`Render ${currentRender + 1} — ${unit.typology}`}
-              className="w-full h-full object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={renders[currentRender]}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Image
+                  src={renders[currentRender]}
+                  alt={`Render ${currentRender + 1} — ${unit.typology}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 340px"
+                  quality={82}
+                  className="object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
             {/* Navigation arrows */}
             {renders.length > 1 && (
               <>
@@ -685,6 +708,21 @@ export default function PlantaInteractiva() {
           const renders = siteConfig.typology_renders as Record<string, string[]>
           if (renders && typeof renders === 'object') {
             setTypologyRenders(renders)
+
+            // Warm the browser cache with only the first image of each distinct
+            // typology gallery. Duplicate URLs are loaded once.
+            const firstImages = Array.from(new Set(
+              Object.values(renders)
+                .filter((gallery): gallery is string[] => Array.isArray(gallery) && gallery.length > 0)
+                .map((gallery) => gallery[0])
+                .filter(Boolean),
+            ))
+            window.setTimeout(() => {
+              firstImages.forEach((src) => {
+                const preload = new window.Image()
+                preload.src = src
+              })
+            }, 250)
           }
         }
 
