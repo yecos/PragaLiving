@@ -248,7 +248,7 @@ export default function Tipologias() {
                   </span>
                 </div>
                 <p className="text-[11px] text-[#D8D1C8]/50">
-                  {typo.area} m² · {typo.bedrooms} Hab · {typo.bathrooms} Baños
+                  {typo.area} m² · {typo.bedrooms} Hab · {typo.bathrooms} {Number(typo.bathrooms) === 1 ? 'Baño' : 'Baños'}
                 </p>
               </motion.button>
             ))}
