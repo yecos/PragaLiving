@@ -24,26 +24,15 @@ const typologyImages = (prefix: string, count: number) =>
 
 const defaultTypologies: Typology[] = [
   {
-    id: 'tipo-104',
-    name: '104 m²',
-    area: '104',
-    bedrooms: '3',
-    bathrooms: '2',
-    images: typologyImages('104', 11),
-    description: 'La residencia más exclusiva del edificio. Tres habitaciones con vistas privilegiadas hacia el Valle de Aburrá, acabados de nivel superior y espacios amplios para vivir con calma, luz natural y privacidad.',
-    features: ['3 Habitaciones', '2 Baños', 'Vista panorámica', 'Sala y comedor', 'Cocina integrada', 'Acabados superiores'],
-    status: 'Últimas unidades',
-  },
-  {
     id: 'tipo-78',
     name: '78.51 m²',
     area: '78.51',
     bedrooms: '3',
     bathrooms: '2',
     images: typologyImages('78', 5),
-    description: 'Residencia de tres habitaciones con dos baños completos, cocina integrada y una distribución equilibrada que conecta la zona social con espacios privados cálidos y luminosos.',
-    features: ['3 Habitaciones', '2 Baños', 'Cocina integrada', 'Zona social', 'Habitación principal', 'Vista exterior'],
-    status: 'Disponible',
+    description: 'Apartamento de 78.51 m² con tres habitaciones, dos baños y una distribución amplia para vida familiar.',
+    features: ['3 Habitaciones', '2 Baños', '78.51 m²', 'Valor base por m²: $7.000.000'],
+    status: 'Consultar disponibilidad',
   },
   {
     id: 'tipo-60',
@@ -52,21 +41,36 @@ const defaultTypologies: Typology[] = [
     bedrooms: '2',
     bathrooms: '1',
     images: typologyImages('60', 6),
-    description: 'Una residencia compacta y sofisticada de dos habitaciones. La cocina, la sala y el comedor se integran en un ambiente fluido, con iluminación natural y acabados de alta calidad.',
-    features: ['2 Habitaciones', '1 Baño', 'Sala-comedor', 'Cocina integrada', 'Centro de TV', 'Acabados premium'],
-    status: 'Disponible',
+    description: 'Apartamento de 60 m² con dos habitaciones, un baño y zona social integrada.',
+    features: ['2 Habitaciones', '1 Baño', '60 m²', 'Valor base por m²: $7.000.000'],
+    status: 'Consultar disponibilidad',
   },
   {
-    id: 'tipo-studio',
-    name: '33–36 m²',
-    area: '33–36',
+    id: 'tipo-104',
+    name: '104 m²',
+    area: '104',
+    bedrooms: '3',
+    bathrooms: '2',
+    images: typologyImages('104', 11),
+    description: 'La tipología de mayor área: 104 m², tres habitaciones y dos baños.',
+    features: ['3 Habitaciones', '2 Baños', '104 m²', 'Valor base por m²: $7.000.000'],
+    status: 'Consultar disponibilidad',
+  },
+  ...[
+    { id: 'tipo-34-28', name: '34.28 m²', area: '34.28' },
+    { id: 'tipo-35-6', name: '35.6 m²', area: '35.6' },
+    { id: 'tipo-35-8', name: '35.8 m²', area: '35.8' },
+    { id: 'tipo-33-75', name: '33.75 m²', area: '33.75' },
+    { id: 'tipo-33-05', name: '33.05 m²', area: '33.05' },
+  ].map((studio) => ({
+    ...studio,
     bedrooms: '1',
     bathrooms: '1',
     images: typologyImages('33', 4),
-    description: 'Una tipología eficiente para quienes buscan diseño, confort y una inversión inteligente. Un ambiente integrado con cocina, zona social, alcoba y baño completo.',
-    features: ['1 Alcoba', '1 Baño', 'Ambiente integrado', 'Cocina', 'Diseño eficiente', 'Alta rentabilidad'],
-    status: 'Disponible',
-  },
+    description: `Apartaestudio de ${studio.area} m² con distribución eficiente y acabados del proyecto.`,
+    features: ['1 Alcoba', '1 Baño', `${studio.area} m²`, 'Valor base por m²: $7.500.000'],
+    status: 'Consultar disponibilidad',
+  })),
 ]
 
 export default function Tipologias() {
@@ -91,7 +95,7 @@ export default function Tipologias() {
   const title = tipoConfig?.title || 'Comparar Residencias'
   const configuredItems = (tipoConfig?.items || []) as Array<Partial<Typology> & { image?: string }>
   const typologies: Typology[] = defaultTypologies.map((base, index) => {
-    const configured = configuredItems.find(item => item.id === base.id) || configuredItems[index] || {}
+    const configured = configuredItems.find(item => item.id === base.id) || {}
     const images = Array.isArray(configured.images) && configured.images.length > 0
       ? configured.images
       : typeof configured.image === 'string' && configured.image.trim()
@@ -100,7 +104,8 @@ export default function Tipologias() {
 
     const areaText = String(configured.area || base.area)
     const numericParts = areaText.match(/\d+(?:\.\d+)?/g)?.map(Number) || []
-    const matchingInventory = inventory.filter((apartment) => {
+    const canonicalInventory = inventory.filter((apartment: { area: number; status: string; floor?: number }) => apartment.floor !== undefined && apartment.floor >= 5 && apartment.floor <= 16)
+    const matchingInventory = canonicalInventory.filter((apartment) => {
       if (numericParts.length >= 2) {
         return apartment.area >= numericParts[0] - 0.25 && apartment.area <= numericParts[1] + 0.25
       }
