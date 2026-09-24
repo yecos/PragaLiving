@@ -29,7 +29,7 @@ const locationLayers = [
     points: [
       { name: 'Parada Bus Urbano', distance: '84m', time: '1 min', description: 'Parada de rutas urbanas con conexión al centro de Caldas y municipios cercanos', lat: 6.08975, lng: -75.63610 },
       { name: 'Parada Rutas Veredales', distance: '120m', time: '2 min', description: 'Conexión con rutas veredales y transporte rural de la zona sur del Valle de Aburrá', lat: 6.09007, lng: -75.63607 },
-      { name: 'Estación La Estrella (Metro)', distance: '7.2 km', time: '25 min', description: 'Estación del Metro de Medellín Línea A, accesible vía bus integrado por Carrera 50', lat: 6.15278, lng: -75.62633 },
+      { name: 'Estación La Estrella (Metro)', distance: '7.2 km', time: '25 min en vehículo', description: 'Estación del Metro de Medellín Línea A, accesible mediante conexión vial o transporte público por Carrera 50', lat: 6.15278, lng: -75.62633 },
     ]
   },
   {
@@ -98,11 +98,18 @@ export default function Ubicacion() {
   const [activeLayer, setActiveLayer] = useState('movilidad')
   const [flyToTarget, setFlyToTarget] = useState<POIPoint | null>(null)
 
-  const layers = useMemo<LocationLayer[]>(() => (
-    Array.isArray(locationConfig?.layers) && locationConfig.layers.length > 0
+  const layers = useMemo<LocationLayer[]>(() => {
+    const source = Array.isArray(locationConfig?.layers) && locationConfig.layers.length > 0
       ? locationConfig.layers as LocationLayer[]
       : locationLayers
-  ), [locationConfig?.layers])
+
+    return source.map((layer) => ({
+      ...layer,
+      points: layer.points.map((point) => point.name === 'Estación La Estrella (Metro)' && point.time === '25 min'
+        ? { ...point, time: '25 min en vehículo', description: 'Estación del Metro de Medellín Línea A, accesible mediante conexión vial o transporte público por Carrera 50' }
+        : point),
+    }))
+  }, [locationConfig?.layers])
 
   const mapCenter = useMemo<[number, number]>(() => {
     const coords = generalConfig?.coordinates
