@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 type SectionKey =
   | 'general' | 'hero' | 'manifiesto' | 'arquitectura' | 'edificio'
   | 'atrio' | 'amenidades' | 'tipologias' | 'recorridos' | 'ubicacion'
-  | 'galeria' | 'inversion' | 'contacto' | 'footer' | 'chat' | 'navigation' | 'seo'
+  | 'galeria' | 'inversion' | 'commercialPricing' | 'contacto' | 'footer' | 'chat' | 'navigation' | 'seo'
 
 interface SubTab {
   id: SectionKey
@@ -36,6 +36,7 @@ const ubicacionTabs: SubTab[] = [
 
 const configuracionTabs: SubTab[] = [
   { id: 'general', label: 'General' },
+  { id: 'commercialPricing', label: 'Comercial' },
   { id: 'contacto', label: 'Contacto' },
   { id: 'footer', label: 'Footer' },
   { id: 'chat', label: 'Chat IA' },
@@ -91,7 +92,7 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
   return (
     <div>
       <label className="text-[10px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">{label}</label>
-      <input type="number" value={value || ''} onChange={e => onChange(Number(e.target.value))} className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[12px] text-[#F5F1EA] font-[family-name:var(--font-inter)] focus:border-[#8B6B4B] focus:outline-none transition-colors" />
+      <input type="number" value={value ?? ''} onChange={e => onChange(Number(e.target.value))} className="w-full bg-[#0A0A0A] border border-[#D8D1C8]/15 px-3 py-2.5 text-[12px] text-[#F5F1EA] font-[family-name:var(--font-inter)] focus:border-[#8B6B4B] focus:outline-none transition-colors" />
     </div>
   )
 }
@@ -280,6 +281,7 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
         {activeSubTab && (
           <motion.div key={activeSubTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
             {activeSubTab === 'general' && <GeneralEditor data={config.general} onChange={(d) => updateSection('general', d)} onSave={() => void saveSection('general')} saving={saving} />}
+            {activeSubTab === 'commercialPricing' && <CommercialPricingEditor data={config.commercialPricing} onChange={(d) => updateSection('commercialPricing', d)} onSave={() => void saveSection('commercialPricing')} saving={saving} />}
             {activeSubTab === 'hero' && <HeroEditor data={config.hero} onChange={(d) => updateSection('hero', d)} onSave={() => void saveSection('hero')} saving={saving} />}
             {activeSubTab === 'manifiesto' && <ManifiestoEditor data={config.manifiesto} onChange={(d) => updateSection('manifiesto', d)} onSave={() => void saveSection('manifiesto')} saving={saving} />}
             {activeSubTab === 'arquitectura' && <ArquitecturaEditor data={config.arquitectura} onChange={(d) => updateSection('arquitectura', d)} onSave={() => void saveSection('arquitectura')} saving={saving} />}
@@ -327,6 +329,94 @@ function GeneralEditor({ data, onChange, onSave, saving }: { data: any; onChange
         <NumberField label="Latitud" value={data.coordinates?.[0] || 0} onChange={v => onChange({ ...data, coordinates: [v, data.coordinates?.[1] || 0] })} />
         <NumberField label="Longitud" value={data.coordinates?.[1] || 0} onChange={v => onChange({ ...data, coordinates: [data.coordinates?.[0] || 0, v] })} />
       </div>
+      <SaveButton onSave={onSave} saving={saving} />
+    </div>
+  )
+}
+
+// ─── COMMERCIAL PRICING EDITOR ───
+function CommercialPricingEditor({ data, onChange, onSave, saving }: { data: any; onChange: (d: any) => void; onSave: () => void; saving: boolean }) {
+  const d = {
+    currency: 'COP',
+    apartmentM2: 7_000_000,
+    studioM2: 7_500_000,
+    parkingCar: 60_000_000,
+    parkingMoto: 15_000_000,
+    utilitySmall: 15_000_000,
+    utilityLarge: 20_000_000,
+    heightPremium: {
+      '5': 0, '6': 0, '7': 0, '8': 0,
+      '9': 1_000_000, '10': 2_000_000, '11': 3_000_000, '12': 4_000_000,
+      '13': 5_000_000, '14': 6_000_000, '15': 7_000_000, '16': 8_000_000,
+    },
+    ...(data || {}),
+    heightPremium: {
+      '5': 0, '6': 0, '7': 0, '8': 0,
+      '9': 1_000_000, '10': 2_000_000, '11': 3_000_000, '12': 4_000_000,
+      '13': 5_000_000, '14': 6_000_000, '15': 7_000_000, '16': 8_000_000,
+      ...(data?.heightPremium || {}),
+    },
+  }
+
+  const upd = (field: string, value: number) => onChange({ ...d, [field]: value })
+  const updPremium = (level: number, value: number) => onChange({
+    ...d,
+    heightPremium: { ...d.heightPremium, [String(level)]: value },
+  })
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA]">Configuración comercial</h3>
+        <p className="mt-2 max-w-3xl text-[10px] leading-relaxed text-[#D8D1C8]/40">
+          Estos valores son la fuente de verdad. El precio final se calcula automáticamente como área × valor por m² + prima de altura.
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-[#8B6B4B]/20 bg-[#8B6B4B]/5 p-4">
+        <p className="mb-3 text-[10px] uppercase tracking-[0.15em] text-[#8B6B4B]">Valor por metro cuadrado</p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <NumberField label="Apartamentos · $/m²" value={d.apartmentM2} onChange={v => upd('apartmentM2', v)} />
+          <NumberField label="Apartaestudios · $/m²" value={d.studioM2} onChange={v => upd('studioM2', v)} />
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-3 text-[10px] uppercase tracking-[0.15em] text-[#8B6B4B]">Adicionales</p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <NumberField label="Parqueadero carro" value={d.parkingCar} onChange={v => upd('parkingCar', v)} />
+          <NumberField label="Parqueadero moto" value={d.parkingMoto} onChange={v => upd('parkingMoto', v)} />
+          <NumberField label="Cuarto útil pequeño" value={d.utilitySmall} onChange={v => upd('utilitySmall', v)} />
+          <NumberField label="Cuarto útil grande" value={d.utilityLarge} onChange={v => upd('utilityLarge', v)} />
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-3 text-[10px] uppercase tracking-[0.15em] text-[#8B6B4B]">Prima de altura por nivel</p>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {Array.from({ length: 12 }, (_, index) => index + 5).map(level => (
+            <NumberField
+              key={level}
+              label={`Nivel ${String(level).padStart(2, '0')}`}
+              value={Number(d.heightPremium?.[String(level)] ?? 0)}
+              onChange={v => updPremium(level, v)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 p-4">
+        <p className="text-[9px] uppercase tracking-[0.14em] text-[#D8D1C8]/35">Ejemplo automático</p>
+        <p className="mt-2 font-[family-name:var(--font-cormorant)] text-lg text-[#F5F1EA]">
+          Nivel 12 · APTO 04 (104 m²)
+        </p>
+        <p className="mt-1 text-[11px] text-[#8B6B4B]">
+          {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(
+            104 * Number(d.apartmentM2 || 0) + Number(d.heightPremium?.['12'] || 0)
+          )}
+        </p>
+      </div>
+
       <SaveButton onSave={onSave} saving={saving} />
     </div>
   )
