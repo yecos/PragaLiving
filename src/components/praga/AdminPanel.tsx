@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, type ComponentType } from 'react'
+import { useState, useCallback, useRef, useEffect, type ComponentType } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
@@ -65,12 +65,14 @@ interface Amenity {
 }
 
 const statusColors: Record<string, string> = {
+  consult: 'bg-[#6F675F] text-[#F5F1EA]',
   available: 'bg-[#4B5646] text-[#F5F1EA]',
   reserved: 'bg-[#8B6B4B] text-[#F5F1EA]',
   sold: 'bg-[#D8D1C8] text-[#111111]',
 }
 
 const statusLabels: Record<string, string> = {
+  consult: 'Consultar',
   available: 'Disponible',
   reserved: 'Reservado',
   sold: 'Vendido',
@@ -136,7 +138,7 @@ const quoteStatusLabels: Record<string, string> = {
   expired: 'Expirada',
 }
 
-const PIE_COLORS = ['#4B5646', '#8B6B4B', '#D8D1C8']
+const PIE_COLORS = ['#6F675F', '#4B5646', '#8B6B4B', '#D8D1C8']
 
 export default function AdminPanel() {
   const { data: session, status } = useSession()
@@ -232,15 +234,20 @@ export default function AdminPanel() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [aptRes, leadRes] = await Promise.all([
+      const [aptRes, leadRes, amenityRes] = await Promise.all([
         fetch('/api/apartments', { cache: 'no-store' }),
         fetch('/api/leads', { cache: 'no-store' }),
+        fetch('/api/amenities', { cache: 'no-store' }),
       ])
-      const aptData = await aptRes.json()
-      const leadData = await leadRes.json()
+      const [aptData, leadData, amenityData] = await Promise.all([
+        aptRes.json(),
+        leadRes.json(),
+        amenityRes.json(),
+      ])
       setApartments(aptData.apartments || [])
       setLeads(leadData.leads || [])
-      if (!aptRes.ok || !leadRes.ok) {
+      setAmenities(amenityData.amenities || [])
+      if (!aptRes.ok || !leadRes.ok || !amenityRes.ok) {
         toast.error('Algunos datos no se pudieron cargar')
       }
     } catch (err) {
@@ -249,6 +256,12 @@ export default function AdminPanel() {
     }
     setLoading(false)
   }, [])
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      void fetchData()
+    }
+  }, [status, fetchData])
 
   const fetchMedia = useCallback(async () => {
     setMediaLoading(true)
@@ -312,7 +325,6 @@ export default function AdminPanel() {
     try {
       const body: Record<string, unknown> = { id: editingAptId }
       if (editingField === 'status') body.status = editValue
-      if (editingField === 'price') body.price = editValue
       const res = await fetch('/api/apartments', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -325,10 +337,9 @@ export default function AdminPanel() {
       setApartments(prev => prev.map(a => {
         if (a.id !== editingAptId) return a
         if (editingField === 'status') return { ...a, status: editValue }
-        if (editingField === 'price') return { ...a, price: parseFloat(editValue) }
         return a
       }))
-      toast.success(`Apartamento actualizado: ${editingField === 'status' ? 'estado' : 'precio'}`)
+      toast.success('Estado del apartamento actualizado')
     } catch (err) {
       console.error('[admin] saveEdit error:', err)
       toast.error('No se pudo actualizar el apartamento', { description: err instanceof Error ? err.message : undefined })
@@ -446,12 +457,14 @@ export default function AdminPanel() {
   }
 
   // Computed values
+  const consult = apartments.filter(a => a.status === 'consult').length
   const available = apartments.filter(a => a.status === 'available').length
   const reserved = apartments.filter(a => a.status === 'reserved').length
   const sold = apartments.filter(a => a.status === 'sold').length
   const soldPct = apartments.length > 0 ? ((sold / apartments.length) * 100).toFixed(1) : '0'
 
   const pieData = [
+    { name: 'Consultar', value: consult },
     { name: 'Disponibles', value: available },
     { name: 'Reservadas', value: reserved },
     { name: 'Vendidas', value: sold },
@@ -481,14 +494,15 @@ export default function AdminPanel() {
 
   // Availability by floor
   const floorAvailability = apartments.reduce((acc, a) => {
-    const key = `Piso ${a.floor}`
-    if (!acc[key]) acc[key] = { total: 0, available: 0, reserved: 0, sold: 0 }
+    const key = `Nivel ${String(a.floor).padStart(2, '0')}`
+    if (!acc[key]) acc[key] = { total: 0, consult: 0, available: 0, reserved: 0, sold: 0 }
     acc[key].total++
+    if (a.status === 'consult') acc[key].consult++
     if (a.status === 'available') acc[key].available++
     if (a.status === 'reserved') acc[key].reserved++
     if (a.status === 'sold') acc[key].sold++
     return acc
-  }, {} as Record<string, { total: number; available: number; reserved: number; sold: number }>)
+  }, {} as Record<string, { total: number; consult: number; available: number; reserved: number; sold: number }>)
 
   const doUpdateQuoteStatus = async (quoteId: string, newStatus: string, quoteNumber: string) => {
     try {
@@ -741,18 +755,19 @@ export default function AdminPanel() {
                       <h3 className="text-[9px] font-semibold tracking-[0.18em] uppercase text-[#B89268] mb-4">Disponibilidad por Piso</h3>
                       <div className="max-h-52 overflow-y-auto custom-scrollbar space-y-2">
                         {Object.entries(floorAvailability).sort((a, b) => {
-                          const fa = parseInt(a[0].replace('Piso ', ''))
-                          const fb = parseInt(b[0].replace('Piso ', ''))
+                          const fa = parseInt(a[0].replace('Nivel ', ''))
+                          const fb = parseInt(b[0].replace('Nivel ', ''))
                           return fa - fb
                         }).map(([floor, data]) => (
                           <div key={floor} className="flex items-center gap-3">
                             <span className="text-[10px] text-[#D8D1C8]/40 w-14 font-[family-name:var(--font-inter)]">{floor}</span>
                             <div className="flex h-2.5 flex-1 overflow-hidden rounded-full bg-[#1A1A18]">
+                              {data.consult > 0 && <div className="bg-[#6F675F]/70 h-full" style={{ width: `${(data.consult / data.total) * 100}%` }} />}
                               {data.available > 0 && <div className="bg-[#4B5646]/70 h-full" style={{ width: `${(data.available / data.total) * 100}%` }} />}
                               {data.reserved > 0 && <div className="bg-[#8B6B4B]/70 h-full" style={{ width: `${(data.reserved / data.total) * 100}%` }} />}
                               {data.sold > 0 && <div className="bg-[#D8D1C8]/30 h-full" style={{ width: `${(data.sold / data.total) * 100}%` }} />}
                             </div>
-                            <span className="text-[9px] text-[#D8D1C8]/30 w-16 text-right">{data.available}/{data.total} disp.</span>
+                            <span className="text-[9px] text-[#D8D1C8]/30 w-20 text-right">{data.available} disp. · {data.consult} cons.</span>
                           </div>
                         ))}
                       </div>
@@ -793,6 +808,7 @@ export default function AdminPanel() {
                       <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => { setAptSearch(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none" />
                       <select value={aptStatusFilter} onChange={e => { setAptStatusFilter(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none">
                         <option value="" className="bg-[#111111]">Todos los estados</option>
+                        <option value="consult" className="bg-[#111111]">Consultar</option>
                         <option value="available" className="bg-[#111111]">Disponible</option>
                         <option value="reserved" className="bg-[#111111]">Reservado</option>
                         <option value="sold" className="bg-[#111111]">Vendido</option>
@@ -832,24 +848,22 @@ export default function AdminPanel() {
                             <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.view}</td>
                             <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.typology}</td>
                             <td className="p-3">
-                              {editingAptId === apt.id && editingField === 'price' ? (
-                                <input type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} className="bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#8B6B4B] w-28 focus:outline-none" autoFocus />
-                              ) : (
-                                <span className="text-[11px] text-[#8B6B4B] cursor-pointer hover:underline" onClick={() => startEdit(apt.id, 'price', apt.price.toString())} title={formatCOP(apt.price)}>
-                                  {formatCOP(apt.price, true)}
-                                </span>
-                              )}
+                              <span className="text-[11px] text-[#8B6B4B]" title={`Valor oficial calculado · ${formatCOP(apt.price)}`}>
+                                {formatCOP(apt.price, true)}
+                              </span>
+                              <span className="block mt-0.5 text-[7px] uppercase tracking-wider text-[#D8D1C8]/25">Oficial</span>
                             </td>
                             <td className="p-3">
                               {editingAptId === apt.id && editingField === 'status' ? (
                                 <select value={editValue} onChange={e => { setEditValue(e.target.value); setTimeout(() => void saveEdit(), 50) }} className="bg-[#0A0A0A] border border-[#8B6B4B] px-1 py-0.5 text-[9px] text-[#F5F1EA] focus:outline-none" autoFocus>
+                                  <option value="consult" className="bg-[#111111]">Consultar</option>
                                   <option value="available" className="bg-[#111111]">Disponible</option>
                                   <option value="reserved" className="bg-[#111111]">Reservado</option>
                                   <option value="sold" className="bg-[#111111]">Vendido</option>
                                 </select>
                               ) : (
-                                <span className={`text-[8px] tracking-wider uppercase px-2 py-0.5 cursor-pointer ${statusColors[apt.status]}`} onClick={() => startEdit(apt.id, 'status', apt.status)}>
-                                  {statusLabels[apt.status]}
+                                <span className={`text-[8px] tracking-wider uppercase px-2 py-0.5 cursor-pointer ${statusColors[apt.status] || statusColors.consult}`} onClick={() => startEdit(apt.id, 'status', apt.status)}>
+                                  {statusLabels[apt.status] || 'Consultar'}
                                 </span>
                               )}
                             </td>
