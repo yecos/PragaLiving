@@ -1,0 +1,29 @@
+name: Verify PRAGA clean database
+
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-clean-db.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify production database
+        run: |
+          set -euo pipefail
+          RESPONSE="$(curl --fail-with-body --silent --show-error --max-time 30 'https://my-project-psi-sage.vercel.app/api/health/database')"
+          echo "$RESPONSE"
+          python - "$RESPONSE" <<'PY'
+          import json, sys
+          data=json.loads(sys.argv[1])
+          assert data["ok"] is True
+          assert data["database"] == "praga_clean", data
+          assert data["apartmentCount"] == 120, data
+          assert len(data["levels"]) == 12, data
+          assert all(x["count"] == 10 for x in data["levels"]), data
+          assert data["sample"]["floor"] == 12, data
+          assert data["sample"]["name"] == "Apto 04", data
+          assert data["sample"]["price"] == 732000000, data
+          print("PRAGA clean database verified")
+          PY
