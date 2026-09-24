@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAllSiteConfig, updateSiteConfig } from '@/lib/data'
 import staticSiteConfig from '@/data/site-config.json'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
+import { normalizeCommercialPricing } from '@/data/commercial-pricing'
 
 const staticConfig = staticSiteConfig as Record<string, any>
 const CONFIG_META_SECTION = '__site_config_meta'
@@ -86,7 +87,10 @@ export async function POST(request: NextRequest) {
     await ensureApprovedBaseline(dbConfig)
 
     if (typeof body._section === 'string' && Object.prototype.hasOwnProperty.call(body, '_data')) {
-      const result = await updateSiteConfig(body._section, body._data)
+      const payload = body._section === 'commercialPricing'
+        ? normalizeCommercialPricing(body._data)
+        : body._data
+      const result = await updateSiteConfig(body._section, payload)
       if (!result.success) {
         return NextResponse.json({ error: result.error || 'Failed to save' }, { status: 500 })
       }
@@ -96,7 +100,10 @@ export async function POST(request: NextRequest) {
     const results: Record<string, boolean> = {}
     for (const [section, sectionData] of Object.entries(body)) {
       if (section.startsWith('_')) continue
-      const result = await updateSiteConfig(section, sectionData)
+      const payload = section === 'commercialPricing'
+        ? normalizeCommercialPricing(sectionData)
+        : sectionData
+      const result = await updateSiteConfig(section, payload)
       results[section] = result.success
     }
 
