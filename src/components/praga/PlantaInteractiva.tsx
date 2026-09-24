@@ -8,7 +8,7 @@ import { motion, AnimatePresence, useMotionValue, useDragControls, PanInfo } fro
 // TYPES — matching floor-plans.json schema
 // ═══════════════════════════════════════════════════════════════════
 
-type UnitStatus = 'available' | 'reserved' | 'sold'
+type UnitStatus = 'available' | 'reserved' | 'sold' | 'consult'
 
 interface ApartmentZone {
   id: string
@@ -59,12 +59,14 @@ const STATUS_COLORS: Record<UnitStatus, { fill: string; stroke: string }> = {
   available: { fill: '#4B5646', stroke: '#4B5646' },  // Verde Musgo
   reserved: { fill: '#8B6B4B', stroke: '#8B6B4B' },   // Bronce
   sold: { fill: '#D8D1C8', stroke: '#D8D1C8' },        // Gris Piedra
+  consult: { fill: '#6F675F', stroke: '#8B6B4B' },      // Pendiente de disponibilidad comercial
 }
 
 const STATUS_LABELS: Record<UnitStatus, string> = {
   available: 'Disponible',
   reserved: 'Reservado',
   sold: 'Vendido',
+  consult: 'Consultar',
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -239,6 +241,7 @@ function GlassDetailPanel({
         available: 'bg-[#4B5646] text-[#F5F1EA]',
         reserved: 'bg-[#8B6B4B] text-[#F5F1EA]',
         sold: 'bg-[#D8D1C8]/20 text-[#D8D1C8]/50',
+        consult: 'bg-[#6F675F] text-[#F5F1EA]',
       }[unit.status]
     : ''
 
@@ -336,7 +339,7 @@ function GlassDetailPanel({
         {[
           ['Habitaciones', unit.bedrooms],
           ['Baños', unit.bathrooms],
-          ['Piso', floor.name],
+          ['Nivel', floor.name],
           ['Tipología', unit.typology],
           ['Vista', unit.view],
         ].map(([label, value]) => (
@@ -756,6 +759,23 @@ export default function PlantaInteractiva() {
             className="h-[1px] bg-[#8B6B4B] mx-auto mt-6"
           />
         </div>
+
+        <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[
+            ['Parqueadero carro', '$ 60.000.000'],
+            ['Parqueadero moto', '$ 15.000.000'],
+            ['Cuarto útil pequeño', '$ 15.000.000'],
+            ['Cuarto útil grande', '$ 20.000.000'],
+          ].map(([label, value]) => (
+            <div key={label} className="border border-[#8B6B4B]/20 bg-white/20 px-4 py-3 text-center">
+              <p className="text-[9px] uppercase tracking-[0.15em] text-[#111111]/45">{label}</p>
+              <p className="mt-1 font-[family-name:var(--font-cormorant)] text-lg text-[#8B6B4B]">{value}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mb-10 text-center text-[10px] text-[#111111]/45">
+          Valores adicionales al apartamento. La prima de altura ya está incluida en el precio mostrado para cada nivel.
+        </p>
 
         {/* Main layout — two columns: floor selector + floor plan (with overlay panel) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
