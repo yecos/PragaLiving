@@ -37,6 +37,28 @@ interface FloorPlanConfig {
   floors: FloorConfig[]
 }
 
+interface CommercialPricingView {
+  parkingCar: number
+  parkingMoto: number
+  utilitySmall: number
+  utilityLarge: number
+}
+
+const DEFAULT_EXTRAS: CommercialPricingView = {
+  parkingCar: 60_000_000,
+  parkingMoto: 15_000_000,
+  utilitySmall: 15_000_000,
+  utilityLarge: 20_000_000,
+}
+
+function formatCommercialValue(value: number) {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 // UnitData for the detail panel (derived from ApartmentZone)
 interface UnitData {
   id: string
@@ -85,17 +107,17 @@ function getPolygonCenter(polygon: number[][]): [number, number] {
   return [sumX / polygon.length, sumY / polygon.length]
 }
 
-const OFFICIAL_UNITS: Record<number, { area: number; bedrooms: number; bathrooms: number; typology: string; pricePerM2: number }> = {
-  1: { area: 78.51, bedrooms: 3, bathrooms: 2, typology: '78.51 m²', pricePerM2: 7_000_000 },
-  2: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²', pricePerM2: 7_000_000 },
-  3: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²', pricePerM2: 7_000_000 },
-  4: { area: 104, bedrooms: 3, bathrooms: 2, typology: '104 m²', pricePerM2: 7_000_000 },
-  5: { area: 34.28, bedrooms: 1, bathrooms: 1, typology: '34.28 m²', pricePerM2: 7_500_000 },
-  6: { area: 35.6, bedrooms: 1, bathrooms: 1, typology: '35.6 m²', pricePerM2: 7_500_000 },
-  7: { area: 35.8, bedrooms: 1, bathrooms: 1, typology: '35.8 m²', pricePerM2: 7_500_000 },
-  8: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²', pricePerM2: 7_500_000 },
-  9: { area: 33.05, bedrooms: 1, bathrooms: 1, typology: '33.05 m²', pricePerM2: 7_500_000 },
-  10: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²', pricePerM2: 7_500_000 },
+const OFFICIAL_UNITS: Record<number, { area: number; bedrooms: number; bathrooms: number; typology: string }> = {
+  1: { area: 78.51, bedrooms: 3, bathrooms: 2, typology: '78.51 m²' },
+  2: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²' },
+  3: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²' },
+  4: { area: 104, bedrooms: 3, bathrooms: 2, typology: '104 m²' },
+  5: { area: 34.28, bedrooms: 1, bathrooms: 1, typology: '34.28 m²' },
+  6: { area: 35.6, bedrooms: 1, bathrooms: 1, typology: '35.6 m²' },
+  7: { area: 35.8, bedrooms: 1, bathrooms: 1, typology: '35.8 m²' },
+  8: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²' },
+  9: { area: 33.05, bedrooms: 1, bathrooms: 1, typology: '33.05 m²' },
+  10: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²' },
 }
 
 function extractUnitNumber(apt: ApartmentZone): number | null {
@@ -109,23 +131,6 @@ function extractUnitNumber(apt: ApartmentZone): number | null {
   return raw > 10 ? raw % 100 : raw
 }
 
-function levelNumberFromFloor(floor: FloorConfig): number | null {
-  const match = `${floor.id} ${floor.name}`.match(/(?:nivel|piso)[-\s]*(\d+)/i)
-  return match ? Number(match[1]) : null
-}
-
-function officialPriceFor(unitNumber: number | null, floor: FloorConfig): number | null {
-  if (!unitNumber) return null
-  const template = OFFICIAL_UNITS[unitNumber]
-  const level = levelNumberFromFloor(floor)
-  if (!template || level === null || level < 5 || level > 16) return null
-  const heightPremium = level <= 8 ? 0 : (level - 8) * 1_000_000
-  return Math.round(template.area * template.pricePerM2 + heightPremium)
-}
-
-function formatOfficialPrice(value: number) {
-  return '$ ' + new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(value)
-}
 
 function apartmentToUnit(apt: ApartmentZone): UnitData {
   const unitNumber = extractUnitNumber(apt)
@@ -305,8 +310,6 @@ function GlassDetailPanel({
       }[unit.status]
     : ''
 
-  const panelOfficialPrice = unit ? officialPriceFor(unit.unitNumber, floor) : null
-
   const panelContent = unit ? (
     <div className="p-5 md:p-6 overflow-y-auto max-h-full custom-scrollbar">
       {/* Close button */}
@@ -430,7 +433,7 @@ function GlassDetailPanel({
           Precio
         </p>
         <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#8B6B4B]">
-          {panelOfficialPrice !== null ? formatOfficialPrice(panelOfficialPrice) : unit.priceRange}
+          {unit.priceRange}
         </p>
         <p className="text-[8px] text-[#D8D1C8]/25 font-[family-name:var(--font-inter)] mt-1">COP</p>
       </div>
@@ -735,6 +738,7 @@ export default function PlantaInteractiva() {
   const [selectedFloor, setSelectedFloor] = useState(0)
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
+  const [commercialPricing, setCommercialPricing] = useState<CommercialPricingView>(DEFAULT_EXTRAS)
 
   // Fetch floor plan config, typology renders, and apartments from DB
   useEffect(() => {
@@ -754,6 +758,16 @@ export default function PlantaInteractiva() {
         // Load typology renders from site_config
         if (configRes.ok) {
           const siteConfig = await configRes.json()
+          const pricing = siteConfig.commercialPricing
+          if (pricing && typeof pricing === 'object') {
+            setCommercialPricing({
+              parkingCar: Number(pricing.parkingCar) || DEFAULT_EXTRAS.parkingCar,
+              parkingMoto: Number(pricing.parkingMoto) || DEFAULT_EXTRAS.parkingMoto,
+              utilitySmall: Number(pricing.utilitySmall) || DEFAULT_EXTRAS.utilitySmall,
+              utilityLarge: Number(pricing.utilityLarge) || DEFAULT_EXTRAS.utilityLarge,
+            })
+          }
+
           const renders = siteConfig.typology_renders as Record<string, string[]>
           if (renders && typeof renders === 'object') {
             setTypologyRenders(renders)
@@ -850,10 +864,10 @@ export default function PlantaInteractiva() {
 
         <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
-            ['Parqueadero carro', '$ 60.000.000'],
-            ['Parqueadero moto', '$ 15.000.000'],
-            ['Cuarto útil pequeño', '$ 15.000.000'],
-            ['Cuarto útil grande', '$ 20.000.000'],
+            ['Parqueadero carro', formatCommercialValue(commercialPricing.parkingCar)],
+            ['Parqueadero moto', formatCommercialValue(commercialPricing.parkingMoto)],
+            ['Cuarto útil pequeño', formatCommercialValue(commercialPricing.utilitySmall)],
+            ['Cuarto útil grande', formatCommercialValue(commercialPricing.utilityLarge)],
           ].map(([label, value]) => (
             <div key={label} className="border border-[#8B6B4B]/20 bg-white/20 px-4 py-3 text-center">
               <p className="text-[9px] uppercase tracking-[0.15em] text-[#111111]/45">{label}</p>
