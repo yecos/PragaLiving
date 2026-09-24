@@ -336,6 +336,12 @@ function GeneralEditor({ data, onChange, onSave, saving }: { data: any; onChange
 
 // ─── COMMERCIAL PRICING EDITOR ───
 function CommercialPricingEditor({ data, onChange, onSave, saving }: { data: any; onChange: (d: any) => void; onSave: () => void; saving: boolean }) {
+  const defaultHeightPremium = {
+    '5': 0, '6': 0, '7': 0, '8': 0,
+    '9': 1_000_000, '10': 2_000_000, '11': 3_000_000, '12': 4_000_000,
+    '13': 5_000_000, '14': 6_000_000, '15': 7_000_000, '16': 8_000_000,
+  }
+
   const d = {
     currency: 'COP',
     apartmentM2: 7_000_000,
@@ -344,16 +350,9 @@ function CommercialPricingEditor({ data, onChange, onSave, saving }: { data: any
     parkingMoto: 15_000_000,
     utilitySmall: 15_000_000,
     utilityLarge: 20_000_000,
-    heightPremium: {
-      '5': 0, '6': 0, '7': 0, '8': 0,
-      '9': 1_000_000, '10': 2_000_000, '11': 3_000_000, '12': 4_000_000,
-      '13': 5_000_000, '14': 6_000_000, '15': 7_000_000, '16': 8_000_000,
-    },
     ...(data || {}),
     heightPremium: {
-      '5': 0, '6': 0, '7': 0, '8': 0,
-      '9': 1_000_000, '10': 2_000_000, '11': 3_000_000, '12': 4_000_000,
-      '13': 5_000_000, '14': 6_000_000, '15': 7_000_000, '16': 8_000_000,
+      ...defaultHeightPremium,
       ...(data?.heightPremium || {}),
     },
   }
