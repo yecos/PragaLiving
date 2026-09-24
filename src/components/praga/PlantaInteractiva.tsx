@@ -114,7 +114,8 @@ function getFallbackFloorImage(floorId: string): string {
   const staticImage = STATIC_FLOOR_IMAGES[floorId]
   if (staticImage) return staticImage
 
-  const floorNumber = Number(floorId.replace('piso-', ''))
+  const floorMatch = floorId.match(/(?:piso|nivel)-(\d+)/i)
+  const floorNumber = floorMatch ? Number(floorMatch[1]) : NaN
   if (Number.isInteger(floorNumber) && floorNumber > 0) {
     return floorNumber % 2 === 0
       ? '/images/planos/planta-tipo-pares.jpg'
@@ -135,8 +136,7 @@ function FloorPlanImage({ floor }: { floor: FloorConfig }) {
       fill
       className="object-contain"
       sizes="(max-width: 1024px) 100vw, 58vw"
-      priority
-      unoptimized
+      quality={82}
       onError={() => {
         if (imageSrc !== fallbackImage) setImageSrc(fallbackImage)
       }}
