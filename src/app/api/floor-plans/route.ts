@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getApartments, getFloorPlans, saveFloorPlansConfig } from '@/lib/data'
+import { getApartments, getCommercialPricing, getFloorPlans, saveFloorPlansConfig } from '@/lib/data'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
-import { COMMERCIAL_UNITS, apartmentCommercialPrice } from '@/data/commercial-pricing'
+import { COMMERCIAL_UNITS, commercialPriceForUnit, type CommercialPricing } from '@/data/commercial-pricing'
 
 type ApartmentRecord = Awaited<ReturnType<typeof getApartments>>[number]
 
@@ -60,15 +60,15 @@ function commercialUnitNumber(zone: FloorApartment): number | null {
   return raw > 10 ? raw % 100 : raw
 }
 
-function officialCommercialPrice(zone: FloorApartment, floor: FloorConfig): number | null {
+function officialCommercialPrice(
+  zone: FloorApartment,
+  floor: FloorConfig,
+  pricing: CommercialPricing,
+): number | null {
   const level = floorNumberFromFloor(floor)
   const unitNumber = commercialUnitNumber(zone)
   if (level === null || level < 5 || level > 16 || unitNumber === null) return null
-
-  const template = COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
-  if (!template) return null
-
-  return apartmentCommercialPrice(level, template.area, template.pricePerM2)
+  return commercialPriceForUnit(level, unitNumber, pricing)
 }
 
 function findApartmentRecord(
@@ -98,12 +98,48 @@ function findApartmentRecord(
 
 export async function GET() {
   try {
-    const [floorsRaw, apartments] = await Promise.all([
+    const [floorsRaw, apartments, pricing] = await Promise.all([
       getFloorPlans(),
       getApartments(),
+      getCommercialPricing(),
     ])
 
-    const floors = (floorsRaw as FloorConfig[]).map((floor) => ({
+    const floors = (floorsRaw as FloorConfig[]).map((floor) => {
+      const level = floorNumberFromFloor(floor)
+      const premium = level !== null ? (pricing.heightPremium[String(level)] ?? 0) : 0
+      return {
+      ...floor,
+      typeLabel: floor.isResidential
+        ? `Residencial · ${floor.apartments?.length || 0} unidades · ${premium > 0 ? `Prima altura ${formatPrice(premium)}` : 'Sin prima de altura'}`
+        : floor.typeLabel,
+      apartments: (floor.apartments || []).map((zone) => {
+        const apartment = findApartmentRecord(zone, floor, apartments)
+        const unitNumber = commercialUnitNumber(zone)
+        const template = unitNumber !== null
+          ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
+          : undefined
+        const officialPrice = officialCommercialPrice(zone, floor, pricing)
+
+        return {
+          ...zone,
+          ...(template ? {
+            name: `Apto ${String(template.unit).padStart(2, '0')}`,
+            area: template.area,
+            bedrooms: template.bedrooms,
+            bathrooms: template.bathrooms,
+            typology: template.typology,
+          } : {}),
+          ...(apartment ? {
+            apartmentId: apartment.id,
+            status: apartment.status,
+          } : {}),
+          price: officialPrice ?? zone.price,
+          priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
+        }
+      }),
+    }})
+
+    return NextResponse.json({ floors }, {
       ...floor,
       apartments: (floor.apartments || []).map((zone) => {
         const apartment = findApartmentRecord(zone, floor, apartments)
