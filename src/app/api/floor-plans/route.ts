@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApartments, getFloorPlans, saveFloorPlansConfig } from '@/lib/data'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
+import { COMMERCIAL_UNITS, apartmentCommercialPrice } from '@/data/commercial-pricing'
 
 type ApartmentRecord = Awaited<ReturnType<typeof getApartments>>[number]
 
@@ -48,6 +49,28 @@ function formatPrice(price: number) {
   }).format(price)
 }
 
+function commercialUnitNumber(zone: FloorApartment): number | null {
+  const idMatch = zone.id.match(/apto-(\d{1,2})$/i)
+  if (idMatch) return Number(idMatch[1])
+
+  const nameMatch = zone.name.match(/(?:apto|apartamento)\s*(\d{1,3})/i)
+  if (!nameMatch) return null
+
+  const raw = Number(nameMatch[1])
+  return raw > 10 ? raw % 100 : raw
+}
+
+function officialCommercialPrice(zone: FloorApartment, floor: FloorConfig): number | null {
+  const level = floorNumberFromFloor(floor)
+  const unitNumber = commercialUnitNumber(zone)
+  if (level === null || level < 5 || level > 16 || unitNumber === null) return null
+
+  const template = COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
+  if (!template) return null
+
+  return apartmentCommercialPrice(level, template.area, template.pricePerM2)
+}
+
 function findApartmentRecord(
   zone: FloorApartment,
   floor: FloorConfig,
@@ -86,20 +109,16 @@ export async function GET() {
       ...floor,
       apartments: (floor.apartments || []).map((zone) => {
         const apartment = findApartmentRecord(zone, floor, apartments)
-        if (!apartment) return zone
+        const officialPrice = officialCommercialPrice(zone, floor)
 
         return {
           ...zone,
-          apartmentId: apartment.id,
-          name: apartment.name,
-          area: apartment.area,
-          bedrooms: apartment.bedrooms,
-          bathrooms: apartment.bathrooms,
-          typology: apartment.typology,
-          status: apartment.status,
-          view: apartment.view,
-          price: apartment.price,
-          priceRange: apartment.price > 0 ? formatPrice(apartment.price) : zone.priceRange,
+          ...(apartment ? {
+            apartmentId: apartment.id,
+            status: apartment.status,
+          } : {}),
+          price: officialPrice ?? zone.price,
+          priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
         }
       }),
     }))
