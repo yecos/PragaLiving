@@ -99,6 +99,7 @@ const defaultTypologies: Typology[] = [
 export default function Tipologias() {
   const { config } = useSiteConfig()
   const tipoConfig = config?.tipologias
+  const commercialPricing = config?.commercialPricing
   const [inventory, setInventory] = useState<Array<{ name: string; area: number; status: string; floor?: number }>>([])
 
   useEffect(() => {
@@ -138,11 +139,22 @@ export default function Tipologias() {
           ? 'Reservado'
           : 'Agotado'
 
+    const unitNumber = Number(base.unit)
+    const rate = unitNumber <= 4
+      ? Number(commercialPricing?.apartmentM2 || 7_000_000)
+      : Number(commercialPricing?.studioM2 || 7_500_000)
+    const configuredFeatures = Array.isArray(configured.features) ? configured.features : base.features
+    const features = [
+      ...configuredFeatures.filter((feature) => !String(feature).toLowerCase().includes('valor base por m²')),
+      `Valor base por m²: ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(rate)}`,
+    ]
+
     return {
       ...base,
       ...configured,
       id: configured.id || base.id,
       images,
+      features,
       status: inventoryStatus || configured.status || base.status,
     }
   })
