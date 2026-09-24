@@ -13,274 +13,47 @@ async function main() {
   await prisma.adminUser.deleteMany();
 
   // ==========================================
-  // APARTMENTS - Complete Building Inventory
+  // APARTMENTS — official commercial inventory (Levels 05–16)
   // ==========================================
+  const unitTemplates = [
+    { unit: 1, area: 78.51, bedrooms: 3, bathrooms: 2, typology: "78.51 m²", pricePerM2: 7_000_000, image: "/images/renders/apto-74.png" },
+    { unit: 2, area: 60, bedrooms: 2, bathrooms: 1, typology: "60 m²", pricePerM2: 7_000_000, image: "/images/renders/apto-57.png" },
+    { unit: 3, area: 60, bedrooms: 2, bathrooms: 1, typology: "60 m²", pricePerM2: 7_000_000, image: "/images/renders/apto-57.png" },
+    { unit: 4, area: 104, bedrooms: 3, bathrooms: 2, typology: "104 m²", pricePerM2: 7_000_000, image: "/images/renders/apto-97.png" },
+    { unit: 5, area: 34.28, bedrooms: 1, bathrooms: 1, typology: "34.28 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+    { unit: 6, area: 35.6, bedrooms: 1, bathrooms: 1, typology: "35.6 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+    { unit: 7, area: 35.8, bedrooms: 1, bathrooms: 1, typology: "35.8 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+    { unit: 8, area: 33.75, bedrooms: 1, bathrooms: 1, typology: "33.75 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+    { unit: 9, area: 33.05, bedrooms: 1, bathrooms: 1, typology: "33.05 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+    { unit: 10, area: 33.75, bedrooms: 1, bathrooms: 1, typology: "33.75 m²", pricePerM2: 7_500_000, image: "/images/renders/studio-33.png" },
+  ];
 
   const apartments: any[] = [];
-
-  // Helper: generate unit code
-  const unitCode = (floor: number, unit: number) =>
-    `P${floor}-${String(unit).padStart(2, "0")}`;
-
-  // --- Studios 33m² (Pisos 1-4, 6 units each) ---
-  const studioViews: string[] = [
-    "Atrio",
-    "Exterior",
-    "Atrio",
-    "Exterior",
-    "Atrio",
-    "Exterior",
-  ];
-  const studioAreas: number[] = [33.05, 33.75, 33.05, 33.75, 33.05, 33.75];
-
-  for (let floor = 1; floor <= 4; floor++) {
-    for (let unit = 1; unit <= 6; unit++) {
-      const basePrice = 280_000_000;
-      const floorPremium = (floor - 1) * 8_000_000;
-      const unitPremium = (unit - 1) * 1_500_000;
+  for (let level = 5; level <= 16; level++) {
+    const heightPremium = level <= 8 ? 0 : (level - 8) * 1_000_000;
+    for (const template of unitTemplates) {
       apartments.push({
-        name: `Studio 33 ${unitCode(floor, unit)}`,
-        area: studioAreas[unit - 1],
-        bedrooms: 0,
-        bathrooms: 1,
-        floor,
-        view: studioViews[unit - 1],
-        typology: "Studio",
-        status: "available",
-        price: basePrice + floorPremium + unitPremium,
-        image: "/images/renders/studio-33.jpg",
+        name: `Apto ${String(template.unit).padStart(2, "0")}`,
+        area: template.area,
+        bedrooms: template.bedrooms,
+        bathrooms: template.bathrooms,
+        floor: level,
+        view: "Por definir",
+        typology: template.typology,
+        status: "consult",
+        price: Math.round(template.area * template.pricePerM2 + heightPremium),
+        image: template.image,
         plan360Url: null,
         features: JSON.stringify([
-          "Cocina integral",
-          "Baño completo",
-          "Zona de ropas",
-          "Balconcito",
-          "Acabados premium",
+          `Nivel ${String(level).padStart(2, "0")}`,
+          `Apartamento ${String(template.unit).padStart(2, "0")}`,
+          `Prima de altura incluida: $${heightPremium.toLocaleString("es-CO")}`,
         ]),
       });
     }
   }
 
-  // --- Studios Plus 35m² (Pisos 3-4, some units) ---
-  // 3 units on floor 3, 3 units on floor 4
-  const studioPlusViews: string[] = ["Exterior", "Atrio", "Exterior"];
-  const studioPlusAreas: number[] = [35.6, 35.8, 35.6];
-
-  for (let floor = 3; floor <= 4; floor++) {
-    for (let unit = 1; unit <= 3; unit++) {
-      const basePrice = 310_000_000;
-      const floorPremium = (floor - 3) * 12_000_000;
-      const unitPremium = (unit - 1) * 2_000_000;
-      apartments.push({
-        name: `Studio Plus 35 ${unitCode(floor, unit + 6)}`,
-        area: studioPlusAreas[unit - 1],
-        bedrooms: 0,
-        bathrooms: 1,
-        floor,
-        view: studioPlusViews[unit - 1],
-        typology: "Studio Plus",
-        status: "available",
-        price: basePrice + floorPremium + unitPremium,
-        image: "/images/renders/studio-33.jpg",
-        plan360Url: null,
-        features: JSON.stringify([
-          "Cocina integral ampliada",
-          "Baño completo con ducha escocesa",
-          "Zona de ropas",
-          "Balcón",
-          "Acabados premium",
-          "Espacio para estudio",
-        ]),
-      });
-    }
-  }
-
-  // --- Apartamento 2H 57m² (Pisos 5-8, 5 units each) ---
-  const apto2hViews: string[] = [
-    "Atrio",
-    "Exterior",
-    "Atrio",
-    "Exterior",
-    "Panorámica",
-  ];
-  const apto2hAreas: number[] = [57.05, 57.09, 57.05, 57.09, 57.05];
-
-  for (let floor = 5; floor <= 8; floor++) {
-    for (let unit = 1; unit <= 5; unit++) {
-      const basePrice = 420_000_000;
-      const floorPremium = (floor - 5) * 12_000_000;
-      const unitPremium = (unit - 1) * 2_500_000;
-      apartments.push({
-        name: `Apto 2H 57 ${unitCode(floor, unit)}`,
-        area: apto2hAreas[unit - 1],
-        bedrooms: 2,
-        bathrooms: 1,
-        floor,
-        view: apto2hViews[unit - 1],
-        typology: "Apartamento 2H",
-        status: "available",
-        price: basePrice + floorPremium + unitPremium,
-        image: "/images/renders/apto-57.jpg",
-        plan360Url: null,
-        features: JSON.stringify([
-          "2 alcobas",
-          "Baño completo",
-          "Baño de visitas",
-          "Cocina integral",
-          "Zona de ropas",
-          "Balcón",
-          "Acabados premium",
-        ]),
-      });
-    }
-  }
-
-  // --- Apartamento Premium 2H 74m² (Pisos 5-8 some units; Pisos 9-12, 4 units) ---
-  // 2 units on floors 5-8, 4 units on floors 9-12
-  const premiumViews5to8: string[] = ["Exterior", "Panorámica"];
-
-  for (let floor = 5; floor <= 8; floor++) {
-    for (let unit = 1; unit <= 2; unit++) {
-      const basePrice = 560_000_000;
-      const floorPremium = (floor - 5) * 15_000_000;
-      const unitPremium = (unit - 1) * 4_000_000;
-      apartments.push({
-        name: `Apto Premium 2H 74 ${unitCode(floor, unit + 5)}`,
-        area: 74.73,
-        bedrooms: 2,
-        bathrooms: 2,
-        floor,
-        view: premiumViews5to8[unit - 1],
-        typology: "Apartamento Premium 2H",
-        status: "available",
-        price: basePrice + floorPremium + unitPremium,
-        image: "/images/renders/apto-74.jpg",
-        plan360Url: null,
-        features: JSON.stringify([
-          "2 alcobas con walk-in closet",
-          "2 baños completos",
-          "Cocina integral con isla",
-          "Zona de ropas",
-          "Balcón amplio",
-          "Acabados premium",
-          "Piso porcelánico",
-        ]),
-      });
-    }
-  }
-
-  const premiumViews9to12: string[] = [
-    "Atrio",
-    "Exterior",
-    "Panorámica",
-    "Exterior",
-  ];
-
-  for (let floor = 9; floor <= 12; floor++) {
-    for (let unit = 1; unit <= 4; unit++) {
-      const basePrice = 600_000_000;
-      const floorPremium = (floor - 9) * 8_000_000;
-      const unitPremium = (unit - 1) * 3_000_000;
-      apartments.push({
-        name: `Apto Premium 2H 74 ${unitCode(floor, unit)}`,
-        area: 74.73,
-        bedrooms: 2,
-        bathrooms: 2,
-        floor,
-        view: premiumViews9to12[unit - 1],
-        typology: "Apartamento Premium 2H",
-        status: "available",
-        price: basePrice + floorPremium + unitPremium,
-        image: "/images/renders/apto-74.jpg",
-        plan360Url: null,
-        features: JSON.stringify([
-          "2 alcobas con walk-in closet",
-          "2 baños completos",
-          "Cocina integral con isla",
-          "Zona de ropas",
-          "Balcón amplio",
-          "Acabados premium",
-          "Piso porcelánico",
-        ]),
-      });
-    }
-  }
-
-  // --- Penthouse 3H 97m² (Pisos 11-12, 2 units) ---
-  const penthouseViews: string[] = ["Panorámica", "Panorámica"];
-
-  for (let unit = 1; unit <= 1; unit++) {
-    // Floor 11
-    apartments.push({
-      name: `Penthouse 3H 97 ${unitCode(11, 5)}`,
-      area: 97.45,
-      bedrooms: 3,
-      bathrooms: 2,
-      floor: 11,
-      view: "Panorámica",
-      typology: "Penthouse 3H",
-      status: "available",
-      price: 780_000_000,
-      image: "/images/renders/apto-97.jpg",
-      plan360Url: null,
-      features: JSON.stringify([
-        "3 alcobas con walk-in closet",
-        "2 baños completos + baño de visitas",
-        "Cocina integral con isla",
-        "Zona de ropas",
-        "Terraza panorámica",
-        "Acabados premium",
-        "Piso porcelánico",
-        "Doble altura en sala",
-      ]),
-    });
-
-    // Floor 12
-    apartments.push({
-      name: `Penthouse 3H 97 ${unitCode(12, 5)}`,
-      area: 97.45,
-      bedrooms: 3,
-      bathrooms: 2,
-      floor: 12,
-      view: "Panorámica",
-      typology: "Penthouse 3H",
-      status: "available",
-      price: 920_000_000,
-      image: "/images/renders/apto-97.jpg",
-      plan360Url: null,
-      features: JSON.stringify([
-        "3 alcobas con walk-in closet",
-        "2 baños completos + baño de visitas",
-        "Cocina integral con isla",
-        "Zona de ropas",
-        "Terraza panorámica",
-        "Acabados premium",
-        "Piso porcelánico",
-        "Doble altura en sala",
-        "Roof garden privado",
-      ]),
-    });
-  }
-
-  // Mark some units as reserved/sold for realism
-  // 2 Studios on floor 1 sold
-  apartments[0].status = "sold";
-  apartments[3].status = "sold";
-  // 3 Studios reserved across floors
-  apartments[6].status = "reserved";
-  apartments[14].status = "reserved";
-  apartments[19].status = "reserved";
-  // 1 Apto 2H sold
-  apartments[31].status = "sold";
-  // 2 Apto 2H reserved
-  apartments[35].status = "reserved";
-  apartments[42].status = "reserved";
-  // 1 Premium reserved
-  apartments[53].status = "reserved";
-  // 1 Penthouse reserved
-  apartments[apartments.length - 2].status = "reserved";
-
-  console.log(`Creating ${apartments.length} apartments...`);
+  console.log(`Creating ${apartments.length} commercial apartments...`);
   for (const apt of apartments) {
     await prisma.apartment.create({ data: apt });
   }
