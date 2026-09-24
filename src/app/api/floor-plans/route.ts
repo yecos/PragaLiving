@@ -34,7 +34,7 @@ function normalize(value: string) {
 }
 
 function floorNumberFromFloor(floor: FloorConfig): number | null {
-  const idMatch = floor.id.match(/(?:piso-)?(\d+)/i)
+  const idMatch = floor.id.match(/(?:piso|nivel)-(\d+)/i)
   if (idMatch) return Number(idMatch[1])
 
   const nameMatch = floor.name.match(/(\d+)/)
@@ -76,15 +76,15 @@ function findApartmentRecord(
   floor: FloorConfig,
   apartments: ApartmentRecord[],
 ): ApartmentRecord | undefined {
-  if (zone.apartmentId) {
-    const byId = apartments.find((apartment) => apartment.id === zone.apartmentId)
-    if (byId) return byId
-  }
-
   const floorNumber = floorNumberFromFloor(floor)
   const sameFloor = floorNumber === null
     ? apartments
     : apartments.filter((apartment) => apartment.floor === floorNumber)
+
+  if (zone.apartmentId) {
+    const byId = sameFloor.find((apartment) => apartment.id === zone.apartmentId)
+    if (byId) return byId
+  }
 
   const normalizedName = normalize(zone.name)
   const byName = sameFloor.find((apartment) => normalize(apartment.name) === normalizedName)
@@ -107,69 +107,39 @@ export async function GET() {
     const floors = (floorsRaw as FloorConfig[]).map((floor) => {
       const level = floorNumberFromFloor(floor)
       const premium = level !== null ? (pricing.heightPremium[String(level)] ?? 0) : 0
+
       return {
-      ...floor,
-      typeLabel: floor.isResidential
-        ? `Residencial · ${floor.apartments?.length || 0} unidades · ${premium > 0 ? `Prima altura ${formatPrice(premium)}` : 'Sin prima de altura'}`
-        : floor.typeLabel,
-      apartments: (floor.apartments || []).map((zone) => {
-        const apartment = findApartmentRecord(zone, floor, apartments)
-        const unitNumber = commercialUnitNumber(zone)
-        const template = unitNumber !== null
-          ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
-          : undefined
-        const officialPrice = officialCommercialPrice(zone, floor, pricing)
+        ...floor,
+        typeLabel: floor.isResidential
+          ? `Residencial · ${floor.apartments?.length || 0} unidades · ${premium > 0 ? `Prima altura ${formatPrice(premium)}` : 'Sin prima de altura'}`
+          : floor.typeLabel,
+        apartments: (floor.apartments || []).map((zone) => {
+          const apartment = findApartmentRecord(zone, floor, apartments)
+          const unitNumber = commercialUnitNumber(zone)
+          const template = unitNumber !== null
+            ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
+            : undefined
+          const officialPrice = officialCommercialPrice(zone, floor, pricing)
 
-        return {
-          ...zone,
-          ...(template ? {
-            name: `Apto ${String(template.unit).padStart(2, '0')}`,
-            area: template.area,
-            bedrooms: template.bedrooms,
-            bathrooms: template.bathrooms,
-            typology: template.typology,
-          } : {}),
-          ...(apartment ? {
-            apartmentId: apartment.id,
-            status: apartment.status,
-          } : {}),
-          price: officialPrice ?? zone.price,
-          priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
-        }
-      }),
-    }})
-
-    return NextResponse.json({ floors }, {
-      ...floor,
-      apartments: (floor.apartments || []).map((zone) => {
-        const apartment = findApartmentRecord(zone, floor, apartments)
-        const level = floorNumberFromFloor(floor)
-        const unitNumber = commercialUnitNumber(zone)
-        const template = unitNumber !== null
-          ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
-          : undefined
-        const officialPrice = template && level !== null
-          ? apartmentCommercialPrice(level, template.area, template.pricePerM2)
-          : null
-
-        return {
-          ...zone,
-          ...(template ? {
-            name: `Apto ${String(template.unit).padStart(2, '0')}`,
-            area: template.area,
-            bedrooms: template.bedrooms,
-            bathrooms: template.bathrooms,
-            typology: template.typology,
-          } : {}),
-          ...(apartment ? {
-            apartmentId: apartment.id,
-            status: apartment.status,
-          } : {}),
-          price: officialPrice ?? zone.price,
-          priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
-        }
-      }),
-    }))
+          return {
+            ...zone,
+            ...(template ? {
+              name: `Apto ${String(template.unit).padStart(2, '0')}`,
+              area: template.area,
+              bedrooms: template.bedrooms,
+              bathrooms: template.bathrooms,
+              typology: template.typology,
+            } : {}),
+            ...(apartment ? {
+              apartmentId: apartment.id,
+              status: apartment.status,
+            } : {}),
+            price: officialPrice ?? zone.price,
+            priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
+          }
+        }),
+      }
+    })
 
     return NextResponse.json({ floors }, {
       headers: { 'Cache-Control': 'no-store, max-age=0' },
