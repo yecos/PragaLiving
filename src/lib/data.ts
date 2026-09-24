@@ -11,14 +11,224 @@ import bcrypt from 'bcryptjs'
 import type { Prisma } from '@prisma/client'
 import { randomUUID } from 'crypto'
 import canonicalFloorPlans from '@/data/floor-plans.json'
+import staticSiteConfig from '@/data/site-config.json'
+import {
+  COMMERCIAL_UNITS,
+  RESIDENTIAL_LEVELS,
+  HEIGHT_PREMIUM,
+  apartmentCommercialPrice,
+} from '@/data/commercial-pricing'
 
 const prisma = db
+
+const COMMERCIAL_INVENTORY_VERSION = 'praga-commercial-2026-09-24-v3'
+const COMMERCIAL_META_SECTION = '__commercial_inventory_meta'
+const COMMERCIAL_BACKUP_SECTION = '__backup_commercial_inventory_pre_v3'
+
+const UNIT_VIEWS: Record<number, string> = {
+  1: 'Carrera 50',
+  2: 'Interior',
+  3: 'Interior',
+  4: 'Calle 133 Sur',
+  5: 'Carrera 50',
+  6: 'Atrio',
+  7: 'Atrio',
+  8: 'Interior',
+  9: 'Interior',
+  10: 'Calle 133 Sur',
+}
+
+const UNIT_IMAGES: Record<number, string> = {
+  1: '/images/typologies/78-01.jpg',
+  2: '/images/typologies/60-01.jpg',
+  3: '/images/typologies/60-01.jpg',
+  4: '/images/typologies/104-01.jpg',
+  5: '/images/typologies/33-01.jpg',
+  6: '/images/typologies/33-01.jpg',
+  7: '/images/typologies/33-01.jpg',
+  8: '/images/typologies/33-01.jpg',
+  9: '/images/typologies/33-01.jpg',
+  10: '/images/typologies/33-01.jpg',
+}
+
+function asJson(value: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
+}
+
+let commercialInventoryReady: Promise<void> | null = null
+
+async function performCommercialInventoryMigration() {
+  await prisma.$transaction(async (tx) => {
+    // Serialize the one-time migration across concurrent serverless requests.
+    await tx.$executeRawUnsafe('SELECT pg_advisory_xact_lock(724092024)')
+
+    const currentMeta = await tx.siteConfig.findUnique({
+      where: { section: COMMERCIAL_META_SECTION },
+    })
+    const meta = currentMeta?.data as { version?: string } | null
+    if (meta?.version === COMMERCIAL_INVENTORY_VERSION) return
+
+    // Preserve the previous commercial data before replacing it.
+    const legacyApartments = await tx.apartment.findMany()
+    const legacyQuotes = await tx.quote.findMany()
+    const legacyFloorPlans = await tx.siteConfig.findUnique({ where: { section: 'floor_plans' } })
+    const legacyTypologies = await tx.siteConfig.findUnique({ where: { section: 'tipologias' } })
+    const legacyPricing = await tx.siteConfig.findUnique({ where: { section: 'commercialPricing' } })
+
+    await tx.siteConfig.upsert({
+      where: { section: COMMERCIAL_BACKUP_SECTION },
+      create: {
+        section: COMMERCIAL_BACKUP_SECTION,
+        data: asJson({
+          backedUpAt: new Date().toISOString(),
+          apartments: legacyApartments,
+          quotes: legacyQuotes,
+          floorPlans: legacyFloorPlans?.data ?? {},
+          typologies: legacyTypologies?.data ?? {},
+          commercialPricing: legacyPricing?.data ?? {},
+        }),
+      },
+      update: {
+        data: asJson({
+          backedUpAt: new Date().toISOString(),
+          apartments: legacyApartments,
+          quotes: legacyQuotes,
+          floorPlans: legacyFloorPlans?.data ?? {},
+          typologies: legacyTypologies?.data ?? {},
+          commercialPricing: legacyPricing?.data ?? {},
+        }),
+      },
+    })
+
+    // Old quotes reference old apartment IDs, so back them up and clear them
+    // before rebuilding the official inventory.
+    await tx.quote.deleteMany()
+    await tx.apartment.deleteMany()
+    await tx.floorPlan.deleteMany()
+
+    const apartmentRows = RESIDENTIAL_LEVELS.flatMap((level) =>
+      COMMERCIAL_UNITS.map((unit) => {
+        const heightPremium = HEIGHT_PREMIUM[level] ?? 0
+        return {
+          name: `Apto ${String(unit.unit).padStart(2, '0')}`,
+          area: unit.area,
+          bedrooms: unit.bedrooms,
+          bathrooms: unit.bathrooms,
+          floor: level,
+          view: UNIT_VIEWS[unit.unit] || 'Por definir',
+          typology: unit.typology,
+          status: 'consult',
+          price: apartmentCommercialPrice(level, unit.area, unit.pricePerM2),
+          image: UNIT_IMAGES[unit.unit] || null,
+          plan360Url: null,
+          features: JSON.stringify([
+            `Nivel ${String(level).padStart(2, '0')}`,
+            `APTO ${String(unit.unit).padStart(2, '0')}`,
+            `Valor base por m²: ${unit.pricePerM2.toLocaleString('es-CO')}`,
+            `Prima de altura: ${heightPremium.toLocaleString('es-CO')}`,
+          ]),
+        }
+      }),
+    )
+
+    await tx.apartment.createMany({ data: apartmentRows })
+
+    const canonical = canonicalFloorPlans as {
+      floors: Array<{
+        id: string
+        name: string
+        image?: string
+        isResidential?: boolean
+        apartments?: unknown[]
+      }>
+    }
+    const residentialFloors = canonical.floors.filter((floor) => floor.isResidential)
+
+    for (const floor of residentialFloors) {
+      const levelMatch = floor.id.match(/nivel-(\d+)/i)
+      const level = levelMatch ? Number(levelMatch[1]) : NaN
+      if (!Number.isInteger(level)) continue
+      await tx.floorPlan.create({
+        data: {
+          floorNumber: level,
+          floorName: floor.name,
+          image: floor.image || null,
+          apartments: asJson(floor.apartments || []),
+        },
+      })
+    }
+
+    const config = staticSiteConfig as Record<string, unknown>
+    await tx.siteConfig.upsert({
+      where: { section: 'floor_plans' },
+      create: { section: 'floor_plans', data: asJson(canonicalFloorPlans) },
+      update: { data: asJson(canonicalFloorPlans) },
+    })
+    await tx.siteConfig.upsert({
+      where: { section: 'tipologias' },
+      create: { section: 'tipologias', data: asJson(config.tipologias || {}) },
+      update: { data: asJson(config.tipologias || {}) },
+    })
+    await tx.siteConfig.upsert({
+      where: { section: 'commercialPricing' },
+      create: { section: 'commercialPricing', data: asJson(config.commercialPricing || {}) },
+      update: { data: asJson(config.commercialPricing || {}) },
+    })
+
+    const apartmentCount = await tx.apartment.count()
+    const grouped = await tx.apartment.groupBy({
+      by: ['floor'],
+      _count: { _all: true },
+      orderBy: { floor: 'asc' },
+    })
+    const validDistribution =
+      apartmentCount === 120 &&
+      grouped.length === 12 &&
+      grouped.every((row) => row.floor >= 5 && row.floor <= 16 && row._count._all === 10)
+
+    if (!validDistribution) {
+      throw new Error('La migración comercial no produjo 120 apartamentos distribuidos en niveles 05–16')
+    }
+
+    await tx.siteConfig.upsert({
+      where: { section: COMMERCIAL_META_SECTION },
+      create: {
+        section: COMMERCIAL_META_SECTION,
+        data: asJson({
+          version: COMMERCIAL_INVENTORY_VERSION,
+          migratedAt: new Date().toISOString(),
+          apartmentCount,
+          levels: RESIDENTIAL_LEVELS,
+        }),
+      },
+      update: {
+        data: asJson({
+          version: COMMERCIAL_INVENTORY_VERSION,
+          migratedAt: new Date().toISOString(),
+          apartmentCount,
+          levels: RESIDENTIAL_LEVELS,
+        }),
+      },
+    })
+  }, { maxWait: 10_000, timeout: 30_000 })
+}
+
+export async function ensureOfficialCommercialInventory() {
+  if (!commercialInventoryReady) {
+    commercialInventoryReady = performCommercialInventoryMigration().catch((error) => {
+      commercialInventoryReady = null
+      throw error
+    })
+  }
+  return commercialInventoryReady
+}
 
 // ==========================================
 // APARTMENTS
 // ==========================================
 
 export async function getApartments(filters?: { status?: string; floor?: number; typology?: string }) {
+  await ensureOfficialCommercialInventory()
   const where: Prisma.ApartmentWhereInput = {}
   if (filters?.status) where.status = filters.status
   if (filters?.floor !== undefined) where.floor = filters.floor
@@ -31,13 +241,25 @@ export async function getApartments(filters?: { status?: string; floor?: number;
 }
 
 export async function getApartmentById(id: string) {
+  await ensureOfficialCommercialInventory()
   return prisma.apartment.findUnique({ where: { id } })
 }
 
 export async function updateApartment(id: string, data: { status?: string; price?: number }) {
+  await ensureOfficialCommercialInventory()
+  const current = await prisma.apartment.findUnique({ where: { id } })
+  if (!current) throw new Error('Apartamento no encontrado')
+
   const updateData: Prisma.ApartmentUpdateInput = {}
   if (data.status) updateData.status = data.status
-  if (data.price !== undefined) updateData.price = data.price
+
+  const unitMatch = current.name.match(/(\d{1,2})$/)
+  const unitNumber = unitMatch ? Number(unitMatch[1]) : null
+  const template = unitNumber ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber) : undefined
+  if (template && current.floor >= 5 && current.floor <= 16) {
+    updateData.price = apartmentCommercialPrice(current.floor, template.area, template.pricePerM2)
+  }
+
   return prisma.apartment.update({ where: { id }, data: updateData })
 }
 
@@ -130,6 +352,7 @@ export function generateQuoteNumber(): string {
 }
 
 export async function getQuotes(filters?: { status?: string }): Promise<Quote[]> {
+  await ensureOfficialCommercialInventory()
   const where: Prisma.QuoteWhereInput = {}
   if (filters?.status) where.status = filters.status
   const rows = await prisma.quote.findMany({
@@ -164,6 +387,7 @@ export async function createQuote(data: {
   validUntil?: Date
 }): Promise<{ success: boolean; quote?: Quote; error?: string }> {
   try {
+    await ensureOfficialCommercialInventory()
     const created = await prisma.quote.create({
       data: {
         number: generateQuoteNumber(),
@@ -303,11 +527,13 @@ export async function verifyAdmin(username: string, password: string) {
 // ==========================================
 
 export async function getSiteConfig(section: string): Promise<unknown> {
+  await ensureOfficialCommercialInventory()
   const row = await prisma.siteConfig.findUnique({ where: { section } })
   return row?.data ?? null
 }
 
 export async function getAllSiteConfig(): Promise<Record<string, unknown>> {
+  await ensureOfficialCommercialInventory()
   const rows = await prisma.siteConfig.findMany()
   const config: Record<string, unknown> = {}
   for (const row of rows) {
@@ -318,6 +544,7 @@ export async function getAllSiteConfig(): Promise<Record<string, unknown>> {
 
 export async function updateSiteConfig(section: string, data: unknown): Promise<{ success: boolean; error?: string }> {
   try {
+    await ensureOfficialCommercialInventory()
     // Prisma upsert with Json field
     await prisma.siteConfig.upsert({
       where: { section },
@@ -341,6 +568,7 @@ export async function updateSiteConfig(section: string, data: unknown): Promise<
 // of truth for the PlantaInteractiva component.
 
 export async function getFloorPlans() {
+  await ensureOfficialCommercialInventory()
   // 1. Read from site_config.floor_plans (primary — what the editor saves to)
   const row = await prisma.siteConfig.findUnique({ where: { section: 'floor_plans' } })
   if (row?.data) {
