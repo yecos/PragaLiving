@@ -41,6 +41,7 @@ interface FloorPlanConfig {
 interface UnitData {
   id: string
   apartmentId?: string
+  unitNumber: number | null
   name: string
   area: number
   bedrooms: number
@@ -84,16 +85,62 @@ function getPolygonCenter(polygon: number[][]): [number, number] {
   return [sumX / polygon.length, sumY / polygon.length]
 }
 
+const OFFICIAL_UNITS: Record<number, { area: number; bedrooms: number; bathrooms: number; typology: string; pricePerM2: number }> = {
+  1: { area: 78.51, bedrooms: 3, bathrooms: 2, typology: '78.51 m²', pricePerM2: 7_000_000 },
+  2: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²', pricePerM2: 7_000_000 },
+  3: { area: 60, bedrooms: 2, bathrooms: 1, typology: '60 m²', pricePerM2: 7_000_000 },
+  4: { area: 104, bedrooms: 3, bathrooms: 2, typology: '104 m²', pricePerM2: 7_000_000 },
+  5: { area: 34.28, bedrooms: 1, bathrooms: 1, typology: '34.28 m²', pricePerM2: 7_500_000 },
+  6: { area: 35.6, bedrooms: 1, bathrooms: 1, typology: '35.6 m²', pricePerM2: 7_500_000 },
+  7: { area: 35.8, bedrooms: 1, bathrooms: 1, typology: '35.8 m²', pricePerM2: 7_500_000 },
+  8: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²', pricePerM2: 7_500_000 },
+  9: { area: 33.05, bedrooms: 1, bathrooms: 1, typology: '33.05 m²', pricePerM2: 7_500_000 },
+  10: { area: 33.75, bedrooms: 1, bathrooms: 1, typology: '33.75 m²', pricePerM2: 7_500_000 },
+}
+
+function extractUnitNumber(apt: ApartmentZone): number | null {
+  const idMatch = apt.id.match(/apto-(\d{1,2})$/i)
+  if (idMatch) return Number(idMatch[1])
+
+  const cleanName = String(apt.name || '').match(/(?:apto|apartamento)\s*(\d{1,3})/i)
+  if (!cleanName) return null
+
+  const raw = Number(cleanName[1])
+  return raw > 10 ? raw % 100 : raw
+}
+
+function levelNumberFromFloor(floor: FloorConfig): number | null {
+  const match = `${floor.id} ${floor.name}`.match(/(?:nivel|piso)[-\s]*(\d+)/i)
+  return match ? Number(match[1]) : null
+}
+
+function officialPriceFor(unitNumber: number | null, floor: FloorConfig): number | null {
+  if (!unitNumber) return null
+  const template = OFFICIAL_UNITS[unitNumber]
+  const level = levelNumberFromFloor(floor)
+  if (!template || level === null || level < 5 || level > 16) return null
+  const heightPremium = level <= 8 ? 0 : (level - 8) * 1_000_000
+  return Math.round(template.area * template.pricePerM2 + heightPremium)
+}
+
+function formatOfficialPrice(value: number) {
+  return '$ ' + new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(value)
+}
+
 function apartmentToUnit(apt: ApartmentZone): UnitData {
+  const unitNumber = extractUnitNumber(apt)
+  const official = unitNumber ? OFFICIAL_UNITS[unitNumber] : undefined
+
   return {
     id: apt.id,
     apartmentId: apt.apartmentId,
-    name: apt.name,
-    area: apt.area,
-    bedrooms: apt.bedrooms,
-    bathrooms: apt.bathrooms,
+    unitNumber,
+    name: unitNumber ? `Apto ${String(unitNumber).padStart(2, '0')}` : apt.name,
+    area: official?.area ?? apt.area,
+    bedrooms: official?.bedrooms ?? apt.bedrooms,
+    bathrooms: official?.bathrooms ?? apt.bathrooms,
     status: (apt.status as UnitStatus) || 'available',
-    typology: apt.typology,
+    typology: official?.typology ?? apt.typology,
     priceRange: apt.priceRange,
     view: apt.view,
   }
@@ -258,6 +305,8 @@ function GlassDetailPanel({
       }[unit.status]
     : ''
 
+  const panelOfficialPrice = unit ? officialPriceFor(unit.unitNumber, floor) : null
+
   const panelContent = unit ? (
     <div className="p-5 md:p-6 overflow-y-auto max-h-full custom-scrollbar">
       {/* Close button */}
@@ -381,7 +430,7 @@ function GlassDetailPanel({
           Precio
         </p>
         <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#8B6B4B]">
-          {unit.priceRange}
+          {panelOfficialPrice !== null ? formatOfficialPrice(panelOfficialPrice) : unit.priceRange}
         </p>
         <p className="text-[8px] text-[#D8D1C8]/25 font-[family-name:var(--font-inter)] mt-1">COP</p>
       </div>
@@ -638,7 +687,7 @@ function FloorPlanDisplay({
                         fontWeight="600"
                         opacity={unit.status === 'sold' ? 0.3 : 0.9}
                       >
-                        {unit.name.replace('APTO-', '')}
+                        {unit.unitNumber ? `Apto ${String(unit.unitNumber).padStart(2, '0')}` : unit.name.replace('APTO-', '')}
                       </text>
                       <text
                         x={center[0]}
