@@ -1,5 +1,5 @@
 name: Diagnose PRAGA build
-# validate CMS after chat type fix
+# validate CMS after digital twin typing
 
 on:
   push:
