@@ -20,8 +20,8 @@ export default function ChatIA() {
   const { config } = useSiteConfig()
   const chatConfig = config?.chat
   const welcomeMessage = chatConfig?.welcomeMessage || 'Bienvenido a PRAGA Living. Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?'
-  const quickQuestions = Array.isArray(chatConfig?.quickQuestions) && chatConfig.quickQuestions.length > 0
-    ? chatConfig.quickQuestions
+  const quickQuestions: string[] = Array.isArray(chatConfig?.quickQuestions) && chatConfig.quickQuestions.length > 0
+    ? chatConfig.quickQuestions.filter((question: unknown): question is string => typeof question === 'string')
     : defaultQuickQuestions
   const chatTitle = chatConfig?.title || 'Asistente PRAGA'
   const configuredFallbacks = chatConfig?.fallbackResponses && typeof chatConfig.fallbackResponses === 'object'
