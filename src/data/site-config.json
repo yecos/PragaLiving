@@ -1865,5 +1865,85 @@
       "15": 7000000,
       "16": 8000000
     }
-  }
+  },
+  "pageSections": [
+    {
+      "id": "hero",
+      "label": "Hero / Portada",
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "manifiesto",
+      "label": "Manifiesto",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "arquitectura",
+      "label": "Arquitectura",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "edificio",
+      "label": "Explorar edificio",
+      "enabled": false,
+      "order": 3
+    },
+    {
+      "id": "atrio",
+      "label": "Atrio",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "amenidades",
+      "label": "Amenidades",
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "id": "tipologias",
+      "label": "Tipologías",
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "id": "planta",
+      "label": "Planta interactiva",
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "id": "recorridos",
+      "label": "Recorridos 360°",
+      "enabled": false,
+      "order": 8
+    },
+    {
+      "id": "ubicacion",
+      "label": "Ubicación",
+      "enabled": true,
+      "order": 9
+    },
+    {
+      "id": "galeria",
+      "label": "Galería",
+      "enabled": true,
+      "order": 10
+    },
+    {
+      "id": "inversion",
+      "label": "Inversión",
+      "enabled": true,
+      "order": 11
+    },
+    {
+      "id": "contacto",
+      "label": "Contacto",
+      "enabled": true,
+      "order": 12
+    }
+  ]
 }
