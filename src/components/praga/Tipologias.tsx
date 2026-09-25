@@ -100,7 +100,16 @@ export default function Tipologias() {
   const { config } = useSiteConfig()
   const tipoConfig = config?.tipologias
   const commercialPricing = config?.commercialPricing
-  const [inventory, setInventory] = useState<Array<{ name: string; area: number; status: string; floor?: number }>>([])
+  const [inventory, setInventory] = useState<Array<{
+    name: string
+    area: number
+    bedrooms: number
+    bathrooms: number
+    typology: string
+    status: string
+    floor?: number
+    features?: string | null
+  }>>([])
 
   useEffect(() => {
     let cancelled = false
@@ -127,8 +136,14 @@ export default function Tipologias() {
         : base.images
 
     const canonicalInventory = inventory.filter((apartment) => apartment.floor !== undefined && apartment.floor >= 5 && apartment.floor <= 16)
-    const unitName = `apto ${base.unit}`.toLowerCase()
-    const matchingInventory = canonicalInventory.filter((apartment) => apartment.name.trim().toLowerCase() === unitName)
+    const expectedUnit = Number(base.unit)
+    const matchingInventory = canonicalInventory.filter((apartment) => {
+      const nameMatch = apartment.name.match(/(\d{1,2})$/)
+      if (nameMatch && Number(nameMatch[1]) === expectedUnit) return true
+      const featureMatch = apartment.features?.match(/(?:APTO|Apartamento)\s*(\d{1,2})/i)
+      return Boolean(featureMatch && Number(featureMatch[1]) === expectedUnit)
+    })
+    const representative = matchingInventory[0]
     const availableCount = matchingInventory.filter((apartment) => apartment.status === 'available').length
     const reservedCount = matchingInventory.filter((apartment) => apartment.status === 'reserved').length
     const consultCount = matchingInventory.filter((apartment) => apartment.status === 'consult').length
@@ -156,6 +171,10 @@ export default function Tipologias() {
       ...base,
       ...configured,
       id: configured.id || base.id,
+      name: configured.name || (representative ? `APTO ${base.unit} · ${representative.area} m²` : base.name),
+      area: representative ? String(representative.area) : (configured.area || base.area),
+      bedrooms: representative ? String(representative.bedrooms) : (configured.bedrooms || base.bedrooms),
+      bathrooms: representative ? String(representative.bathrooms) : (configured.bathrooms || base.bathrooms),
       images,
       features,
       status: inventoryStatus || configured.status || base.status,
