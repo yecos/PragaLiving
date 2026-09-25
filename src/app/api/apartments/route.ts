@@ -17,15 +17,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PUT — ADMIN ONLY: change apartment availability status.
-// Price is canonical and derived from area + level premium.
+// PUT — ADMIN ONLY: edit the apartment master record.
+// Final price is never entered manually; it is derived from area + commercial settings.
 export async function PUT(req: NextRequest) {
   const auth = await requireAdminWithCsrf(req)
   if (!auth.authorized) return auth.error!
 
   try {
     const body = await req.json()
-    const { id, status } = body
+    const { id, status, name, area, bedrooms, bathrooms, view, typology, image, plan360Url, features } = body
 
     if (!id) {
       return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
@@ -36,8 +36,36 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Estado inválido' }, { status: 400 })
     }
 
-    const data: { status?: string } = {}
-    if (status) data.status = status
+    if (name !== undefined && (typeof name !== 'string' || !name.trim() || name.length > 80)) {
+      return NextResponse.json({ error: 'Nombre inválido' }, { status: 400 })
+    }
+
+    const parsedArea = area !== undefined ? Number(area) : undefined
+    if (parsedArea !== undefined && (!Number.isFinite(parsedArea) || parsedArea <= 0 || parsedArea > 1000)) {
+      return NextResponse.json({ error: 'Área inválida' }, { status: 400 })
+    }
+
+    const parsedBedrooms = bedrooms !== undefined ? Number(bedrooms) : undefined
+    const parsedBathrooms = bathrooms !== undefined ? Number(bathrooms) : undefined
+    if (parsedBedrooms !== undefined && (!Number.isInteger(parsedBedrooms) || parsedBedrooms < 0 || parsedBedrooms > 20)) {
+      return NextResponse.json({ error: 'Número de alcobas inválido' }, { status: 400 })
+    }
+    if (parsedBathrooms !== undefined && (!Number.isInteger(parsedBathrooms) || parsedBathrooms < 0 || parsedBathrooms > 20)) {
+      return NextResponse.json({ error: 'Número de baños inválido' }, { status: 400 })
+    }
+
+    const data = {
+      ...(status !== undefined ? { status } : {}),
+      ...(name !== undefined ? { name: name.trim() } : {}),
+      ...(parsedArea !== undefined ? { area: parsedArea } : {}),
+      ...(parsedBedrooms !== undefined ? { bedrooms: parsedBedrooms } : {}),
+      ...(parsedBathrooms !== undefined ? { bathrooms: parsedBathrooms } : {}),
+      ...(view !== undefined ? { view: String(view).trim() } : {}),
+      ...(typology !== undefined ? { typology: String(typology).trim() } : {}),
+      ...(image !== undefined ? { image: image ? String(image).trim() : null } : {}),
+      ...(plan360Url !== undefined ? { plan360Url: plan360Url ? String(plan360Url).trim() : null } : {}),
+      ...(features !== undefined ? { features: features ? String(features) : null } : {}),
+    }
 
     const apartment = await updateApartment(id, data)
     return NextResponse.json({ success: true, apartment })
