@@ -100,13 +100,24 @@ export function pricePerM2ForUnit(unitNumber: number, pricing: CommercialPricing
   return unit.category === 'studio' ? pricing.studioM2 : pricing.apartmentM2
 }
 
-export function commercialPriceForUnit(level: number, unitNumber: number, pricing: CommercialPricing) {
+export function commercialPriceForArea(
+  level: number,
+  unitNumber: number,
+  area: number,
+  pricing: CommercialPricing,
+) {
   const unit = COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
   if (!unit) return null
 
   const pricePerM2 = pricePerM2ForUnit(unitNumber, pricing)
   const premium = pricing.heightPremium[String(level)] ?? 0
-  return Math.round(unit.area * pricePerM2 + premium)
+  return Math.round(area * pricePerM2 + premium)
+}
+
+export function commercialPriceForUnit(level: number, unitNumber: number, pricing: CommercialPricing) {
+  const unit = COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
+  if (!unit) return null
+  return commercialPriceForArea(level, unitNumber, unit.area, pricing)
 }
 
 // Legacy helper used by seed/static data. Runtime pricing should prefer commercialPriceForUnit().
