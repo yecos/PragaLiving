@@ -18,8 +18,22 @@ const BuildingScene = dynamic(() => import('./BuildingScene'), {
   ),
 })
 
+type BuildingLevel = {
+  id: string
+  name: string
+  type: string
+  icon: string
+  description: string
+  features: string[]
+  render: string
+}
+
+type BuildingStat = { label: string; value: string }
+
+type ViewModeItem = { id: ViewMode; name: string; icon: string }
+
 /* ─── Building Level Data ─── */
-const defaultBuildingLevels = [
+const defaultBuildingLevels: BuildingLevel[] = [
   {
     id: 'cobertura',
     name: 'Cubierta',
@@ -103,7 +117,7 @@ const defaultBuildingLevels = [
 ]
 
 /* ─── View Modes ─── */
-const defaultViewModes = [
+const defaultViewModes: ViewModeItem[] = [
   { id: 'exploded' as const, name: 'Vista Explotada', icon: '⬒' },
   { id: 'corte' as const, name: 'Corte Vertical', icon: '⬡' },
   { id: 'fachada' as const, name: 'Fachada', icon: '⬢' },
@@ -112,7 +126,7 @@ const defaultViewModes = [
 type ViewMode = 'exploded' | 'corte' | 'fachada'
 
 /* ─── Stats Data ─── */
-const defaultStats = [
+const defaultStats: BuildingStat[] = [
   { label: 'Sótanos', value: '3' },
   { label: 'Nivel Acceso', value: '1' },
   { label: 'Nivel Comercial', value: '1' },
@@ -145,14 +159,31 @@ function CanvasLoader() {
 export default function ExplorarEdificio() {
   const { config } = useSiteConfig()
   const edificioConfig = config?.edificio
-  const buildingLevels = Array.isArray(edificioConfig?.levels) && edificioConfig.levels.length > 0
-    ? edificioConfig.levels.map((item: any) => ({ ...item, render: item.render || item.image || '' }))
+  const buildingLevels: BuildingLevel[] = Array.isArray(edificioConfig?.levels) && edificioConfig.levels.length > 0
+    ? edificioConfig.levels.map((item: any) => ({
+        id: String(item.id || ''),
+        name: String(item.name || ''),
+        type: String(item.type || ''),
+        icon: String(item.icon || ''),
+        description: String(item.description || ''),
+        features: Array.isArray(item.features) ? item.features.map((feature: unknown) => String(feature)) : [],
+        render: String(item.render || item.image || ''),
+      }))
     : defaultBuildingLevels
-  const viewModes = (Array.isArray(edificioConfig?.viewModes) && edificioConfig.viewModes.length > 0
+  const viewModes: ViewModeItem[] = Array.isArray(edificioConfig?.viewModes) && edificioConfig.viewModes.length > 0
     ? edificioConfig.viewModes
-    : defaultViewModes) as Array<{ id: ViewMode; name: string; icon: string }>
-  const stats = Array.isArray(edificioConfig?.stats) && edificioConfig.stats.length > 0
-    ? edificioConfig.stats
+        .filter((item: any) => ['exploded', 'corte', 'fachada'].includes(String(item?.id)))
+        .map((item: any) => ({
+          id: String(item.id) as ViewMode,
+          name: String(item.name || ''),
+          icon: String(item.icon || ''),
+        }))
+    : defaultViewModes
+  const stats: BuildingStat[] = Array.isArray(edificioConfig?.stats) && edificioConfig.stats.length > 0
+    ? edificioConfig.stats.map((item: any) => ({
+        label: String(item.label || ''),
+        value: String(item.value || ''),
+      }))
     : defaultStats
   const sectionLabel = edificioConfig?.label || 'Explorar Edificio'
   const sectionTitle = edificioConfig?.title || 'Digital Twin'
