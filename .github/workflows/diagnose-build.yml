@@ -1,5 +1,5 @@
 name: Diagnose PRAGA build
-# validate complete CMS wiring
+# validate CMS after chat type fix
 
 on:
   push:
