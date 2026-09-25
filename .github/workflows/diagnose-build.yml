@@ -1,5 +1,5 @@
 name: Diagnose PRAGA build
-# rerun after TypeScript fix
+# validate full admin CMS
 
 on:
   push:
