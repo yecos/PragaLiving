@@ -1,5 +1,5 @@
 name: Diagnose PRAGA build
-# validate full admin CMS
+# validate complete CMS wiring
 
 on:
   push:
