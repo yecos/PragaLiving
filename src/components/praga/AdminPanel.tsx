@@ -324,22 +324,21 @@ export default function AdminPanel() {
     if (!editingAptId || !editingField) return
     try {
       const body: Record<string, unknown> = { id: editingAptId }
-      if (editingField === 'status') body.status = editValue
+      const numericFields = ['area', 'bedrooms', 'bathrooms']
+      body[editingField] = numericFields.includes(editingField) ? Number(editValue) : editValue
+
       const res = await fetch('/api/apartments', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.apartment) {
         throw new Error(data.error || `HTTP ${res.status}`)
       }
-      setApartments(prev => prev.map(a => {
-        if (a.id !== editingAptId) return a
-        if (editingField === 'status') return { ...a, status: editValue }
-        return a
-      }))
-      toast.success('Estado del apartamento actualizado')
+
+      setApartments(prev => prev.map(a => a.id === editingAptId ? { ...a, ...data.apartment } : a))
+      toast.success('Apartamento actualizado')
     } catch (err) {
       console.error('[admin] saveEdit error:', err)
       toast.error('No se pudo actualizar el apartamento', { description: err instanceof Error ? err.message : undefined })
@@ -803,7 +802,10 @@ export default function AdminPanel() {
               {activeTab === 'apartments' && (
                 <motion.div key="apartments" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Apartamentos</h2>
+                    <div>
+                      <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#F7F1E8]">Apartamentos</h2>
+                      <p className="mt-1 text-[9px] text-[#D8D1C8]/30">Haz clic en cualquier dato para editarlo. El precio se recalcula automáticamente.</p>
+                    </div>
                     <div className="flex flex-wrap gap-3 items-center">
                       <input type="text" placeholder="Buscar nombre/piso..." value={aptSearch} onChange={e => { setAptSearch(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] w-40 focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none" />
                       <select value={aptStatusFilter} onChange={e => { setAptStatusFilter(e.target.value); setAptPage(0) }} className="rounded-xl bg-[#141412] border border-[#E9E0D3]/10 px-3 py-1.5 text-[11px] text-[#F5F1EA] focus:border-[#B89268]/70 focus:ring-2 focus:ring-[#B89268]/10 focus:outline-none appearance-none">
@@ -832,7 +834,7 @@ export default function AdminPanel() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-[#D8D1C8]/10">
-                          {['Nombre', 'Área', 'Hab', 'Baños', 'Piso', 'Vista', 'Tipología', 'Precio', 'Estado'].map((h) => (
+                          {['Nombre', 'Área', 'Hab', 'Baños', 'Nivel', 'Vista', 'Tipología', 'Precio', 'Estado'].map((h) => (
                             <th key={h} className="text-left text-[9px] tracking-[0.15em] uppercase text-[#8B6B4B] p-3 whitespace-nowrap">{h}</th>
                           ))}
                         </tr>
@@ -840,13 +842,49 @@ export default function AdminPanel() {
                       <tbody>
                         {paginatedApartments.map((apt) => (
                           <tr key={apt.id} className="border-b border-[#E9E0D3]/6 hover:bg-[#1A1A1A] transition-colors">
-                            <td className="text-[11px] text-[#F5F1EA] p-3 whitespace-nowrap">{apt.name}</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.area} m²</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.bedrooms}</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.bathrooms}</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.floor}</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.view}</td>
-                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{apt.typology}</td>
+                            <td className="p-3 whitespace-nowrap">
+                              {editingAptId === apt.id && editingField === 'name' ? (
+                                <input value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-24 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'name', apt.name)} className="text-[11px] text-[#F5F1EA] hover:text-[#B89268]">{apt.name}</button>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {editingAptId === apt.id && editingField === 'area' ? (
+                                <input type="number" step="0.01" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-20 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'area', String(apt.area))} className="text-[11px] text-[#D8D1C8]/60 hover:text-[#B89268]">{apt.area} m²</button>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {editingAptId === apt.id && editingField === 'bedrooms' ? (
+                                <input type="number" min="0" max="20" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-12 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'bedrooms', String(apt.bedrooms))} className="text-[11px] text-[#D8D1C8]/60 hover:text-[#B89268]">{apt.bedrooms}</button>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {editingAptId === apt.id && editingField === 'bathrooms' ? (
+                                <input type="number" min="0" max="20" value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-12 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'bathrooms', String(apt.bathrooms))} className="text-[11px] text-[#D8D1C8]/60 hover:text-[#B89268]">{apt.bathrooms}</button>
+                              )}
+                            </td>
+                            <td className="text-[11px] text-[#D8D1C8]/60 p-3">{String(apt.floor).padStart(2, '0')}</td>
+                            <td className="p-3">
+                              {editingAptId === apt.id && editingField === 'view' ? (
+                                <input value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-28 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'view', apt.view)} className="text-[11px] text-[#D8D1C8]/60 hover:text-[#B89268]">{apt.view}</button>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {editingAptId === apt.id && editingField === 'typology' ? (
+                                <input value={editValue} onChange={e => setEditValue(e.target.value)} onBlur={() => void saveEdit()} onKeyDown={e => e.key === 'Enter' && void saveEdit()} autoFocus className="w-24 bg-[#0A0A0A] border border-[#8B6B4B] px-2 py-1 text-[11px] text-[#F5F1EA] focus:outline-none" />
+                              ) : (
+                                <button onClick={() => startEdit(apt.id, 'typology', apt.typology)} className="text-[11px] text-[#D8D1C8]/60 hover:text-[#B89268]">{apt.typology}</button>
+                              )}
+                            </td>
                             <td className="p-3">
                               <span className="text-[11px] text-[#8B6B4B]" title={`Valor oficial calculado · ${formatCOP(apt.price)}`}>
                                 {formatCOP(apt.price, true)}
