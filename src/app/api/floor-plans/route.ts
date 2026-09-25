@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApartments, getCommercialPricing, getFloorPlans, saveFloorPlansConfig } from '@/lib/data'
 import { requireAdminWithCsrf } from '@/lib/auth-guard'
-import { COMMERCIAL_UNITS, commercialPriceForUnit, type CommercialPricing } from '@/data/commercial-pricing'
+import { commercialPriceForArea, type CommercialPricing } from '@/data/commercial-pricing'
 
 type ApartmentRecord = Awaited<ReturnType<typeof getApartments>>[number]
 
@@ -68,7 +68,7 @@ function officialCommercialPrice(
   const level = floorNumberFromFloor(floor)
   const unitNumber = commercialUnitNumber(zone)
   if (level === null || level < 5 || level > 16 || unitNumber === null) return null
-  return commercialPriceForUnit(level, unitNumber, pricing)
+  return commercialPriceForArea(level, unitNumber, zone.area, pricing)
 }
 
 function findApartmentRecord(
@@ -115,27 +115,28 @@ export async function GET() {
           : floor.typeLabel,
         apartments: (floor.apartments || []).map((zone) => {
           const apartment = findApartmentRecord(zone, floor, apartments)
-          const unitNumber = commercialUnitNumber(zone)
-          const template = unitNumber !== null
-            ? COMMERCIAL_UNITS.find((item) => item.unit === unitNumber)
-            : undefined
-          const officialPrice = officialCommercialPrice(zone, floor, pricing)
+          const fallbackPrice = officialCommercialPrice(zone, floor, pricing)
+
+          if (apartment) {
+            return {
+              ...zone,
+              apartmentId: apartment.id,
+              name: apartment.name,
+              area: apartment.area,
+              bedrooms: apartment.bedrooms,
+              bathrooms: apartment.bathrooms,
+              typology: apartment.typology,
+              status: apartment.status,
+              view: apartment.view,
+              price: apartment.price,
+              priceRange: formatPrice(apartment.price),
+            }
+          }
 
           return {
             ...zone,
-            ...(template ? {
-              name: `Apto ${String(template.unit).padStart(2, '0')}`,
-              area: template.area,
-              bedrooms: template.bedrooms,
-              bathrooms: template.bathrooms,
-              typology: template.typology,
-            } : {}),
-            ...(apartment ? {
-              apartmentId: apartment.id,
-              status: apartment.status,
-            } : {}),
-            price: officialPrice ?? zone.price,
-            priceRange: officialPrice !== null ? formatPrice(officialPrice) : zone.priceRange,
+            price: fallbackPrice ?? zone.price,
+            priceRange: fallbackPrice !== null ? formatPrice(fallbackPrice) : zone.priceRange,
           }
         }),
       }
