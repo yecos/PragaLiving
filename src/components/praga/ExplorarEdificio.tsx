@@ -3,6 +3,7 @@
 import { useRef, useState, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 /* ─── Dynamic import for Three.js (SSR incompatible) ─── */
 const BuildingScene = dynamic(() => import('./BuildingScene'), {
@@ -18,7 +19,7 @@ const BuildingScene = dynamic(() => import('./BuildingScene'), {
 })
 
 /* ─── Building Level Data ─── */
-const buildingLevels = [
+const defaultBuildingLevels = [
   {
     id: 'cobertura',
     name: 'Cubierta',
@@ -102,7 +103,7 @@ const buildingLevels = [
 ]
 
 /* ─── View Modes ─── */
-const viewModes = [
+const defaultViewModes = [
   { id: 'exploded' as const, name: 'Vista Explotada', icon: '⬒' },
   { id: 'corte' as const, name: 'Corte Vertical', icon: '⬡' },
   { id: 'fachada' as const, name: 'Fachada', icon: '⬢' },
@@ -111,7 +112,7 @@ const viewModes = [
 type ViewMode = 'exploded' | 'corte' | 'fachada'
 
 /* ─── Stats Data ─── */
-const stats = [
+const defaultStats = [
   { label: 'Sótanos', value: '3' },
   { label: 'Nivel Acceso', value: '1' },
   { label: 'Nivel Comercial', value: '1' },
@@ -142,6 +143,21 @@ function CanvasLoader() {
 
 /* ─── Main Component ─── */
 export default function ExplorarEdificio() {
+  const { config } = useSiteConfig()
+  const edificioConfig = config?.edificio
+  const buildingLevels = Array.isArray(edificioConfig?.levels) && edificioConfig.levels.length > 0
+    ? edificioConfig.levels.map((item: any) => ({ ...item, render: item.render || item.image || '' }))
+    : defaultBuildingLevels
+  const viewModes = (Array.isArray(edificioConfig?.viewModes) && edificioConfig.viewModes.length > 0
+    ? edificioConfig.viewModes
+    : defaultViewModes) as Array<{ id: ViewMode; name: string; icon: string }>
+  const stats = Array.isArray(edificioConfig?.stats) && edificioConfig.stats.length > 0
+    ? edificioConfig.stats
+    : defaultStats
+  const sectionLabel = edificioConfig?.label || 'Explorar Edificio'
+  const sectionTitle = edificioConfig?.title || 'Digital Twin'
+  const sectionDescription = edificioConfig?.description || 'Navega cada nivel del edificio en 3D. Haz clic en cualquier piso para explorar su distribución, amenidades y residencias.'
+
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const [selectedLevel, setSelectedLevel] = useState(4) // zona social
@@ -161,7 +177,7 @@ export default function ExplorarEdificio() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Explorar Edificio
+            {sectionLabel}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -169,7 +185,7 @@ export default function ExplorarEdificio() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#F5F1EA] font-light"
           >
-            Digital Twin
+            {sectionTitle}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -177,7 +193,7 @@ export default function ExplorarEdificio() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="font-[family-name:var(--font-inter)] text-sm text-[#D8D1C8]/50 mt-4 max-w-xl mx-auto"
           >
-            Navega cada nivel del edificio en 3D. Haz clic en cualquier piso para explorar su distribución, amenidades y residencias.
+            {sectionDescription}
           </motion.p>
           <motion.div
             initial={{ width: 0 }}
