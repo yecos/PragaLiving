@@ -57,12 +57,14 @@ interface FloorPlanConfig {
 // ═══════════════════════════════════════════════════════════════════
 
 const STATUS_COLORS: Record<string, { fill: string; opacity: number }> = {
+  consult: { fill: '#6F675F', opacity: 0.35 },
   available: { fill: '#4B5646', opacity: 0.35 },
   reserved: { fill: '#8B6B4B', opacity: 0.35 },
   sold: { fill: '#D8D1C8', opacity: 0.15 },
 }
 
 const STATUS_LABELS: Record<string, string> = {
+  consult: 'Consultar',
   available: 'Disponible',
   reserved: 'Reservado',
   sold: 'Vendido',
@@ -71,7 +73,7 @@ const STATUS_LABELS: Record<string, string> = {
 const TYPOLOGY_OPTIONS = ['78.51 m²', '60 m²', '104 m²', '34.28 m²', '35.6 m²', '35.8 m²', '33.75 m²', '33.05 m²']
 const BEDROOM_OPTIONS = [1, 2, 3]
 const BATHROOM_OPTIONS = [1, 2]
-const STATUS_OPTIONS = ['available', 'reserved', 'sold']
+const STATUS_OPTIONS = ['consult', 'available', 'reserved', 'sold']
 const VIEW_OPTIONS = ['Carrera 50', 'Calle 133 Sur', 'Atrio', 'Panorámica', 'Interior']
 
 const CLOSE_THRESHOLD = 3 // percentage units to auto-close polygon
@@ -194,6 +196,7 @@ export default function FloorPlanEditor() {
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const linkedSaveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   // Load config on mount
   useEffect(() => {
@@ -654,21 +657,80 @@ export default function FloorPlanEditor() {
   }, [dragVertex, config, saveConfig])
 
   // ═══ APARTMENT DATA UPDATE ═══
+  // Linked apartments are edited in Neon directly. The floor-plan JSON keeps
+  // geometry and a local mirror, but the apartment master record is the source of truth.
   const updateApartment = useCallback((field: string, value: string | number) => {
     if (!selectedAptId || !currentFloor) return
+
     const newConfig = { ...config }
-    newConfig.floors = newConfig.floors.map((f, i) => {
-      if (i !== selectedFloorIndex) return f
+    newConfig.floors = newConfig.floors.map((floor, i) => {
+      if (i !== selectedFloorIndex) return floor
       return {
-        ...f,
-        apartments: f.apartments.map(apt =>
+        ...floor,
+        apartments: floor.apartments.map(apt =>
           apt.id === selectedAptId ? { ...apt, [field]: value } : apt
         ),
       }
     })
     setConfig(newConfig)
-    // Auto-save with debounce is handled by the useEffect below
-  }, [selectedAptId, currentFloor, config, selectedFloorIndex])
+
+    const masterId = selectedApt?.apartmentId
+    const editableMasterFields = ['name', 'area', 'bedrooms', 'bathrooms', 'typology', 'view', 'status']
+    if (!masterId || !editableMasterFields.includes(field)) return
+
+    const timerKey = `${masterId}:${field}`
+    const existing = linkedSaveTimersRef.current[timerKey]
+    if (existing) clearTimeout(existing)
+
+    linkedSaveTimersRef.current[timerKey] = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/apartments', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: masterId, [field]: value }),
+        })
+        const payload = await res.json().catch(() => ({}))
+        if (!res.ok || !payload.apartment) {
+          throw new Error(payload.error || `HTTP ${res.status}`)
+        }
+
+        const saved = payload.apartment
+        setConfig(prev => ({
+          ...prev,
+          floors: prev.floors.map((floor, i) => i !== selectedFloorIndex ? floor : ({
+            ...floor,
+            apartments: floor.apartments.map(apt => apt.id !== selectedAptId ? apt : ({
+              ...apt,
+              name: saved.name,
+              area: saved.area,
+              bedrooms: saved.bedrooms,
+              bathrooms: saved.bathrooms,
+              typology: saved.typology,
+              view: saved.view,
+              status: saved.status,
+              price: saved.price,
+              priceRange: new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                maximumFractionDigits: 0,
+              }).format(saved.price),
+            })),
+          })),
+        }))
+      } catch (err) {
+        console.error('[floor-editor] linked apartment update error:', err)
+        setToast(`No se pudo guardar ${field}`)
+      } finally {
+        delete linkedSaveTimersRef.current[timerKey]
+      }
+    }, field === 'name' || field === 'area' ? 650 : 150)
+  }, [selectedAptId, currentFloor, config, selectedFloorIndex, selectedApt?.apartmentId])
+
+  useEffect(() => {
+    return () => {
+      Object.values(linkedSaveTimersRef.current).forEach(clearTimeout)
+    }
+  }, [])
 
   // Track whether config has changed from what was last saved.
   // This prevents the auto-save effect from firing on every render due to
@@ -884,7 +946,7 @@ export default function FloorPlanEditor() {
                               y={center[1] + 1}
                               textAnchor="middle"
                               dominantBaseline="middle"
-                              fill="#8B6B4B"
+                              fill="#F5F1EA"
                               fontSize="2.5"
                               fontFamily="var(--font-cormorant)"
                               fontWeight="700"
@@ -1385,11 +1447,13 @@ export default function FloorPlanEditor() {
                 {/* Status badge + actions */}
                 <div className="flex items-center justify-between">
                   <span className={`text-[9px] tracking-wider uppercase px-2 py-0.5 ${
-                    selectedApt.status === 'available'
-                      ? 'bg-[#4B5646] text-[#F5F1EA]'
-                      : selectedApt.status === 'reserved'
-                        ? 'bg-[#8B6B4B] text-[#F5F1EA]'
-                        : 'bg-[#D8D1C8]/20 text-[#D8D1C8]/50'
+                    selectedApt.status === 'consult'
+                      ? 'bg-[#6F675F] text-[#F5F1EA]'
+                      : selectedApt.status === 'available'
+                        ? 'bg-[#4B5646] text-[#F5F1EA]'
+                        : selectedApt.status === 'reserved'
+                          ? 'bg-[#8B6B4B] text-[#F5F1EA]'
+                          : 'bg-[#D8D1C8]/20 text-[#D8D1C8]/50'
                   }`}>
                     {STATUS_LABELS[selectedApt.status]}
                   </span>
@@ -1438,8 +1502,7 @@ export default function FloorPlanEditor() {
                   <input
                     type="text"
                     value={selectedApt.name}
-                    disabled={Boolean(selectedApt.apartmentId)}
-                    onChange={(e) => updateApartment('name', e.target.value)}
+                                        onChange={(e) => updateApartment('name', e.target.value)}
                     className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -1451,8 +1514,7 @@ export default function FloorPlanEditor() {
                     type="number"
                     step="0.01"
                     value={selectedApt.area || ''}
-                    disabled={Boolean(selectedApt.apartmentId)}
-                    onChange={(e) => updateApartment('area', parseFloat(e.target.value) || 0)}
+                                        onChange={(e) => updateApartment('area', parseFloat(e.target.value) || 0)}
                     className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -1463,8 +1525,7 @@ export default function FloorPlanEditor() {
                     <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Alcobas</label>
                     <select
                       value={selectedApt.bedrooms}
-                      disabled={Boolean(selectedApt.apartmentId)}
-                      onChange={(e) => updateApartment('bedrooms', parseInt(e.target.value))}
+                                            onChange={(e) => updateApartment('bedrooms', parseInt(e.target.value))}
                       className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                     >
                       {BEDROOM_OPTIONS.map(n => (
@@ -1476,8 +1537,7 @@ export default function FloorPlanEditor() {
                     <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Baños</label>
                     <select
                       value={selectedApt.bathrooms}
-                      disabled={Boolean(selectedApt.apartmentId)}
-                      onChange={(e) => updateApartment('bathrooms', parseInt(e.target.value))}
+                                            onChange={(e) => updateApartment('bathrooms', parseInt(e.target.value))}
                       className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                     >
                       {BATHROOM_OPTIONS.map(n => (
@@ -1492,8 +1552,7 @@ export default function FloorPlanEditor() {
                   <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Tipología</label>
                   <select
                     value={selectedApt.typology}
-                    disabled={Boolean(selectedApt.apartmentId)}
-                    onChange={(e) => updateApartment('typology', e.target.value)}
+                                        onChange={(e) => updateApartment('typology', e.target.value)}
                     className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                   >
                     {TYPOLOGY_OPTIONS.map(t => (
@@ -1508,16 +1567,24 @@ export default function FloorPlanEditor() {
                   <div className="w-full border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 px-3 py-2 text-[12px] text-[#F5F1EA]">
                     {selectedApt.priceRange || 'Sin precio vinculado'}
                   </div>
-                  <p className="mt-1 text-[8px] tracking-wide text-[#D8D1C8]/25">Se actualiza desde Residencias</p>
+                  <p className="mt-1 text-[8px] tracking-wide text-[#D8D1C8]/25">Calculado automáticamente desde área, valor/m² y prima de altura</p>
                 </div>
 
                 <div>
                   <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Estado comercial</label>
-                  <div className="w-full border border-[#D8D1C8]/10 bg-[#0A0A0A]/40 px-3 py-2 text-[12px] text-[#F5F1EA]">
-                    {STATUS_LABELS[selectedApt.status] || selectedApt.status}
-                  </div>
+                  <select
+                    value={selectedApt.status}
+                    onChange={(e) => updateApartment('status', e.target.value)}
+                    className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none"
+                  >
+                    {STATUS_OPTIONS.map(status => (
+                      <option key={status} value={status} className="bg-[#111111]">
+                        {STATUS_LABELS[status] || status}
+                      </option>
+                    ))}
+                  </select>
                   <p className="mt-1 text-[8px] tracking-wide text-[#D8D1C8]/25">
-                    {selectedApt.apartmentId ? 'Vinculado a Residencias' : 'Sin vínculo automático: revisa nombre, piso y tipología'}
+                    {selectedApt.apartmentId ? 'Guardado directamente en Residencias / Neon' : 'Sin vínculo automático'}
                   </p>
                 </div>
 
@@ -1526,8 +1593,7 @@ export default function FloorPlanEditor() {
                   <label className="text-[9px] tracking-[0.15em] uppercase text-[#D8D1C8]/40 block mb-1.5">Vista</label>
                   <select
                     value={selectedApt.view}
-                    disabled={Boolean(selectedApt.apartmentId)}
-                    onChange={(e) => updateApartment('view', e.target.value)}
+                                        onChange={(e) => updateApartment('view', e.target.value)}
                     className="w-full bg-transparent border border-[#D8D1C8]/15 px-3 py-2 text-[12px] text-[#F5F1EA] focus:border-[#8B6B4B] focus:outline-none appearance-none disabled:opacity-45 disabled:cursor-not-allowed"
                   >
                     {VIEW_OPTIONS.map(v => (
