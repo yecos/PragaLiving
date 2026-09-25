@@ -29,11 +29,15 @@ export default function Navigation() {
   const navConfig = config?.navigation
 
   const allNavItems: NavItem[] = navConfig?.items || defaultNavItems
-  const SHOW_DIGITAL_TWIN = false // Mantener oculto temporalmente; cambiar a true para reactivarlo.
-  const SHOW_EXPERIENCE = false // Mantener ocultos temporalmente los recorridos 360°.
+  const pageSections = Array.isArray(config?.pageSections) ? config.pageSections : []
+  const sectionVisibility = new Map(
+    pageSections.map((section: any) => [String(section?.id || ''), section?.enabled !== false]),
+  )
   const navItems: NavItem[] = allNavItems.filter((item) => {
-    if (!SHOW_DIGITAL_TWIN && item.href === '#edificio') return false
-    if (!SHOW_EXPERIENCE && item.href === '#recorridos') return false
+    const sectionId = item.href.replace('#', '')
+    if (sectionVisibility.has(sectionId)) return sectionVisibility.get(sectionId) !== false
+    // Preserve the previously approved defaults until pageSections loads.
+    if (sectionId === 'edificio' || sectionId === 'recorridos') return false
     return true
   })
   const ctaText = navConfig?.ctaText || 'Agendar Visita'
