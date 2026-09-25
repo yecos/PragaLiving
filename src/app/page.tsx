@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Lenis from 'lenis'
 import Navigation from '@/components/praga/Navigation'
@@ -20,11 +20,42 @@ import Contacto from '@/components/praga/Contacto'
 import Footer from '@/components/praga/Footer'
 import WhatsAppButton from '@/components/praga/WhatsAppButton'
 import ChatIA from '@/components/praga/ChatIA'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
-const SHOW_DIGITAL_TWIN = false // Activar cuando el módulo esté listo para volver a publicarse.
-const SHOW_EXPERIENCE = false // Reactivar cuando la experiencia 360° esté lista.
+const DEFAULT_PAGE_SECTIONS = [
+  { id: 'hero', enabled: true },
+  { id: 'manifiesto', enabled: true },
+  { id: 'arquitectura', enabled: true },
+  { id: 'edificio', enabled: false },
+  { id: 'atrio', enabled: true },
+  { id: 'amenidades', enabled: true },
+  { id: 'tipologias', enabled: true },
+  { id: 'planta', enabled: true },
+  { id: 'recorridos', enabled: false },
+  { id: 'ubicacion', enabled: true },
+  { id: 'galeria', enabled: true },
+  { id: 'inversion', enabled: true },
+  { id: 'contacto', enabled: true },
+]
+
+const PAGE_COMPONENTS: Record<string, ComponentType> = {
+  hero: Hero,
+  manifiesto: Manifiesto,
+  arquitectura: Arquitectura,
+  edificio: ExplorarEdificio,
+  atrio: Atrio,
+  amenidades: Amenidades,
+  tipologias: Tipologias,
+  planta: PlantaInteractiva,
+  recorridos: Recorridos360,
+  ubicacion: Ubicacion,
+  galeria: Galeria,
+  inversion: Inversion,
+  contacto: Contacto,
+}
 
 export default function Home() {
+  const { config } = useSiteConfig()
   const [minTimePassed, setMinTimePassed] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   // Safety timeout: if 'hero-ready' never fires (image cached, network error,
@@ -89,6 +120,22 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [])
 
+  const pageSections = useMemo(() => {
+    const configured = Array.isArray(config?.pageSections) ? config.pageSections : []
+    const merged = DEFAULT_PAGE_SECTIONS.map((item, defaultIndex) => {
+      const savedIndex = configured.findIndex((saved: any) => saved?.id === item.id)
+      const saved = savedIndex >= 0 ? configured[savedIndex] : null
+      return {
+        ...item,
+        ...(saved || {}),
+        order: saved?.order ?? (savedIndex >= 0 ? savedIndex : defaultIndex),
+      }
+    })
+    return merged
+      .filter(section => section.enabled !== false)
+      .sort((a, b) => Number(a.order) - Number(b.order))
+  }, [config?.pageSections])
+
   return (
     <>
       <AnimatePresence>
@@ -133,19 +180,10 @@ export default function Home() {
 
       <main className="relative">
         <Navigation />
-        <Hero />
-        <Manifiesto />
-        <Arquitectura />
-        {SHOW_DIGITAL_TWIN && <ExplorarEdificio />}
-        <Atrio />
-        <Amenidades />
-        <Tipologias />
-        <PlantaInteractiva />
-        {SHOW_EXPERIENCE && <Recorridos360 />}
-        <Ubicacion />
-        <Galeria />
-        <Inversion />
-        <Contacto />
+        {pageSections.map(section => {
+          const SectionComponent = PAGE_COMPONENTS[section.id]
+          return SectionComponent ? <SectionComponent key={section.id} /> : null
+        })}
         <Footer />
         <WhatsAppButton />
         <ChatIA />
