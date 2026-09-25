@@ -13,7 +13,7 @@ import { randomUUID } from 'crypto'
 import canonicalFloorPlans from '@/data/floor-plans.json'
 import {
   DEFAULT_COMMERCIAL_PRICING,
-  commercialPriceForUnit,
+  commercialPriceForArea,
   normalizeCommercialPricing,
   type CommercialPricing,
 } from '@/data/commercial-pricing'
@@ -24,19 +24,28 @@ const prisma = db
 // APARTMENTS
 // ==========================================
 
-function unitNumberFromName(name: string): number | null {
-  const match = name.match(/(\d{1,2})$/)
-  return match ? Number(match[1]) : null
+function unitNumberFromApartment(apartment: { name: string; features?: string | null }): number | null {
+  const nameMatch = apartment.name.match(/(\d{1,2})$/)
+  if (nameMatch) return Number(nameMatch[1])
+
+  if (apartment.features) {
+    const featureMatch = apartment.features.match(/(?:APTO|Apartamento)\s*(\d{1,2})/i)
+    if (featureMatch) return Number(featureMatch[1])
+  }
+
+  return null
 }
 
-function withCalculatedCommercialPrice<T extends { name: string; floor: number; price: number }>(
+function withCalculatedCommercialPrice<
+  T extends { name: string; floor: number; area: number; price: number; features?: string | null }
+>(
   apartment: T,
   pricing: CommercialPricing,
 ): T {
-  const unitNumber = unitNumberFromName(apartment.name)
+  const unitNumber = unitNumberFromApartment(apartment)
   if (!unitNumber || apartment.floor < 5 || apartment.floor > 16) return apartment
 
-  const calculated = commercialPriceForUnit(apartment.floor, unitNumber, pricing)
+  const calculated = commercialPriceForArea(apartment.floor, unitNumber, apartment.area, pricing)
   return calculated === null ? apartment : { ...apartment, price: calculated }
 }
 
@@ -70,12 +79,32 @@ export async function getApartmentById(id: string) {
   return apartment ? withCalculatedCommercialPrice(apartment, pricing) : null
 }
 
-export async function updateApartment(id: string, data: { status?: string }) {
+export async function updateApartment(id: string, data: {
+  status?: string
+  name?: string
+  area?: number
+  bedrooms?: number
+  bathrooms?: number
+  view?: string
+  typology?: string
+  image?: string | null
+  plan360Url?: string | null
+  features?: string | null
+}) {
   const current = await prisma.apartment.findUnique({ where: { id } })
   if (!current) throw new Error('Apartamento no encontrado')
 
   const updateData: Prisma.ApartmentUpdateInput = {}
-  if (data.status) updateData.status = data.status
+  if (data.status !== undefined) updateData.status = data.status
+  if (data.name !== undefined) updateData.name = data.name
+  if (data.area !== undefined) updateData.area = data.area
+  if (data.bedrooms !== undefined) updateData.bedrooms = data.bedrooms
+  if (data.bathrooms !== undefined) updateData.bathrooms = data.bathrooms
+  if (data.view !== undefined) updateData.view = data.view
+  if (data.typology !== undefined) updateData.typology = data.typology
+  if (data.image !== undefined) updateData.image = data.image
+  if (data.plan360Url !== undefined) updateData.plan360Url = data.plan360Url
+  if (data.features !== undefined) updateData.features = data.features
 
   const updated = await prisma.apartment.update({ where: { id }, data: updateData })
   const pricing = await getCommercialPricing()
