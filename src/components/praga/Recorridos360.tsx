@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 /* ──────────────────────────── TYPES ──────────────────────────── */
 
@@ -23,7 +24,7 @@ interface Space {
 
 /* ──────────────────────────── DATA ──────────────────────────── */
 
-const spaces: Space[] = [
+const defaultSpaces: Space[] = [
   {
     id: 'lobby',
     name: 'Lobby',
@@ -155,6 +156,16 @@ function hotspotToScreen(yaw: number, pitch: number, viewYaw: number, viewPitch:
 /* ──────────────────────────── COMPONENT ──────────────────────────── */
 
 export default function Recorridos360() {
+  const { config } = useSiteConfig()
+  const recorridosConfig = config?.recorridos
+  const spaces = useMemo<Space[]>(() => (
+    Array.isArray(recorridosConfig?.spaces) && recorridosConfig.spaces.length > 0
+      ? recorridosConfig.spaces as Space[]
+      : defaultSpaces
+  ), [recorridosConfig?.spaces])
+  const sectionLabel = recorridosConfig?.label || 'Recorridos 360°'
+  const sectionTitle = recorridosConfig?.title || 'Experimentar Espacios'
+
   const sectionRef = useRef<HTMLElement>(null)
   const viewerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
@@ -514,7 +525,7 @@ export default function Recorridos360() {
             transition={{ duration: 0.8 }}
             className="text-[10px] tracking-[0.5em] uppercase text-[#8B6B4B] mb-4"
           >
-            Recorridos 360°
+            {sectionLabel}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
@@ -522,7 +533,7 @@ export default function Recorridos360() {
             transition={{ duration: 1, delay: 0.2 }}
             className="font-[family-name:var(--font-cormorant)] text-3xl md:text-5xl text-[#F5F1EA] font-light"
           >
-            Experimentar Espacios
+            {sectionTitle}
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
