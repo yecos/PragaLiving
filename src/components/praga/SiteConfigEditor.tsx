@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 // ─── Types ───
 type SectionKey =
-  | 'general' | 'hero' | 'manifiesto' | 'arquitectura' | 'edificio'
+  | 'pageSections' | 'general' | 'hero' | 'manifiesto' | 'arquitectura' | 'edificio'
   | 'atrio' | 'amenidades' | 'tipologias' | 'recorridos' | 'ubicacion'
   | 'galeria' | 'inversion' | 'commercialPricing' | 'contacto' | 'footer' | 'chat' | 'navigation' | 'seo'
 
@@ -18,6 +18,7 @@ interface SubTab {
 
 // ─── Sub-tab groups ───
 const contenidoTabs: SubTab[] = [
+  { id: 'pageSections', label: 'Estructura' },
   { id: 'hero', label: 'Hero' },
   { id: 'manifiesto', label: 'Manifiesto' },
   { id: 'arquitectura', label: 'Arquitectura' },
@@ -280,6 +281,7 @@ export default function SiteConfigEditor({ mode }: SiteConfigEditorProps) {
       <AnimatePresence mode="wait">
         {activeSubTab && (
           <motion.div key={activeSubTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+            {activeSubTab === 'pageSections' && <PageSectionsEditor data={config.pageSections} onChange={(d) => updateSection('pageSections', d)} onSave={() => void saveSection('pageSections')} saving={saving} />}
             {activeSubTab === 'general' && <GeneralEditor data={config.general} onChange={(d) => updateSection('general', d)} onSave={() => void saveSection('general')} saving={saving} />}
             {activeSubTab === 'commercialPricing' && <CommercialPricingEditor data={config.commercialPricing} onChange={(d) => updateSection('commercialPricing', d)} onSave={() => void saveSection('commercialPricing')} saving={saving} />}
             {activeSubTab === 'hero' && <HeroEditor data={config.hero} onChange={(d) => updateSection('hero', d)} onSave={() => void saveSection('hero')} saving={saving} />}
@@ -329,6 +331,91 @@ function GeneralEditor({ data, onChange, onSave, saving }: { data: any; onChange
         <NumberField label="Latitud" value={data.coordinates?.[0] || 0} onChange={v => onChange({ ...data, coordinates: [v, data.coordinates?.[1] || 0] })} />
         <NumberField label="Longitud" value={data.coordinates?.[1] || 0} onChange={v => onChange({ ...data, coordinates: [data.coordinates?.[0] || 0, v] })} />
       </div>
+      <SaveButton onSave={onSave} saving={saving} />
+    </div>
+  )
+}
+
+// ─── PAGE STRUCTURE EDITOR ───
+const DEFAULT_PAGE_SECTIONS = [
+  { id: 'hero', label: 'Hero / Portada', enabled: true },
+  { id: 'manifiesto', label: 'Manifiesto', enabled: true },
+  { id: 'arquitectura', label: 'Arquitectura', enabled: true },
+  { id: 'edificio', label: 'Explorar edificio', enabled: false },
+  { id: 'atrio', label: 'Atrio', enabled: true },
+  { id: 'amenidades', label: 'Amenidades', enabled: true },
+  { id: 'tipologias', label: 'Tipologías', enabled: true },
+  { id: 'planta', label: 'Planta interactiva', enabled: true },
+  { id: 'recorridos', label: 'Recorridos 360°', enabled: false },
+  { id: 'ubicacion', label: 'Ubicación', enabled: true },
+  { id: 'galeria', label: 'Galería', enabled: true },
+  { id: 'inversion', label: 'Inversión', enabled: true },
+  { id: 'contacto', label: 'Contacto', enabled: true },
+]
+
+function PageSectionsEditor({ data, onChange, onSave, saving }: { data: any; onChange: (d: any) => void; onSave: () => void; saving: boolean }) {
+  const incoming = Array.isArray(data) ? data : []
+  const sections = DEFAULT_PAGE_SECTIONS.map(defaultSection => {
+    const saved = incoming.find((item: any) => item?.id === defaultSection.id)
+    return saved ? { ...defaultSection, ...saved } : defaultSection
+  }).sort((a, b) => {
+    const aSaved = incoming.findIndex((item: any) => item?.id === a.id)
+    const bSaved = incoming.findIndex((item: any) => item?.id === b.id)
+    const ai = aSaved === -1 ? DEFAULT_PAGE_SECTIONS.findIndex(item => item.id === a.id) : aSaved
+    const bi = bSaved === -1 ? DEFAULT_PAGE_SECTIONS.findIndex(item => item.id === b.id) : bSaved
+    return ai - bi
+  })
+
+  const apply = (next: typeof sections) => onChange(next.map((item, order) => ({ ...item, order })))
+
+  const move = (index: number, direction: -1 | 1) => {
+    const target = index + direction
+    if (target < 0 || target >= sections.length) return
+    const next = [...sections]
+    ;[next[index], next[target]] = [next[target], next[index]]
+    apply(next)
+  }
+
+  const toggle = (index: number) => {
+    const next = sections.map((item, i) => i === index ? { ...item, enabled: !item.enabled } : item)
+    apply(next)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#F5F1EA]">Estructura de la página principal</h3>
+        <p className="mt-2 max-w-3xl text-[10px] leading-relaxed text-[#D8D1C8]/40">
+          Activa, oculta y ordena las secciones de la página. Los cambios se publican al guardar y no requieren modificar código.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        {sections.map((section, index) => (
+          <div key={section.id} className="flex items-center gap-3 rounded-xl border border-[#D8D1C8]/10 bg-[#0A0A0A]/35 px-4 py-3">
+            <div className="flex w-14 shrink-0 items-center gap-1">
+              <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="h-7 w-6 border border-[#D8D1C8]/10 text-[#D8D1C8]/45 hover:text-[#8B6B4B] disabled:opacity-20">↑</button>
+              <button type="button" onClick={() => move(index, 1)} disabled={index === sections.length - 1} className="h-7 w-6 border border-[#D8D1C8]/10 text-[#D8D1C8]/45 hover:text-[#8B6B4B] disabled:opacity-20">↓</button>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-[#F5F1EA]">{section.label}</p>
+              <p className="mt-0.5 text-[8px] uppercase tracking-[0.12em] text-[#D8D1C8]/25">{section.id}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => toggle(index)}
+              className={`min-w-[92px] px-3 py-1.5 text-[9px] uppercase tracking-[0.12em] border transition-colors ${
+                section.enabled
+                  ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
+                  : 'border-[#D8D1C8]/10 bg-[#111111] text-[#D8D1C8]/30'
+              }`}
+            >
+              {section.enabled ? 'Visible' : 'Oculta'}
+            </button>
+          </div>
+        ))}
+      </div>
+
       <SaveButton onSave={onSave} saving={saving} />
     </div>
   )
