@@ -2,13 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-const quickQuestions = [
+const defaultQuickQuestions = [
   '¿Cuáles son las tipologías disponibles?',
   '¿Qué amenidades incluye el proyecto?',
   '¿Cuál es el precio de las residencias?',
@@ -16,11 +17,22 @@ const quickQuestions = [
 ]
 
 export default function ChatIA() {
+  const { config } = useSiteConfig()
+  const chatConfig = config?.chat
+  const welcomeMessage = chatConfig?.welcomeMessage || 'Bienvenido a PRAGA Living. Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?'
+  const quickQuestions = Array.isArray(chatConfig?.quickQuestions) && chatConfig.quickQuestions.length > 0
+    ? chatConfig.quickQuestions
+    : defaultQuickQuestions
+  const chatTitle = chatConfig?.title || 'Asistente PRAGA'
+  const configuredFallbacks = chatConfig?.fallbackResponses && typeof chatConfig.fallbackResponses === 'object'
+    ? chatConfig.fallbackResponses as Record<string, string>
+    : null
+
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Bienvenido a PRAGA Living. Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?'
+      content: welcomeMessage
     }
   ])
   const [input, setInput] = useState('')
@@ -34,6 +46,15 @@ export default function ChatIA() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].role === 'assistant') {
+        return [{ role: 'assistant', content: welcomeMessage }]
+      }
+      return prev
+    })
+  }, [welcomeMessage])
 
   const handleSend = async (text?: string) => {
     const message = text || input
@@ -58,14 +79,15 @@ export default function ChatIA() {
       setMessages(prev => [...prev, assistantMessage])
     } catch {
       // Fallback response if API fails
-      const fallbackResponses: Record<string, string> = {
+      const defaultFallbackResponses: Record<string, string> = {
         'tipologías': 'PRAGA Living ofrece 8 tipologías desde Studio de 33 m² hasta Penthouse de 97 m². Cada residencia está diseñada con acabados premium, balcones privados y ventilación cruzada. ¿Te gustaría conocer más detalles de alguna en particular?',
         'amenidades': 'Nuestras amenidades incluyen: Coworking, Gimnasio premium, Salón Social, Ludoteca, Sauna, Baño Turco, Vitality Pool, Hidromasaje, Hidroterapia y Zona de Descanso. Todo diseñado para un estilo de vida excepcional.',
         'precio': 'Los precios varían según la tipología y el piso. Te recomiendo agendar una visita con nuestros asesores para recibir información personalizada y actualizada. ¿Te gustaría que te contacte un asesor?',
         'visita': 'Puedes agendar una visita de tres formas: 1) Por WhatsApp al +57 300 4203548, 2) Completando el formulario de contacto en esta página, o 3) Llamando al +57 300 4203548. ¿Cuál prefieres?',
       }
 
-      const key = Object.keys(fallbackResponses).find(k => message.toLowerCase().includes(k))
+      const fallbackResponses = configuredFallbacks || defaultFallbackResponses
+      const key = Object.keys(fallbackResponses).find(k => message.toLowerCase().includes(k.toLowerCase()))
       const response = key 
         ? fallbackResponses[key]
         : 'Gracias por tu interés en PRAGA Living. Un asesor se pondrá en contacto contigo pronto para brindarte información personalizada. Mientras tanto, puedes explorar nuestras tipologías y amenidades en esta plataforma.'
@@ -118,7 +140,7 @@ export default function ChatIA() {
             <div className="p-4 border-b border-[#8B6B4B]/10 flex items-center gap-3">
               <img src="/images/logo.png" alt="PRAGA" className="h-6 w-auto brightness-0 invert opacity-70" />
               <div>
-                <p className="text-[11px] text-[#F5F1EA] tracking-wider">Asistente PRAGA</p>
+                <p className="text-[11px] text-[#F5F1EA] tracking-wider">{chatTitle}</p>
                 <p className="text-[8px] text-[#4B5646] tracking-wider">En línea</p>
               </div>
             </div>
