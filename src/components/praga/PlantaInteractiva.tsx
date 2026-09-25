@@ -702,7 +702,7 @@ function FloorPlanDisplay({
                         y={center[1] + 0.8}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fill="#8B6B4B"
+                        fill="#F5F1EA"
                         fontSize="2.8"
                         fontFamily="var(--font-cormorant)"
                         fontWeight="700"
