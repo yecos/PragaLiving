@@ -24,8 +24,6 @@ const defaultGalleryItems = [
   {"id":11,"category":"Atrio","src":"/images/renders/atrio-2026/atrio-niveles.jpg","title":"Atrio · Niveles residenciales"},
   {"id":12,"category":"Atrio","src":"/images/renders/atrio-2026/atrio-vertical.jpg","title":"Atrio · Vista vertical"},
   {"id":13,"category":"Atrio","src":"/images/renders/atrio-main.png","title":"Atrio central"},
-  {"id":14,"category":"Atrio","src":"/images/renders/atrium-interior-1.png","title":"Atrio · Vista inferior"},
-  {"id":15,"category":"Atrio","src":"/images/renders/atrium-interior-2.png","title":"Atrio · Vista superior"},
   {"id":16,"category":"Amenidades","src":"/images/amenities-2026/coworking-01.jpg","title":"Coworking · Zona de trabajo"},
   {"id":17,"category":"Amenidades","src":"/images/amenities-2026/coworking-02.jpg","title":"Coworking · Sala colaborativa"},
   {"id":18,"category":"Amenidades","src":"/images/amenities-2026/gimnasio-01.jpg","title":"Gimnasio · Entrenamiento"},
