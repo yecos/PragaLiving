@@ -1,0 +1,23 @@
+name: Inspect live gallery
+
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-live-gallery.yml'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read live Atrio gallery
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error 'https://my-project-psi-sage.vercel.app/api/site-config' -o /tmp/config.json
+          python - <<'PY'
+          import json
+          with open('/tmp/config.json') as f:
+              data=json.load(f)
+          items=data.get('galeria',{}).get('items',[])
+          atrio=[x for x in items if x.get('category')=='Atrio']
+          print(json.dumps(atrio, ensure_ascii=False, indent=2))
+          PY
