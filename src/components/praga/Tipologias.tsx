@@ -96,6 +96,80 @@ const defaultTypologies: Typology[] = [
   },
 ]
 
+
+function RotatingTypologyImage({ typo }: { typo: Typology }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [typo.id, typo.images])
+
+  useEffect(() => {
+    if (paused || typo.images.length <= 1) return
+
+    let cancelled = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const scheduleNext = () => {
+      // Different rhythm for every card, so the grid never rotates in sync.
+      const delay = 3200 + Math.floor(Math.random() * 3600)
+
+      timer = setTimeout(() => {
+        if (cancelled) return
+
+        setActiveIndex((current) => {
+          const options = typo.images.length - 1
+          const offset = 1 + Math.floor(Math.random() * options)
+          return (current + offset) % typo.images.length
+        })
+
+        scheduleNext()
+      }, delay)
+    }
+
+    // Random initial delay also prevents cards with the same image set from syncing.
+    const initialDelay = 700 + Math.floor(Math.random() * 2200)
+    timer = setTimeout(() => {
+      if (cancelled) return
+      setActiveIndex((current) => {
+        const options = typo.images.length - 1
+        const offset = 1 + Math.floor(Math.random() * options)
+        return (current + offset) % typo.images.length
+      })
+      scheduleNext()
+    }, initialDelay)
+
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
+    }
+  }, [paused, typo.id, typo.images])
+
+  const activeSrc = typo.images[activeIndex] || typo.images[0]
+
+  return (
+    <div
+      className="relative h-64 w-full overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <AnimatePresence mode="sync" initial={false}>
+        <motion.img
+          key={activeSrc}
+          src={activeSrc}
+          alt={typo.name + ' — vista ' + (activeIndex + 1)}
+          initial={{ opacity: 0, scale: 1.015 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ opacity: { duration: 0.8 }, scale: { duration: 1.1 } }}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      </AnimatePresence>
+    </div>
+  )
+}
+
 export default function Tipologias() {
   const { config } = useSiteConfig()
   const tipoConfig = config?.tipologias
@@ -272,11 +346,7 @@ export default function Tipologias() {
                 }}
               >
                 <div className="relative mb-5 overflow-hidden bg-[#0A0A0A]">
-                  <img
-                    src={typo.images[0]}
-                    alt={typo.name + ' — vista principal'}
-                    className="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+                  <RotatingTypologyImage typo={typo} />
                   <div className="absolute inset-0 bg-[#111111]/25 transition-colors duration-500 group-hover:bg-[#111111]/5" />
                   <div className="absolute right-4 top-4">
                     <span
