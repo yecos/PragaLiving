@@ -34,9 +34,9 @@ const defaultContactMethods = [
 ]
 
 const defaultSchedule = [
-  { days: 'Lunes a Viernes', hours: '8:00 AM - 6:00 PM' },
-  { days: 'Sábados', hours: '9:00 AM - 2:00 PM' },
-  { days: 'Visitas Privadas', hours: 'Bajo cita' },
+  { days: 'Domingo', hours: '10:00 a. m. – 4:00 p. m.' },
+  { days: 'Lunes a Viernes', hours: '10:00 a. m. – 1:00 p. m. / 2:00 p. m. – 5:00 p. m.' },
+  { days: 'Sábado', hours: '10:00 a. m. – 5:00 p. m.' },
 ]
 
 function PhoneIcon() {
