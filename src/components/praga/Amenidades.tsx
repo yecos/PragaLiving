@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
+import FullscreenGallery from './FullscreenGallery'
 
 type AmenityImage = { src: string; alt: string; label: string }
 type Amenity = { id: string; name: string; description: string; images: AmenityImage[]; benefits: string[] }
@@ -48,6 +49,9 @@ export default function Amenidades() {
   }, [amenConfig?.items])
   const [selected, setSelected] = useState(0)
   const [activeImage, setActiveImage] = useState(0)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const closeViewer = useCallback(() => setViewerOpen(false), [])
+  const setViewerPhoto = useCallback((index: number) => setActiveImage(index), [])
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const amenity = amenities[Math.min(selected, Math.max(amenities.length - 1, 0))] || defaultAmenities[0]
@@ -56,7 +60,7 @@ export default function Amenidades() {
     setActiveImage(0)
   }, [amenities.length, selected])
   const padded = (n: number) => String(n + 1).padStart(2, '0')
-  const selectAmenity = (n: number) => { setSelected(n); setActiveImage(0) }
+  const selectAmenity = (n: number) => { setSelected(n); setActiveImage(0); setViewerOpen(false) }
   const previous = () => setActiveImage((n) => (n - 1 + amenity.images.length) % amenity.images.length)
   const next = () => setActiveImage((n) => (n + 1) % amenity.images.length)
 
@@ -78,11 +82,12 @@ export default function Amenidades() {
                     <Image src={amenity.images[activeImage].src} alt={amenity.images[activeImage].alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 58vw" priority={selected === 0 && activeImage === 0} />
                   </motion.div>
                 </AnimatePresence>
+                <button type="button" aria-label={'Ampliar foto de ' + amenity.name} onClick={() => setViewerOpen(true)} className="absolute inset-0 z-[5] cursor-zoom-in" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/85 via-transparent to-[#111111]/10" />
                 {amenity.images.length > 1 && <div className="absolute right-4 top-4 z-10 flex gap-2"><button type="button" onClick={previous} aria-label="Imagen anterior" className="flex h-10 w-10 items-center justify-center border border-white/30 bg-[#111111]/35 text-white backdrop-blur-sm hover:border-[#B89268]"><ChevronLeft className="h-4 w-4" /></button><button type="button" onClick={next} aria-label="Imagen siguiente" className="flex h-10 w-10 items-center justify-center border border-white/30 bg-[#111111]/35 text-white backdrop-blur-sm hover:border-[#B89268]"><ChevronRight className="h-4 w-4" /></button></div>}
                 <div className="absolute inset-x-0 bottom-0 p-5 md:p-8"><span className="mb-1 block text-[10px] uppercase tracking-[0.3em] text-[#C5A47E]">{padded(selected)} / {padded(amenities.length - 1)} · Vista {activeImage + 1} de {amenity.images.length}</span><h3 className="font-[family-name:var(--font-cormorant)] text-2xl text-[#F5F1EA] md:text-3xl">{amenity.images[activeImage].label}</h3></div>
               </div>
-              {amenity.images.length > 1 && <div className="mt-3 grid grid-flow-col auto-cols-fr gap-2" aria-label={`Galería de ${amenity.name}`}>{amenity.images.map((item, i) => <button key={item.src} type="button" onClick={() => setActiveImage(i)} aria-label={`Ver ${item.label}`} className={`relative aspect-[4/3] overflow-hidden border-2 ${activeImage === i ? 'border-[#8B6B4B]' : 'border-transparent opacity-55'}`}><Image src={item.src} alt="" fill className="object-cover" sizes="10vw" /></button>)}</div>}
+              {amenity.images.length > 1 && <div className="mt-3 grid grid-flow-col auto-cols-fr gap-2" aria-label={`Galería de ${amenity.name}`}>{amenity.images.map((item, i) => <button key={item.src} type="button" onClick={() => { setActiveImage(i); setViewerOpen(true) }} aria-label={`Ampliar ${item.label}`} className={`relative aspect-[4/3] overflow-hidden border-2 ${activeImage === i ? 'border-[#8B6B4B]' : 'border-transparent opacity-55'}`}><Image src={item.src} alt="" fill className="object-cover" sizes="10vw" /></button>)}</div>}
             </div>
           </motion.div>
 
@@ -91,6 +96,7 @@ export default function Amenidades() {
           </motion.div>
         </div>
       </div>
+      <FullscreenGallery photos={amenity.images.map((item) => ({ src: item.src, alt: item.alt, label: item.label }))} index={activeImage} open={viewerOpen} title={amenity.name} onClose={closeViewer} onIndexChange={setViewerPhoto} />
     </section>
   )
 }
