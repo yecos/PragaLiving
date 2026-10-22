@@ -262,6 +262,8 @@ export default function Tipologias() {
   const [selected, setSelected] = useState(0)
   const [activeImage, setActiveImage] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'compare'>('grid')
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const touchStart = useRef<number | null>(null)
 
   const current = typologies[selected]
   const selectTypology = (index: number) => {
@@ -276,6 +278,19 @@ export default function Tipologias() {
   const nextImage = () => {
     setActiveImage((currentIndex) => (currentIndex + 1) % current.images.length)
   }
+
+  useEffect(() => {
+    if (!lightboxOpen) return
+    const oldOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightboxOpen(false)
+      if (event.key === 'ArrowLeft') setActiveImage(i => (i - 1 + current.images.length) % current.images.length)
+      if (event.key === 'ArrowRight') setActiveImage(i => (i + 1) % current.images.length)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => { document.body.style.overflow = oldOverflow; window.removeEventListener('keydown', onKey) }
+  }, [lightboxOpen, current.images.length])
 
   return (
     <section id="tipologias" ref={ref} className="relative bg-[#111111] py-24 md:py-32">
@@ -359,7 +374,7 @@ export default function Tipologias() {
                     </span>
                   </div>
                   <div className="absolute bottom-4 left-4 bg-[#111111]/80 px-3 py-1 text-[9px] uppercase tracking-[0.15em] text-[#F5F1EA]/80">
-                    {typo.images.length} vistas
+                    {typo.images.length} fotos
                   </div>
                 </div>
                 <div className="mb-2 flex items-baseline justify-between">
@@ -405,7 +420,7 @@ export default function Tipologias() {
                       selected === i ? 'text-[#F5F1EA]' : 'text-[#D8D1C8]/40',
                     ].join(' ')}
                   >
-                    {typo.images.length} vistas
+                    {typo.images.length} fotos
                   </p>
                 </button>
               ))}
@@ -423,6 +438,7 @@ export default function Tipologias() {
                 >
                   <div>
                     <div className="relative h-[350px] overflow-hidden bg-[#0A0A0A] md:h-[400px]">
+                      <button type="button" aria-label={'Ampliar vista ' + (activeImage + 1)} onClick={() => setLightboxOpen(true)} className="absolute inset-0 z-10 cursor-zoom-in" />
                       <img
                         src={current.images[activeImage]}
                         alt={current.name + ' — vista ' + (activeImage + 1)}
@@ -434,7 +450,7 @@ export default function Tipologias() {
                             type="button"
                             onClick={previousImage}
                             aria-label="Imagen anterior"
-                            className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
+                            className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
                           >
                             ‹
                           </button>
@@ -442,7 +458,7 @@ export default function Tipologias() {
                             type="button"
                             onClick={nextImage}
                             aria-label="Imagen siguiente"
-                            className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
+                            className="absolute right-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/60 text-xl text-[#F5F1EA] backdrop-blur-sm transition-colors hover:border-[#8B6B4B]"
                           >
                             ›
                           </button>
@@ -458,7 +474,7 @@ export default function Tipologias() {
                           <button
                             type="button"
                             key={src}
-                            onClick={() => setActiveImage(index)}
+                            onClick={() => { setActiveImage(index); setLightboxOpen(true) }}
                             aria-label={'Ver vista ' + (index + 1) + ' de ' + current.name}
                             className={[
                               'relative aspect-[4/3] overflow-hidden border-2',
@@ -523,6 +539,24 @@ export default function Tipologias() {
           </div>
         )}
       </div>
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div role="dialog" aria-modal="true" aria-label={'Galería de ' + current.name} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex h-[100dvh] w-screen flex-col bg-[#111111] text-[#F5F1EA]" onClick={() => setLightboxOpen(false)} onTouchStart={e => { touchStart.current = e.touches[0]?.clientX ?? null }} onTouchEnd={e => { if (touchStart.current === null || current.images.length < 2) return; const delta = e.changedTouches[0].clientX - touchStart.current; touchStart.current = null; if (Math.abs(delta) > 60) { e.stopPropagation(); setActiveImage(i => (i + (delta < 0 ? 1 : -1) + current.images.length) % current.images.length) } }}>
+            <div className="flex shrink-0 items-center justify-between px-5 py-4 md:px-10">
+              <span className="font-[family-name:var(--font-cormorant)] text-lg tracking-widest text-[#D8D1C8]">PRAGA LIVING <span className="ml-2 text-sm text-[#8B6B4B]">{current.name}</span></span>
+              <button type="button" onClick={() => setLightboxOpen(false)} aria-label="Cerrar galería" className="flex h-11 w-11 items-center justify-center border border-[#D8D1C8]/30 text-2xl hover:border-[#8B6B4B]">×</button>
+            </div>
+            <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-2 md:px-20" onClick={e => e.stopPropagation()}>
+              <img src={current.images[activeImage]} alt={current.name + ' — vista ' + (activeImage + 1)} className="max-h-full max-w-full object-contain" />
+              {current.images.length > 1 && <>
+                <button type="button" onClick={previousImage} aria-label="Imagen anterior" className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/75 text-3xl hover:border-[#8B6B4B] md:left-6">‹</button>
+                <button type="button" onClick={nextImage} aria-label="Imagen siguiente" className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#111111]/75 text-3xl hover:border-[#8B6B4B] md:right-6">›</button>
+              </>}
+            </div>
+            <div className="shrink-0 px-4 pb-5 pt-3 text-center text-[11px] uppercase tracking-[0.2em] text-[#C8A47F]" onClick={e => e.stopPropagation()}>Vista {activeImage + 1} / {current.images.length}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
