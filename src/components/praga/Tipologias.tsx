@@ -374,7 +374,7 @@ export default function Tipologias() {
                     </span>
                   </div>
                   <div className="absolute bottom-4 left-4 bg-[#111111]/80 px-3 py-1 text-[9px] uppercase tracking-[0.15em] text-[#F5F1EA]/80">
-                    {typo.images.length} vistas
+                    {typo.images.length} fotos
                   </div>
                 </div>
                 <div className="mb-2 flex items-baseline justify-between">
@@ -420,7 +420,7 @@ export default function Tipologias() {
                       selected === i ? 'text-[#F5F1EA]' : 'text-[#D8D1C8]/40',
                     ].join(' ')}
                   >
-                    {typo.images.length} vistas
+                    {typo.images.length} fotos
                   </p>
                 </button>
               ))}
