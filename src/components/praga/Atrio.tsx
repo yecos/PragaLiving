@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import FullscreenGallery from './FullscreenGallery'
 import { motion, useInView, useScroll, useTransform } from 'framer-motion'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
@@ -61,6 +62,12 @@ export default function Atrio() {
   const ctaText = atrioConfig?.ctaText || 'Recorrer el Atrio 360°'
   const ctaLink = atrioConfig?.ctaLink || '#recorridos'
   const gallery: GalleryItem[] = atrioConfig?.gallery?.length ? atrioConfig.gallery : defaultGallery
+  const [viewerIndex, setViewerIndex] = useState(0)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const closeViewer = useCallback(() => setViewerOpen(false), [])
+  const setViewerPhoto = useCallback((index: number) => setViewerIndex(index), [])
+  const openViewer = (index: number) => { setViewerIndex(index); setViewerOpen(true) }
+  const receptionPhotos = gallery.map((item) => ({ src: item.image, alt: item.alt, label: item.title }))
   const receptionStory = atrioConfig?.receptionStory || defaultReceptionStory
   const atriumStory = atrioConfig?.atriumStory || defaultAtriumStory
 
@@ -182,8 +189,9 @@ export default function Atrio() {
                       sizes={index === 0 ? '(max-width: 1024px) 100vw, 64vw' : '(max-width: 768px) 100vw, 32vw'}
                       className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.035]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/75 via-transparent to-transparent" />
-                    <figcaption className="absolute left-5 right-5 bottom-4 font-[family-name:var(--font-cormorant)] text-lg text-[#F5F1EA] tracking-wide">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/75 via-transparent to-transparent pointer-events-none" />
+                    <button type="button" onClick={() => openViewer(index)} aria-label={'Ampliar ' + item.title} className="absolute inset-0 z-10 cursor-zoom-in" />
+                    <figcaption className="pointer-events-none absolute left-5 right-5 bottom-4 font-[family-name:var(--font-cormorant)] text-lg text-[#F5F1EA] tracking-wide">
                       {item.title}
                     </figcaption>
                   </div>
@@ -231,6 +239,7 @@ export default function Atrio() {
           </div>
         </div>
       </div>
+      <FullscreenGallery photos={receptionPhotos} index={viewerIndex} open={viewerOpen} title="Atrio · La llegada" onClose={closeViewer} onIndexChange={setViewerPhoto} />
     </section>
   )
 }

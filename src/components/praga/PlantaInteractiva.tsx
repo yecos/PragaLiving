@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence, useMotionValue, useDragControls, PanInfo } from 'framer-motion'
+import FullscreenGallery from './FullscreenGallery'
 
 // ═══════════════════════════════════════════════════════════════════
 // TYPES — matching floor-plans.json schema
@@ -277,6 +278,9 @@ function GlassDetailPanel({
   const dragY = useMotionValue(0)
   const dragControls = useDragControls()
   const [currentRender, setCurrentRender] = useState(0)
+  const [renderViewerOpen, setRenderViewerOpen] = useState(false)
+  const closeRenderViewer = useCallback(() => setRenderViewerOpen(false), [])
+  const changeRenderViewerIndex = useCallback((i: number) => setCurrentRender(i), [])
   const handleDragEnd = useCallback(
     (_: unknown, info: PanInfo) => {
       // If dragged down more than 100px or velocity is high, close the panel
@@ -291,6 +295,8 @@ function GlassDetailPanel({
   useEffect(() => {
     Promise.resolve().then(() => setCurrentRender(0))
   }, [unit?.id])
+
+  useEffect(() => { if (!isOpen) setRenderViewerOpen(false) }, [isOpen])
 
   // Preload neighboring carousel images so next/previous feels immediate.
   useEffect(() => {
@@ -369,12 +375,13 @@ function GlassDetailPanel({
                 />
               </motion.div>
             </AnimatePresence>
+            <button type="button" onClick={() => setRenderViewerOpen(true)} aria-label="Ampliar render del apartamento" className="absolute inset-0 z-[1] cursor-zoom-in" />
             {/* Navigation arrows */}
             {renders.length > 1 && (
               <>
                 <button
                   onClick={() => setCurrentRender((prev) => (prev - 1 + renders.length) % renders.length)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
+                  className="absolute left-2 top-1/2 z-[2] -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
                   aria-label="Render anterior"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" strokeWidth="2">
@@ -383,7 +390,7 @@ function GlassDetailPanel({
                 </button>
                 <button
                   onClick={() => setCurrentRender((prev) => (prev + 1) % renders.length)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
+                  className="absolute right-2 top-1/2 z-[2] -translate-y-1/2 w-7 h-7 bg-[#111111]/60 backdrop-blur-sm border border-[#8B6B4B]/30 flex items-center justify-center hover:bg-[#8B6B4B]/30 transition-colors"
                   aria-label="Render siguiente"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5F1EA" strokeWidth="2">
@@ -391,7 +398,7 @@ function GlassDetailPanel({
                   </svg>
                 </button>
                 {/* Dots indicator */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <div className="absolute bottom-2 left-1/2 z-[2] -translate-x-1/2 flex gap-1.5">
                   {renders.map((_, i) => (
                     <button
                       key={i}
@@ -480,6 +487,7 @@ function GlassDetailPanel({
 
   return (
     <>
+      <FullscreenGallery photos={renders.map((src, i) => ({ src, alt: 'Render ' + (i + 1) + ' de ' + (unit?.name || 'apartamento') }))} index={currentRender} open={renderViewerOpen && isOpen && !!unit} title={unit?.name || 'Apartamento'} onClose={closeRenderViewer} onIndexChange={changeRenderViewerIndex} />
       {/* ═══════ DESKTOP PANEL — slides from right ═══════ */}
       <AnimatePresence>
         {isOpen && unit && (
@@ -744,6 +752,9 @@ export default function PlantaInteractiva() {
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null)
   const [typologyRenders, setTypologyRenders] = useState<Record<string, string[]>>({})
   const [commercialPricing, setCommercialPricing] = useState<CommercialPricingView>(DEFAULT_EXTRAS)
+  const [planViewerOpen, setPlanViewerOpen] = useState(false)
+  const closePlanViewer = useCallback(() => setPlanViewerOpen(false), [])
+  const setPlanViewerIndex = useCallback((_index: number) => {}, [])
 
   // Fetch floor plan config, typology renders, and apartments from DB
   useEffect(() => {
@@ -811,6 +822,7 @@ export default function PlantaInteractiva() {
   const handleFloorSelect = useCallback((i: number) => {
     setSelectedFloor(i)
     setSelectedUnit(null)
+    setPlanViewerOpen(false)
   }, [])
 
   const handleUnitClick = useCallback((i: number) => {
@@ -911,6 +923,10 @@ export default function PlantaInteractiva() {
                     onUnitClick={handleUnitClick}
                   />
 
+                  {/* Open the floor plan separately: apartment polygons keep their original click behavior. */}
+                  <div className="mt-3 flex justify-end">
+                    <button type="button" onClick={() => setPlanViewerOpen(true)} className="border border-[#8B6B4B]/50 px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-[#D8D1C8] hover:bg-[#8B6B4B]/20">Ampliar plano ⤢</button>
+                  </div>
                   {/* Floor info strip */}
                   <div className="flex items-center justify-between mt-4 px-1">
                     <div className="flex items-center gap-3">
@@ -970,6 +986,7 @@ export default function PlantaInteractiva() {
           background: #8B6B4B66;
         }
       `}</style>
+      <FullscreenGallery photos={floor ? [{ src: floor.image?.trim() || getFallbackFloorImage(floor.id), alt: 'Planta arquitectónica — ' + floor.name }] : []} index={0} open={planViewerOpen} title={floor?.name || 'Plano'} onClose={closePlanViewer} onIndexChange={setPlanViewerIndex} />
     </section>
   )
 }
