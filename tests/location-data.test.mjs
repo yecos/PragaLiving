@@ -9,7 +9,7 @@ for (const [name, config] of [['absent', undefined], ['null', null], ['empty', [
   test(`business appears once with ${name} config`, () => {
     const result = resolveLocationLayers(config)
     assert.deepEqual(businessPoints(result), [OPTIKALEJANDRIA])
-    assert.ok(result.find(l => l.id === 'comercio').points.some(p => p.name === OPTIKALEJANDRIA.name))
+    assert.deepEqual(result.find(l => l.id === 'comercio').points[0], OPTIKALEJANDRIA)
   })
 }
 
@@ -19,7 +19,8 @@ test('old CMS preserves custom points and layers, adds business without mutating
   const result = resolveLocationLayers(config)
   assert.deepEqual(config, snapshot)
   assert.equal(result[0].name, 'Tiendas')
-  assert.deepEqual(result[0].points[0], config[0].points[0])
+  assert.deepEqual(result[0].points[0], OPTIKALEJANDRIA)
+  assert.deepEqual(result[0].points[1], config[0].points[0])
   assert.deepEqual(businessPoints(result), [OPTIKALEJANDRIA])
 })
 
