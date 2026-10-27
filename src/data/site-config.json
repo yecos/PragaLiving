@@ -1113,6 +1113,14 @@
         "color": "#8B6B4B",
         "points": [
           {
+            "name": "Optikalejandría S.A.S",
+            "description": "Óptica en Caldas, Antioquia.",
+            "address": "Cra 52 #130 Sur-40, Caldas, Antioquia",
+            "phone": "302 373 1382",
+            "lat": 6.0912953,
+            "lng": -75.6375736
+          },
+          {
             "name": "San Gabriel",
             "distance": "201m",
             "time": "3 min",
@@ -1135,14 +1143,6 @@
             "description": "Fábrica histórica de Corona con outlet de cerámica y materiales",
             "lat": 6.092,
             "lng": -75.638
-          },
-          {
-            "name": "Optikalejandría S.A.S",
-            "description": "Óptica en Caldas, Antioquia.",
-            "address": "Cra 52 #130 Sur-40, Caldas, Antioquia",
-            "phone": "302 373 1382",
-            "lat": 6.0912953,
-            "lng": -75.6375736
           }
         ]
       },

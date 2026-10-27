@@ -121,7 +121,7 @@ export function resolveLocationLayers(configured?: LocationLayer[] | null): Loca
         : point),
   }))
   const commerce = layers.find(layer => layer.id === 'comercio')
-  if (commerce) commerce.points.push({ ...OPTIKALEJANDRIA })
+  if (commerce) commerce.points.unshift({ ...OPTIKALEJANDRIA })
   else layers.push({ id: 'comercio', name: 'Comercio', icon: '□', color: '#8B6B4B', points: [{ ...OPTIKALEJANDRIA }] })
   return layers
 }
