@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useMemo, useRef, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, useInView } from 'framer-motion'
-import type { LocationLayer, POIPoint } from './MapView'
+import { DEFAULT_PRAGA_CENTER, poiMeta, resolveLocationLayers } from './locationData'
+import type { POIPoint } from './locationData'
 import { useSiteConfig } from '@/hooks/useSiteConfig'
 
 // ─── Dynamic import of map (SSR disabled — Leaflet needs window) ───
@@ -19,111 +20,26 @@ const MapView = dynamic(() => import('./MapView'), {
   ),
 })
 
-// ─── Layer data (re-exported from MapView for sidebar use) ─────────
-const locationLayers = [
-  {
-    id: 'movilidad',
-    name: 'Movilidad',
-    icon: '→',
-    color: '#6B8FB5',
-    points: [
-      { name: 'Parada Bus Urbano', distance: '84m', time: '1 min', description: 'Parada de rutas urbanas con conexión al centro de Caldas y municipios cercanos', lat: 6.08975, lng: -75.63610 },
-      { name: 'Parada Rutas Veredales', distance: '120m', time: '2 min', description: 'Conexión con rutas veredales y transporte rural de la zona sur del Valle de Aburrá', lat: 6.09007, lng: -75.63607 },
-      { name: 'Estación La Estrella (Metro)', distance: '7.2 km', time: '25 min en vehículo', description: 'Estación del Metro de Medellín Línea A, accesible mediante conexión vial o transporte público por Carrera 50', lat: 6.15278, lng: -75.62633 },
-    ]
-  },
-  {
-    id: 'gastronomia',
-    name: 'Gastronomía',
-    icon: '◆',
-    color: '#B56B8F',
-    points: [
-      { name: 'Zona Gastronómica Caldas', distance: '200m', time: '3 min', description: 'Concentración de restaurantes típicos antioqueños y cafés en el centro de Caldas', lat: 6.09080, lng: -75.63650 },
-      { name: 'Café Especialidad', distance: '150m', time: '2 min', description: 'Café de especialidad y repostería artesanal en el parque principal', lat: 6.09100, lng: -75.63500 },
-      { name: 'Pasaje Alejandrino', distance: '242m', time: '3 min', description: 'Pasaje gastronómico con variedad de opciones locales e internacionales', lat: 6.09066, lng: -75.63650 },
-    ]
-  },
-  {
-    id: 'comercio',
-    name: 'Comercio',
-    icon: '□',
-    color: '#8B6B4B',
-    points: [
-      { name: 'San Gabriel', distance: '201m', time: '3 min', description: 'Centro comercial local con supermercado, farmacia y tiendas de servicios', lat: 6.09051, lng: -75.63662 },
-      { name: 'Bancolombia', distance: '273m', time: '4 min', description: 'Sucursal bancaria con servicios completos y cajero 24h', lat: 6.09138, lng: -75.63549 },
-      { name: 'Locería Colombiana', distance: '500m', time: '7 min', description: 'Fábrica histórica de Corona con outlet de cerámica y materiales', lat: 6.09200, lng: -75.63800 },
-    ]
-  },
-  {
-    id: 'educacion',
-    name: 'Educación',
-    icon: '△',
-    color: '#6B8F6B',
-    points: [
-      { name: 'IE María Auxiliadora', distance: '152m', time: '2 min', description: 'Institución educativa de prestigio con programas de preescolar a media técnica', lat: 6.09024, lng: -75.63559 },
-      { name: 'Colegio Tercer Milenio', distance: '288m', time: '4 min', description: 'Colegio privado con currículo bilingüe y énfasis en tecnología', lat: 6.09110, lng: -75.63753 },
-      { name: 'IE Ciencias Aplicadas', distance: '390m', time: '5 min', description: 'Institución técnica con programas de formación profesional', lat: 6.09249, lng: -75.63563 },
-    ]
-  },
-  {
-    id: 'salud',
-    name: 'Salud',
-    icon: '○',
-    color: '#6BB5A0',
-    points: [
-      { name: 'Policlínico Sur', distance: '145m', time: '2 min', description: 'Clínica médica con consultas especializadas y servicios de urgencias', lat: 6.09002, lng: -75.63439 },
-      { name: 'Hospital San Vicente de Paúl', distance: '540m', time: '7 min', description: 'Hospital principal de Caldas con servicios de alta complejidad', lat: 6.08720, lng: -75.63620 },
-      { name: 'Cruz Verde Farmacia', distance: '134m', time: '2 min', description: 'Farmacia con servicio de entrega a domicilio', lat: 6.08972, lng: -75.63607 },
-    ]
-  },
-  {
-    id: 'naturaleza',
-    name: 'Naturaleza',
-    icon: '◇',
-    color: '#4B5646',
-    points: [
-      { name: 'Parque El Carrusel', distance: '201m', time: '3 min', description: 'Parque urbano con glorieta, zonas verdes y senderos peatonales', lat: 6.08978, lng: -75.63676 },
-      { name: 'Parque de la Locería', distance: '488m', time: '6 min', description: 'Parque histórico recientemente renovado con áreas deportivas y culturales', lat: 6.09162, lng: -75.63865 },
-      { name: 'Parque Santander', distance: '400m', time: '5 min', description: 'Parque principal del centro de Caldas frente a la Alcaldía', lat: 6.09200, lng: -75.63700 },
-    ]
-  },
-]
-
 export default function Ubicacion() {
   const { config } = useSiteConfig()
   const locationConfig = config?.ubicacion
   const generalConfig = config?.general
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [activeLayer, setActiveLayer] = useState('movilidad')
+  const [selectedLayer, setActiveLayer] = useState('movilidad')
   const [flyToTarget, setFlyToTarget] = useState<POIPoint | null>(null)
 
-  const layers = useMemo<LocationLayer[]>(() => {
-    const source = Array.isArray(locationConfig?.layers) && locationConfig.layers.length > 0
-      ? locationConfig.layers as LocationLayer[]
-      : locationLayers
-
-    return source.map((layer) => ({
-      ...layer,
-      points: layer.points.map((point) => point.name === 'Estación La Estrella (Metro)' && point.time === '25 min'
-        ? { ...point, time: '25 min en vehículo', description: 'Estación del Metro de Medellín Línea A, accesible mediante conexión vial o transporte público por Carrera 50' }
-        : point),
-    }))
-  }, [locationConfig?.layers])
+  const layers = useMemo(() => resolveLocationLayers(locationConfig?.layers), [locationConfig?.layers])
 
   const mapCenter = useMemo<[number, number]>(() => {
     const coords = generalConfig?.coordinates
     if (Array.isArray(coords) && coords.length >= 2 && Number.isFinite(Number(coords[0])) && Number.isFinite(Number(coords[1]))) {
       return [Number(coords[0]), Number(coords[1])]
     }
-    return [6.08895, -75.63514]
+    return DEFAULT_PRAGA_CENTER
   }, [generalConfig?.coordinates])
 
-  useEffect(() => {
-    if (!layers.some(layer => layer.id === activeLayer)) {
-      setActiveLayer(layers[0]?.id || 'movilidad')
-    }
-  }, [activeLayer, layers])
+  const activeLayer = layers.some(layer => layer.id === selectedLayer) ? selectedLayer : layers[0]?.id || 'movilidad'
 
   const activeLayerData = layers.find(l => l.id === activeLayer)
   const activePoints = activeLayerData?.points || []
@@ -405,13 +321,14 @@ export default function Ubicacion() {
             {/* POI list */}
             <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1 praga-poi-scroll">
               {activePoints.map((point, i) => (
-                <motion.div
+                <motion.button
+                  type="button"
                   key={point.name}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                   onClick={() => handlePoiClick(point)}
-                  className="p-4 border border-[#D8D1C8]/50 hover:border-[#8B6B4B]/30 transition-all duration-300 cursor-pointer group hover:bg-white/50"
+                  className="w-full text-left p-4 border border-[#D8D1C8]/50 hover:border-[#8B6B4B]/30 transition-all duration-300 cursor-pointer group hover:bg-white/50"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -430,12 +347,12 @@ export default function Ubicacion() {
                   <p className="text-[11px] text-[#111111]/50 leading-relaxed pl-[18px]">
                     {point.description}
                   </p>
-                  <div className="flex items-center gap-3 mt-2 pl-[18px]">
-                    <span className="text-[10px] text-[#8B6B4B] tracking-wide">{point.distance}</span>
-                    <span className="text-[10px] text-[#D8D1C8]">|</span>
-                    <span className="text-[10px] text-[#111111]/30 tracking-wide">{point.time} caminando</span>
-                  </div>
-                </motion.div>
+                  {point.address && <p className="text-[11px] text-[#111111]/50 mt-2 pl-[18px]">{point.address}</p>}
+                  {point.phone && <p className="text-[11px] text-[#8B6B4B] mt-2 pl-[18px]">Tel. {point.phone}</p>}
+                  {poiMeta(point) && (
+                    <p className="text-[10px] text-[#8B6B4B] tracking-wide mt-2 pl-[18px]">{poiMeta(point)}</p>
+                  )}
+                </motion.button>
               ))}
             </div>
 
